@@ -1,0 +1,690 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: transparent; font-family: system-ui, -apple-system, sans-serif; }
+
+.root { background: #07111F; border-radius: 16px; overflow: hidden; }
+
+.header {
+  background: #0B1726;
+  border-bottom: 1px solid rgba(0,212,255,0.12);
+  padding: 24px 28px 20px;
+}
+.header-title { font-size: 11px; font-weight: 600; color: #4A5E7A; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+.header-h1 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.header-sub { font-size: 12px; color: #8B9FC0; }
+
+.concept-nav {
+  display: flex; gap: 2px;
+  background: #0B1726;
+  border-bottom: 1px solid rgba(0,212,255,0.1);
+  padding: 0 20px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.concept-nav::-webkit-scrollbar { display: none; }
+.cn-tab {
+  padding: 10px 14px; font-size: 11px; font-weight: 500;
+  color: #4A5E7A; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap; background: none; border-left: none; border-right: none; border-top: none;
+  transition: all 0.2s;
+}
+.cn-tab:hover { color: #8B9FC0; }
+.cn-tab.active { color: #00D4FF; border-bottom-color: #00D4FF; }
+.cn-tab.recommend { color: #00FFC6; }
+.cn-tab.recommend.active { border-bottom-color: #00FFC6; }
+
+.content { padding: 24px 28px; }
+.concept { display: none; }
+.concept.active { display: block; }
+
+.concept-header { margin-bottom: 20px; }
+.concept-num { font-size: 10px; font-weight: 600; color: #4A5E7A; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+.concept-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.concept-idea { font-size: 12px; color: #8B9FC0; line-height: 1.6; }
+
+.logo-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.logo-card {
+  background: #0B1726;
+  border: 1px solid rgba(0,212,255,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.logo-card-dark {
+  background: #07111F;
+  border-color: rgba(0,212,255,0.08);
+}
+.logo-card-light {
+  background: #F0F4FF;
+  border-color: rgba(7,17,31,0.1);
+}
+.logo-card-label {
+  font-size: 9px; font-weight: 600; color: #4A5E7A;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 12px; align-self: flex-start;
+}
+.logo-card-label-dark { color: #8B9FC0; }
+.logo-card-label-light { color: #0B1726; opacity: 0.4; }
+
+.favicon-row { display: flex; gap: 8px; align-items: flex-end; margin-top: 6px; }
+.fv { display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+.fv-label { font-size: 9px; color: #4A5E7A; text-align: center; margin-top: 3px; }
+.fv-wrap { text-align: center; }
+
+.spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.spec-item {
+  background: #111C2D;
+  border-radius: 8px; padding: 10px 12px;
+}
+.spec-key { font-size: 9px; font-weight: 600; color: #4A5E7A; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.spec-val { font-size: 11px; color: #8B9FC0; line-height: 1.5; }
+
+.recommend-banner {
+  background: rgba(0,255,198,0.06);
+  border: 1px solid rgba(0,255,198,0.2);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.rb-icon { font-size: 16px; flex-shrink: 0; }
+.rb-title { font-size: 11px; font-weight: 700; color: #00FFC6; margin-bottom: 3px; }
+.rb-desc { font-size: 11px; color: #8B9FC0; line-height: 1.5; }
+</style>
+
+<div class="root">
+  <div class="header">
+    <div class="header-title">MesaFlow by NautilusTech · Logo Design System</div>
+    <div class="header-h1">5 Conceptos de Logo Oficial</div>
+    <div class="header-sub">Propuesta visual completa · Isotipo · Horizontal · Favicon · Versión dark &amp; light</div>
+  </div>
+
+  <div class="concept-nav">
+    <button class="cn-tab active" onclick="show(0)">01 · Flow Node</button>
+    <button class="cn-tab" onclick="show(1)">02 · Mesa Hex</button>
+    <button class="cn-tab" onclick="show(2)">03 · Stream Arc</button>
+    <button class="cn-tab recommend" onclick="show(3)">04 · Nautilus Grid ★</button>
+    <button class="cn-tab" onclick="show(4)">05 · Orbit Table</button>
+  </div>
+
+  <div class="content">
+
+    <!-- CONCEPT 01: FLOW NODE -->
+    <div class="concept active" id="c0">
+      <div class="concept-header">
+        <div class="concept-num">Concepto 01</div>
+        <div class="concept-name">Flow Node</div>
+        <div class="concept-idea">Un nodo central con tres líneas de flujo divergentes que simbolizan pedidos, cocina y pago — los tres flujos principales de MesaFlow. Minimalista, tecnológico, con referencia directa al concepto de "flujo de datos".</div>
+      </div>
+
+      <div class="logo-grid">
+        <div class="logo-card logo-card-dark">
+          <div class="logo-card-label logo-card-label-dark">Horizontal · Dark</div>
+          <svg width="200" height="48" viewBox="0 0 200 48">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <circle cx="20" cy="24" r="5" fill="url(#g1)"/>
+            <line x1="25" y1="24" x2="36" y2="16" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="25" y1="24" x2="38" y2="24" stroke="url(#g1)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="25" y1="24" x2="36" y2="32" stroke="#00FFC6" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="38" cy="16" r="2.5" fill="#00D4FF" opacity="0.7"/>
+            <circle cx="40" cy="24" r="2.5" fill="url(#g1)"/>
+            <circle cx="38" cy="32" r="2.5" fill="#00FFC6" opacity="0.7"/>
+            <text x="52" y="19" font-family="system-ui,-apple-system,sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" letter-spacing="-0.3">Mesa</text>
+            <text x="52" y="19" font-family="system-ui,-apple-system,sans-serif" font-size="15" font-weight="700" fill="#00D4FF" letter-spacing="-0.3">
+              <tspan x="92" dy="0">Flow</tspan>
+            </text>
+            <text x="52" y="34" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#4A5E7A" letter-spacing="0.12em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card logo-card-light">
+          <div class="logo-card-label logo-card-label-light">Horizontal · Light</div>
+          <svg width="200" height="48" viewBox="0 0 200 48">
+            <defs>
+              <linearGradient id="g1l" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00A8CC"/>
+                <stop offset="100%" stop-color="#00C49A"/>
+              </linearGradient>
+            </defs>
+            <circle cx="20" cy="24" r="5" fill="url(#g1l)"/>
+            <line x1="25" y1="24" x2="36" y2="16" stroke="#00A8CC" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="25" y1="24" x2="38" y2="24" stroke="url(#g1l)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="25" y1="24" x2="36" y2="32" stroke="#00C49A" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="38" cy="16" r="2.5" fill="#00A8CC" opacity="0.8"/>
+            <circle cx="40" cy="24" r="2.5" fill="url(#g1l)"/>
+            <circle cx="38" cy="32" r="2.5" fill="#00C49A" opacity="0.8"/>
+            <text x="52" y="19" font-family="system-ui,-apple-system,sans-serif" font-size="15" font-weight="700" fill="#07111F" letter-spacing="-0.3">Mesa</text>
+            <text x="52" y="19" font-family="system-ui,-apple-system,sans-serif" font-size="15" font-weight="700" fill="#00A8CC">
+              <tspan x="92" dy="0">Flow</tspan>
+            </text>
+            <text x="52" y="34" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#8B9FC0" letter-spacing="0.12em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card">
+          <div class="logo-card-label">Isotipo solo</div>
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <defs>
+              <linearGradient id="g1i" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="64" height="64" rx="14" fill="#0B1726"/>
+            <circle cx="24" cy="32" r="7" fill="url(#g1i)"/>
+            <line x1="31" y1="32" x2="46" y2="20" stroke="#00D4FF" stroke-width="2" stroke-linecap="round"/>
+            <line x1="31" y1="32" x2="48" y2="32" stroke="url(#g1i)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="31" y1="32" x2="46" y2="44" stroke="#00FFC6" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="47" cy="20" r="3.5" fill="#00D4FF" opacity="0.8"/>
+            <circle cx="50" cy="32" r="3.5" fill="url(#g1i)"/>
+            <circle cx="47" cy="44" r="3.5" fill="#00FFC6" opacity="0.8"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="logo-card" style="margin-bottom:12px">
+        <div class="logo-card-label" style="align-self:flex-start">Favicons · Múltiples tamaños</div>
+        <div class="favicon-row">
+          <div class="fv-wrap">
+            <div class="fv" style="width:64px;height:64px;background:#0B1726;border-radius:14px">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <defs><linearGradient id="g1fv" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+                <circle cx="14" cy="20" r="5" fill="url(#g1fv)"/>
+                <line x1="19" y1="20" x2="28" y2="13" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="19" y1="20" x2="30" y2="20" stroke="url(#g1fv)" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="19" y1="20" x2="28" y2="27" stroke="#00FFC6" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="29" cy="13" r="2" fill="#00D4FF"/>
+                <circle cx="31" cy="20" r="2" fill="url(#g1fv)"/>
+                <circle cx="29" cy="27" r="2" fill="#00FFC6"/>
+              </svg>
+            </div>
+            <div class="fv-label">64×64</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:32px;height:32px;background:#0B1726;border-radius:7px">
+              <svg width="20" height="20" viewBox="0 0 20 20">
+                <circle cx="7" cy="10" r="3" fill="#00D4FF"/>
+                <line x1="10" y1="10" x2="15" y2="6" stroke="#00D4FF" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="10" y1="10" x2="16" y2="10" stroke="#00FFC6" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="10" y1="10" x2="15" y2="14" stroke="#00FFC6" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="fv-label">32×32</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:16px;height:16px;background:#0B1726;border-radius:3px">
+              <svg width="10" height="10" viewBox="0 0 10 10">
+                <circle cx="3" cy="5" r="2" fill="#00D4FF"/>
+                <line x1="5" y1="5" x2="8" y2="3" stroke="#00D4FF" stroke-width="1" stroke-linecap="round"/>
+                <line x1="5" y1="5" x2="9" y2="5" stroke="#00FFC6" stroke-width="1" stroke-linecap="round"/>
+                <line x1="5" y1="5" x2="8" y2="7" stroke="#00FFC6" stroke-width="1" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="fv-label">16×16</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-key">Tipografía</div><div class="spec-val">Inter 700 · tracking -0.5px · "Mesa" en blanco, "Flow" en #00D4FF</div></div>
+        <div class="spec-item"><div class="spec-key">Uso de color</div><div class="spec-val">Gradiente diagonal cyan→mint en isotipo · texto bicolor en logotipo</div></div>
+        <div class="spec-item"><div class="spec-key">Personalidad</div><div class="spec-val">Tecnológico · datos · networking · API-first · developer-friendly</div></div>
+        <div class="spec-item"><div class="spec-key">Aplicaciones</div><div class="spec-val">Dashboard SaaS, landing tech, documentación, presentaciones B2B</div></div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 02: MESA HEX -->
+    <div class="concept" id="c1">
+      <div class="concept-header">
+        <div class="concept-num">Concepto 02</div>
+        <div class="concept-name">Mesa Hex</div>
+        <div class="concept-idea">Un hexágono — forma que evoca tanto la vista superior de una mesa como la estructura molecular de tecnología avanzada. Dentro, una "M" estilizada formada por el espacio negativo. Refiere a NautilusTech con geometría perfecta.</div>
+      </div>
+
+      <div class="logo-grid">
+        <div class="logo-card logo-card-dark">
+          <div class="logo-card-label logo-card-label-dark">Horizontal · Dark</div>
+          <svg width="200" height="52" viewBox="0 0 200 52">
+            <defs>
+              <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <polygon points="26,8 38,15 38,29 26,36 14,29 14,15" fill="url(#g2)"/>
+            <path d="M20 28 L26 18 L32 28" stroke="#07111F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <line x1="20" y1="24" x2="32" y2="24" stroke="#07111F" stroke-width="2" stroke-linecap="round"/>
+            <text x="48" y="21" font-family="system-ui,-apple-system,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">MesaFlow</text>
+            <text x="48" y="36" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#4A5E7A" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card logo-card-light">
+          <div class="logo-card-label logo-card-label-light">Horizontal · Light</div>
+          <svg width="200" height="52" viewBox="0 0 200 52">
+            <defs>
+              <linearGradient id="g2l" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00A8CC"/>
+                <stop offset="100%" stop-color="#00C49A"/>
+              </linearGradient>
+            </defs>
+            <polygon points="26,8 38,15 38,29 26,36 14,29 14,15" fill="url(#g2l)"/>
+            <path d="M20 28 L26 18 L32 28" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <line x1="20" y1="24" x2="32" y2="24" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <text x="48" y="21" font-family="system-ui,-apple-system,sans-serif" font-size="16" font-weight="700" fill="#07111F" letter-spacing="-0.5">MesaFlow</text>
+            <text x="48" y="36" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#8B9FC0" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card">
+          <div class="logo-card-label">Isotipo solo</div>
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <defs>
+              <linearGradient id="g2i" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="64" height="64" rx="14" fill="#0B1726"/>
+            <polygon points="32,10 46,18 46,34 32,42 18,34 18,18" fill="url(#g2i)"/>
+            <path d="M24 34 L32 20 L40 34" stroke="#07111F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <line x1="24" y1="28" x2="40" y2="28" stroke="#07111F" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="logo-card" style="margin-bottom:12px">
+        <div class="logo-card-label" style="align-self:flex-start">Favicons</div>
+        <div class="favicon-row">
+          <div class="fv-wrap">
+            <div class="fv" style="width:64px;height:64px;background:#0B1726;border-radius:14px">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <defs><linearGradient id="g2fv" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+                <polygon points="20,6 29,11 29,21 20,26 11,21 11,11" fill="url(#g2fv)"/>
+                <path d="M15 21 L20 12 L25 21" stroke="#07111F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <line x1="15" y1="17" x2="25" y2="17" stroke="#07111F" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="fv-label">64×64</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:32px;height:32px;background:#0B1726;border-radius:7px">
+              <svg width="20" height="20" viewBox="0 0 20 20">
+                <polygon points="10,3 15,6 15,12 10,15 5,12 5,6" fill="#00D4FF"/>
+                <path d="M7 12 L10 6 L13 12" stroke="#07111F" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="fv-label">32×32</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:16px;height:16px;background:#0B1726;border-radius:3px">
+              <svg width="10" height="10" viewBox="0 0 10 10">
+                <polygon points="5,1 8,3 8,7 5,9 2,7 2,3" fill="#00D4FF"/>
+              </svg>
+            </div>
+            <div class="fv-label">16×16</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-key">Tipografía</div><div class="spec-val">Inter 700 · tracking -0.5px · texto unificado en blanco sobre dark</div></div>
+        <div class="spec-item"><div class="spec-key">Uso de color</div><div class="spec-val">Hexágono con gradiente completo · "M" en espacio negativo oscuro</div></div>
+        <div class="spec-item"><div class="spec-key">Personalidad</div><div class="spec-val">Premium · confiable · estructurado · corporativo · operacional</div></div>
+        <div class="spec-item"><div class="spec-key">Aplicaciones</div><div class="spec-val">App icon, documentos oficiales, presentaciones enterprise, tarjetas</div></div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 03: STREAM ARC -->
+    <div class="concept" id="c2">
+      <div class="concept-header">
+        <div class="concept-num">Concepto 03</div>
+        <div class="concept-name">Stream Arc</div>
+        <div class="concept-idea">Tres arcos concéntricos en gradiente que irradian desde un punto — como ondas de señal digital o el movimiento fluido de datos en tiempo real. Evoca velocidad, conectividad y la idea de "streaming" de órdenes al instante.</div>
+      </div>
+
+      <div class="logo-grid">
+        <div class="logo-card logo-card-dark">
+          <div class="logo-card-label logo-card-label-dark">Horizontal · Dark</div>
+          <svg width="200" height="52" viewBox="0 0 200 52">
+            <defs>
+              <linearGradient id="g3a" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <circle cx="14" cy="26" r="3" fill="#00D4FF"/>
+            <path d="M19 14 Q28 10 28 26 Q28 42 19 38" stroke="#00D4FF" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <path d="M24 10 Q36 6 36 26 Q36 46 24 42" stroke="url(#g3a)" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M29 6 Q44 2 44 26 Q44 50 29 46" stroke="#00FFC6" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <text x="54" y="22" font-family="system-ui,-apple-system,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" letter-spacing="-0.4">MesaFlow</text>
+            <text x="54" y="37" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#4A5E7A" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card logo-card-light">
+          <div class="logo-card-label logo-card-label-light">Horizontal · Light</div>
+          <svg width="200" height="52" viewBox="0 0 200 52">
+            <circle cx="14" cy="26" r="3" fill="#00A8CC"/>
+            <path d="M19 14 Q28 10 28 26 Q28 42 19 38" stroke="#00A8CC" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.4"/>
+            <path d="M24 10 Q36 6 36 26 Q36 46 24 42" stroke="#008FB5" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M29 6 Q44 2 44 26 Q44 50 29 46" stroke="#00C49A" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.4"/>
+            <text x="54" y="22" font-family="system-ui,-apple-system,sans-serif" font-size="16" font-weight="700" fill="#07111F" letter-spacing="-0.4">MesaFlow</text>
+            <text x="54" y="37" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#8B9FC0" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card">
+          <div class="logo-card-label">Isotipo solo</div>
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <defs>
+              <linearGradient id="g3i" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="64" height="64" rx="14" fill="#0B1726"/>
+            <circle cx="18" cy="32" r="4.5" fill="#00D4FF"/>
+            <path d="M24 18 Q36 14 36 32 Q36 50 24 46" stroke="#00D4FF" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <path d="M30 12 Q46 8 46 32 Q46 56 30 52" stroke="url(#g3i)" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+            <path d="M36 8 Q54 4 54 32 Q54 60 36 56" stroke="#00FFC6" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="logo-card" style="margin-bottom:12px">
+        <div class="logo-card-label" style="align-self:flex-start">Favicons</div>
+        <div class="favicon-row">
+          <div class="fv-wrap">
+            <div class="fv" style="width:64px;height:64px;background:#0B1726;border-radius:14px">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle cx="10" cy="20" r="3.5" fill="#00D4FF"/>
+                <path d="M15 10 Q22 8 22 20 Q22 32 15 30" stroke="#00D4FF" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.6"/>
+                <path d="M19 6 Q30 4 30 20 Q30 36 19 34" stroke="#00FFC6" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.8"/>
+              </svg>
+            </div>
+            <div class="fv-label">64×64</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:32px;height:32px;background:#0B1726;border-radius:7px">
+              <svg width="20" height="20" viewBox="0 0 20 20">
+                <circle cx="5" cy="10" r="2" fill="#00D4FF"/>
+                <path d="M8 4 Q13 2 13 10 Q13 18 8 16" stroke="#00FFC6" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="fv-label">32×32</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:16px;height:16px;background:#0B1726;border-radius:3px">
+              <svg width="10" height="10" viewBox="0 0 10 10">
+                <circle cx="2" cy="5" r="1.5" fill="#00D4FF"/>
+                <path d="M4 2 Q7 1 7 5 Q7 9 4 8" stroke="#00FFC6" stroke-width="1" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="fv-label">16×16</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-key">Tipografía</div><div class="spec-val">Inter 700 · texto unificado · un solo bloque "MesaFlow" sin separación de color</div></div>
+        <div class="spec-item"><div class="spec-key">Uso de color</div><div class="spec-val">Arcos en opacidades escalonadas 50/80/50% · punto ancla en cyan sólido</div></div>
+        <div class="spec-item"><div class="spec-key">Personalidad</div><div class="spec-val">Ágil · tiempo real · streaming · IoT · connectivity · tech moderno</div></div>
+        <div class="spec-item"><div class="spec-key">Aplicaciones</div><div class="spec-val">Landing page animada, app móvil, loading screens, presentaciones</div></div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 04: NAUTILUS GRID ★ RECOMENDADO -->
+    <div class="concept" id="c3">
+      <div class="recommend-banner">
+        <div class="rb-icon">★</div>
+        <div>
+          <div class="rb-title">Concepto Recomendado</div>
+          <div class="rb-desc">Nautilus Grid es el concepto con mayor potencial de marca. Conecta directamente con NautilusTech, escala perfectamente a favicon, y su geometría communica tanto "mesa vista desde arriba" como "estructura de datos". Es el logo más versátil, memorable y diferenciado.</div>
+        </div>
+      </div>
+
+      <div class="concept-header">
+        <div class="concept-num">Concepto 04 · Recomendado</div>
+        <div class="concept-name">Nautilus Grid</div>
+        <div class="concept-idea">Una espiral logarítmica tipo nautilus dividida en cuatro cuadrantes — cada cuadrante representa un módulo de MesaFlow (QR, Cocina, POS, IA). La espiral es el símbolo de NautilusTech; la cuadrícula lo convierte en tecnología operacional. El resultado es único, memorable y con profundo significado de marca.</div>
+      </div>
+
+      <div class="logo-grid">
+        <div class="logo-card logo-card-dark">
+          <div class="logo-card-label logo-card-label-dark">Horizontal · Dark</div>
+          <svg width="220" height="56" viewBox="0 0 220 56">
+            <defs>
+              <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <rect x="4" y="8" width="40" height="40" rx="9" fill="#111C2D"/>
+            <path d="M24 28 Q24 20 32 20 Q40 20 40 28 Q40 36 32 36 Q28 36 28 32 Q28 30 30 30" stroke="url(#g4)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <circle cx="30" cy="30" r="1.5" fill="#00FFC6"/>
+            <line x1="24" y1="16" x2="24" y2="40" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+            <line x1="4" y1="28" x2="44" y2="28" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+            <rect x="4" y="8" width="40" height="40" rx="9" fill="none" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
+            <text x="56" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" letter-spacing="-0.6">Mesa</text>
+            <text x="56" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="300" fill="#00D4FF" letter-spacing="-0.3">
+              <tspan x="101" dy="0">Flow</tspan>
+            </text>
+            <text x="56" y="40" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#4A5E7A" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card logo-card-light">
+          <div class="logo-card-label logo-card-label-light">Horizontal · Light</div>
+          <svg width="220" height="56" viewBox="0 0 220 56">
+            <defs>
+              <linearGradient id="g4l" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#0088AA"/>
+                <stop offset="100%" stop-color="#008870"/>
+              </linearGradient>
+            </defs>
+            <rect x="4" y="8" width="40" height="40" rx="9" fill="#07111F"/>
+            <path d="M24 28 Q24 20 32 20 Q40 20 40 28 Q40 36 32 36 Q28 36 28 32 Q28 30 30 30" stroke="url(#g4l)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <circle cx="30" cy="30" r="1.5" fill="#00C49A"/>
+            <line x1="24" y1="16" x2="24" y2="40" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+            <line x1="4" y1="28" x2="44" y2="28" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+            <rect x="4" y="8" width="40" height="40" rx="9" fill="none" stroke="rgba(0,150,200,0.3)" stroke-width="1"/>
+            <text x="56" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#07111F" letter-spacing="-0.6">Mesa</text>
+            <text x="56" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="300" fill="#0088AA">
+              <tspan x="101" dy="0">Flow</tspan>
+            </text>
+            <text x="56" y="40" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#8B9FC0" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card">
+          <div class="logo-card-label">Isotipo solo</div>
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <defs>
+              <linearGradient id="g4i" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="64" height="64" rx="14" fill="#0B1726"/>
+            <line x1="32" y1="8" x2="32" y2="56" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+            <line x1="8" y1="32" x2="56" y2="32" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+            <path d="M32 32 Q32 20 42 20 Q52 20 52 30 Q52 40 42 40 Q37 40 37 36 Q37 33 40 33" stroke="url(#g4i)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <circle cx="40" cy="33" r="2.5" fill="#00FFC6"/>
+            <rect x="2" y="2" width="60" height="60" rx="13" fill="none" stroke="rgba(0,212,255,0.18)" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="logo-card" style="margin-bottom:12px">
+        <div class="logo-card-label" style="align-self:flex-start">Favicons · Escalabilidad perfecta</div>
+        <div class="favicon-row">
+          <div class="fv-wrap">
+            <div class="fv" style="width:64px;height:64px;background:#0B1726;border-radius:14px">
+              <svg width="44" height="44" viewBox="0 0 44 44">
+                <defs><linearGradient id="g4fv" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+                <line x1="22" y1="6" x2="22" y2="38" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+                <line x1="6" y1="22" x2="38" y2="22" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+                <path d="M22 22 Q22 14 29 14 Q36 14 36 21 Q36 28 29 28 Q26 28 26 25.5 Q26 24 27.5 24" stroke="url(#g4fv)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <circle cx="27.5" cy="24" r="2" fill="#00FFC6"/>
+              </svg>
+            </div>
+            <div class="fv-label">64×64</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:32px;height:32px;background:#0B1726;border-radius:7px">
+              <svg width="22" height="22" viewBox="0 0 22 22">
+                <line x1="11" y1="3" x2="11" y2="19" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+                <line x1="3" y1="11" x2="19" y2="11" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+                <path d="M11 11 Q11 6 15 6 Q19 6 19 10 Q19 14 15 14 Q13.5 14 13.5 12.5 Q13.5 11.5 14.5 11.5" stroke="#00D4FF" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <circle cx="14.5" cy="11.5" r="1.5" fill="#00FFC6"/>
+              </svg>
+            </div>
+            <div class="fv-label">32×32</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:16px;height:16px;background:#0B1726;border-radius:3px">
+              <svg width="12" height="12" viewBox="0 0 12 12">
+                <path d="M6 6 Q6 3 8.5 3 Q11 3 11 5.5 Q11 8 8.5 8 Q7.2 8 7.2 7 Q7.2 6.5 8 6.5" stroke="#00D4FF" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <circle cx="8" cy="6.5" r="1" fill="#00FFC6"/>
+              </svg>
+            </div>
+            <div class="fv-label">16×16</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-key">Tipografía</div><div class="spec-val">Inter 700 "Mesa" + Inter 300 "Flow" · contraste de peso crea jerarquía elegante dentro del wordmark</div></div>
+        <div class="spec-item"><div class="spec-key">Uso de color</div><div class="spec-val">Espiral gradiente completa · cuadrícula en 15% cyan · punto terminal en #00FFC6 sólido</div></div>
+        <div class="spec-item"><div class="spec-key">Personalidad</div><div class="spec-val">Premium · SaaS maduro · tecnológico · sistémico · NautilusTech DNA · memorable</div></div>
+        <div class="spec-item"><div class="spec-key">Aplicaciones</div><div class="spec-val">Todo: landing, dashboard, favicon, app store, QR header, documentos, merch</div></div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 05: ORBIT TABLE -->
+    <div class="concept" id="c4">
+      <div class="concept-header">
+        <div class="concept-num">Concepto 05</div>
+        <div class="concept-name">Orbit Table</div>
+        <div class="concept-idea">Una mesa vista desde arriba (cuatro patas en esquinas como puntos) con una órbita circular que la rodea — símbolo de la plataforma girando alrededor del restaurante, conectando todos sus módulos. Simple, funcional y con lectura inmediata.</div>
+      </div>
+
+      <div class="logo-grid">
+        <div class="logo-card logo-card-dark">
+          <div class="logo-card-label logo-card-label-dark">Horizontal · Dark</div>
+          <svg width="210" height="52" viewBox="0 0 210 52">
+            <defs>
+              <linearGradient id="g5" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <circle cx="24" cy="26" r="16" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="1.2"/>
+            <circle cx="24" cy="26" r="10" fill="none" stroke="url(#g5)" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <rect x="18" y="20" width="12" height="12" rx="2" fill="none" stroke="#00D4FF" stroke-width="1.5"/>
+            <circle cx="16" cy="18" r="1.5" fill="#00D4FF" opacity="0.6"/>
+            <circle cx="32" cy="18" r="1.5" fill="#00FFC6" opacity="0.6"/>
+            <circle cx="16" cy="34" r="1.5" fill="#00FFC6" opacity="0.6"/>
+            <circle cx="32" cy="34" r="1.5" fill="#00D4FF" opacity="0.6"/>
+            <circle cx="24" cy="10" r="2" fill="#00FFC6"/>
+            <text x="50" y="22" font-family="system-ui,-apple-system,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">MesaFlow</text>
+            <text x="50" y="37" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#4A5E7A" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card logo-card-light">
+          <div class="logo-card-label logo-card-label-light">Horizontal · Light</div>
+          <svg width="210" height="52" viewBox="0 0 210 52">
+            <circle cx="24" cy="26" r="16" fill="none" stroke="rgba(0,140,170,0.2)" stroke-width="1.2"/>
+            <circle cx="24" cy="26" r="10" fill="none" stroke="#00A8CC" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <rect x="18" y="20" width="12" height="12" rx="2" fill="none" stroke="#007A9A" stroke-width="1.5"/>
+            <circle cx="16" cy="18" r="1.5" fill="#007A9A" opacity="0.7"/>
+            <circle cx="32" cy="18" r="1.5" fill="#00C49A" opacity="0.7"/>
+            <circle cx="16" cy="34" r="1.5" fill="#00C49A" opacity="0.7"/>
+            <circle cx="32" cy="34" r="1.5" fill="#007A9A" opacity="0.7"/>
+            <circle cx="24" cy="10" r="2" fill="#00C49A"/>
+            <text x="50" y="22" font-family="system-ui,-apple-system,sans-serif" font-size="16" font-weight="700" fill="#07111F" letter-spacing="-0.5">MesaFlow</text>
+            <text x="50" y="37" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#8B9FC0" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+          </svg>
+        </div>
+        <div class="logo-card">
+          <div class="logo-card-label">Isotipo solo</div>
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <defs>
+              <linearGradient id="g5i" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D4FF"/>
+                <stop offset="100%" stop-color="#00FFC6"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="64" height="64" rx="14" fill="#0B1726"/>
+            <circle cx="32" cy="32" r="22" fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+            <circle cx="32" cy="32" r="14" fill="none" stroke="url(#g5i)" stroke-width="1.8" stroke-dasharray="4 3"/>
+            <rect x="24" y="24" width="16" height="16" rx="3" fill="none" stroke="#00D4FF" stroke-width="2"/>
+            <circle cx="21" cy="21" r="2.5" fill="#00D4FF" opacity="0.7"/>
+            <circle cx="43" cy="21" r="2.5" fill="#00FFC6" opacity="0.7"/>
+            <circle cx="21" cy="43" r="2.5" fill="#00FFC6" opacity="0.7"/>
+            <circle cx="43" cy="43" r="2.5" fill="#00D4FF" opacity="0.7"/>
+            <circle cx="32" cy="10" r="3" fill="#00FFC6"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="logo-card" style="margin-bottom:12px">
+        <div class="logo-card-label" style="align-self:flex-start">Favicons</div>
+        <div class="favicon-row">
+          <div class="fv-wrap">
+            <div class="fv" style="width:64px;height:64px;background:#0B1726;border-radius:14px">
+              <svg width="42" height="42" viewBox="0 0 42 42">
+                <defs><linearGradient id="g5fv" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+                <circle cx="21" cy="21" r="14" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+                <circle cx="21" cy="21" r="9" fill="none" stroke="url(#g5fv)" stroke-width="1.5" stroke-dasharray="3 2"/>
+                <rect x="15" y="15" width="12" height="12" rx="2.5" fill="none" stroke="#00D4FF" stroke-width="1.5"/>
+                <circle cx="13" cy="13" r="2" fill="#00D4FF" opacity="0.7"/>
+                <circle cx="29" cy="13" r="2" fill="#00FFC6" opacity="0.7"/>
+                <circle cx="13" cy="29" r="2" fill="#00FFC6" opacity="0.7"/>
+                <circle cx="29" cy="29" r="2" fill="#00D4FF" opacity="0.7"/>
+              </svg>
+            </div>
+            <div class="fv-label">64×64</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:32px;height:32px;background:#0B1726;border-radius:7px">
+              <svg width="22" height="22" viewBox="0 0 22 22">
+                <circle cx="11" cy="11" r="9" fill="none" stroke="#00D4FF" stroke-width="1.2" stroke-dasharray="2 2"/>
+                <rect x="7" y="7" width="8" height="8" rx="1.5" fill="none" stroke="#00D4FF" stroke-width="1.2"/>
+                <circle cx="5" cy="5" r="1.5" fill="#00FFC6"/>
+                <circle cx="17" cy="5" r="1.5" fill="#00D4FF"/>
+              </svg>
+            </div>
+            <div class="fv-label">32×32</div>
+          </div>
+          <div class="fv-wrap">
+            <div class="fv" style="width:16px;height:16px;background:#0B1726;border-radius:3px">
+              <svg width="12" height="12" viewBox="0 0 12 12">
+                <rect x="3" y="3" width="6" height="6" rx="1" fill="none" stroke="#00D4FF" stroke-width="1.2"/>
+                <circle cx="1.5" cy="1.5" r="1.2" fill="#00FFC6"/>
+                <circle cx="10.5" cy="1.5" r="1.2" fill="#00D4FF"/>
+                <circle cx="1.5" cy="10.5" r="1.2" fill="#00D4FF"/>
+                <circle cx="10.5" cy="10.5" r="1.2" fill="#00FFC6"/>
+              </svg>
+            </div>
+            <div class="fv-label">16×16</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-key">Tipografía</div><div class="spec-val">Inter 700 · wordmark unificado · sin separación de colores en el texto</div></div>
+        <div class="spec-item"><div class="spec-key">Uso de color</div><div class="spec-val">Órbita en gradiente con stroke-dasharray · mesa central en cyan · nodos corner en mint</div></div>
+        <div class="spec-item"><div class="spec-key">Personalidad</div><div class="spec-val">Funcional · narrativo · directo · fácil de recordar · explica el producto solo</div></div>
+        <div class="spec-item"><div class="spec-key">Aplicaciones</div><div class="spec-val">Menú QR (muy legible en light), presentaciones comerciales, materiales impresos</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function show(idx) {
+  document.querySelectorAll('.concept').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.cn-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('c'+idx).classList.add('active');
+  document.querySelectorAll('.cn-tab')[idx].classList.add('active');
+}
+</script>

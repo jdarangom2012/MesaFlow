@@ -1,0 +1,1070 @@
+
+<style>
+  :root {
+    --mf-cyan: #00D4FF;
+    --mf-mint: #00FFC6;
+    --mf-bg-deep: #07111F;
+    --mf-bg-card: #0B1726;
+    --mf-bg-panel: #111C2D;
+    --mf-text-primary: #F0F4FF;
+    --mf-text-secondary: #8B9FC0;
+    --mf-text-muted: #4A5E7A;
+    --mf-border: rgba(0, 212, 255, 0.12);
+    --mf-border-hover: rgba(0, 212, 255, 0.28);
+    --mf-glow-cyan: 0 0 20px rgba(0,212,255,0.25), 0 0 40px rgba(0,212,255,0.1);
+    --mf-glow-mint: 0 0 20px rgba(0,255,198,0.2);
+    --r: 10px;
+    --r-lg: 14px;
+    --r-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: transparent; }
+  .ds-root {
+    background: var(--mf-bg-deep);
+    color: var(--mf-text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    padding: 0;
+    min-height: 100vh;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .ds-header {
+    background: linear-gradient(135deg, #0B1726 0%, #07111F 100%);
+    border-bottom: 1px solid var(--mf-border);
+    padding: 28px 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ds-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -40px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .ds-header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 40%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,255,198,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .logo-lockup {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .logo-mark {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, #00D4FF, #00FFC6);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #07111F;
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+  .logo-text { line-height: 1.1; }
+  .logo-text .name { font-size: 18px; font-weight: 600; color: #F0F4FF; }
+  .logo-text .sub { font-size: 11px; color: var(--mf-text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+  .ds-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 11px; color: var(--mf-cyan); letter-spacing: 0.05em;
+  }
+  .ds-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 4px; line-height: 1.2; }
+  .ds-subtitle { font-size: 13px; color: var(--mf-text-secondary); margin-bottom: 12px; }
+  .ds-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta-item { font-size: 11px; color: var(--mf-text-muted); }
+  .meta-item span { color: var(--mf-text-secondary); }
+
+  .nav-tabs {
+    display: flex; gap: 2px;
+    background: var(--mf-bg-card);
+    border-bottom: 1px solid var(--mf-border);
+    padding: 0 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 12px 16px; font-size: 12px; font-weight: 500;
+    color: var(--mf-text-muted); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap; transition: all 0.2s;
+    letter-spacing: 0.02em;
+    background: none; border-left: none; border-right: none; border-top: none;
+  }
+  .nav-tab:hover { color: var(--mf-text-secondary); }
+  .nav-tab.active { color: var(--mf-cyan); border-bottom-color: var(--mf-cyan); }
+
+  .ds-content { padding: 24px 28px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-size: 11px; font-weight: 600; color: var(--mf-text-muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--mf-border);
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+  .card {
+    background: var(--mf-bg-card);
+    border: 1px solid var(--mf-border);
+    border-radius: var(--r-lg);
+    padding: 16px;
+  }
+  .card-label { font-size: 10px; color: var(--mf-text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--mf-text-secondary); margin-bottom: 8px; }
+
+  .color-swatch {
+    height: 52px; border-radius: 8px; margin-bottom: 8px;
+    display: flex; align-items: flex-end; padding: 6px 8px;
+  }
+  .color-hex { font-size: 10px; font-weight: 600; font-family: monospace; }
+  .color-name { font-size: 11px; color: var(--mf-text-secondary); }
+  .color-role { font-size: 10px; color: var(--mf-text-muted); }
+
+  .type-sample { margin-bottom: 12px; }
+  .type-sample .preview { margin-bottom: 4px; }
+  .type-meta { font-size: 10px; color: var(--mf-text-muted); font-family: monospace; }
+
+  .btn { cursor: pointer; border: none; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; letter-spacing: 0.01em; }
+  .btn-primary { background: linear-gradient(135deg, #00D4FF, #00C4ED); color: #07111F; }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-secondary { background: rgba(0,212,255,0.1); color: var(--mf-cyan); border: 1px solid rgba(0,212,255,0.25); }
+  .btn-ghost { background: transparent; color: var(--mf-text-secondary); border: 1px solid var(--mf-border); }
+  .btn-ghost:hover { border-color: var(--mf-border-hover); color: var(--mf-text-primary); }
+  .btn-danger { background: rgba(255,70,70,0.1); color: #FF6B6B; border: 1px solid rgba(255,70,70,0.2); }
+  .btn-mint { background: linear-gradient(135deg, #00FFC6, #00EDB6); color: #07111F; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 5px; }
+  .btn-lg { padding: 12px 24px; font-size: 14px; border-radius: 10px; }
+  .btn-icon { padding: 8px; border-radius: 8px; }
+
+  .input-wrap { margin-bottom: 8px; }
+  .input-label { font-size: 11px; color: var(--mf-text-secondary); margin-bottom: 5px; display: block; }
+  .mf-input {
+    width: 100%; background: var(--mf-bg-deep); border: 1px solid var(--mf-border);
+    border-radius: var(--r-sm); padding: 9px 12px; color: var(--mf-text-primary);
+    font-size: 13px; transition: all 0.2s; font-family: inherit;
+  }
+  .mf-input:focus { outline: none; border-color: var(--mf-cyan); box-shadow: 0 0 0 3px rgba(0,212,255,0.12); }
+  .mf-input::placeholder { color: var(--mf-text-muted); }
+  .mf-input.error { border-color: #FF6B6B; }
+  .mf-input.success { border-color: #00FFC6; }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 20px; padding: 3px 9px; font-size: 11px; font-weight: 500; }
+  .badge-active { background: rgba(0,255,198,0.1); color: #00FFC6; border: 1px solid rgba(0,255,198,0.2); }
+  .badge-pending { background: rgba(255,196,0,0.1); color: #FFD700; border: 1px solid rgba(255,196,0,0.2); }
+  .badge-closed { background: rgba(255,70,70,0.1); color: #FF6B6B; border: 1px solid rgba(255,70,70,0.2); }
+  .badge-info { background: rgba(0,212,255,0.1); color: var(--mf-cyan); border: 1px solid rgba(0,212,255,0.2); }
+  .badge-gray { background: rgba(139,159,192,0.1); color: var(--mf-text-secondary); border: 1px solid rgba(139,159,192,0.15); }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  .widget-card {
+    background: var(--mf-bg-card);
+    border: 1px solid var(--mf-border);
+    border-radius: var(--r-lg);
+    padding: 20px;
+  }
+  .widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .widget-label { font-size: 11px; color: var(--mf-text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .widget-value { font-size: 28px; font-weight: 700; color: #fff; line-height: 1; margin: 4px 0; }
+  .widget-value .unit { font-size: 14px; font-weight: 400; color: var(--mf-text-secondary); margin-left: 2px; }
+  .widget-trend { font-size: 11px; }
+  .trend-up { color: #00FFC6; }
+  .trend-down { color: #FF6B6B; }
+  .icon-pill {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .icon-cyan { background: rgba(0,212,255,0.12); color: var(--mf-cyan); }
+  .icon-mint { background: rgba(0,255,198,0.12); color: #00FFC6; }
+  .icon-gold { background: rgba(255,196,0,0.12); color: #FFD700; }
+  .icon-red { background: rgba(255,107,107,0.12); color: #FF6B6B; }
+
+  .mini-bar { height: 4px; background: var(--mf-bg-panel); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #00D4FF, #00FFC6); }
+
+  .sparkline-area { margin-top: 8px; }
+  svg.spark { overflow: visible; }
+
+  .spacing-demo { display: flex; align-items: flex-end; gap: 16px; margin-top: 8px; }
+  .spacing-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .spacing-box { background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); border-radius: 3px; }
+  .spacing-label { font-size: 10px; color: var(--mf-text-muted); font-family: monospace; }
+
+  .shadow-demo { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 8px; }
+  .shadow-item {
+    background: var(--mf-bg-card);
+    border-radius: 10px; padding: 14px; text-align: center;
+  }
+  .shadow-label { font-size: 10px; color: var(--mf-text-muted); margin-top: 6px; }
+
+  .radius-demo { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .radius-item { width: 52px; height: 52px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .radius-val { font-size: 9px; color: var(--mf-text-muted); margin-top: 4px; font-family: monospace; }
+
+  .table-demo { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .table-demo th { padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--mf-text-muted); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--mf-border); }
+  .table-demo td { padding: 9px 12px; color: var(--mf-text-secondary); border-bottom: 1px solid rgba(0,212,255,0.05); }
+  .table-demo tr:hover td { background: rgba(0,212,255,0.04); color: var(--mf-text-primary); }
+
+  .state-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+  .state-item {
+    background: var(--mf-bg-panel);
+    border-radius: 8px; padding: 12px 14px;
+    border-left: 3px solid transparent;
+    font-size: 12px;
+  }
+  .state-success { border-left-color: #00FFC6; }
+  .state-error { border-left-color: #FF6B6B; }
+  .state-warning { border-left-color: #FFD700; }
+  .state-info { border-left-color: #00D4FF; }
+  .state-title { font-weight: 600; color: var(--mf-text-primary); font-size: 12px; margin-bottom: 2px; }
+  .state-desc { color: var(--mf-text-muted); font-size: 11px; }
+
+  .loading-row { display: flex; gap: 8px; flex-direction: column; }
+  .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 100%); background-size: 200% 100%; border-radius: 4px; animation: shimmer 1.5s ease-in-out infinite; }
+  @keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+
+  .empty-state { text-align: center; padding: 32px 16px; }
+  .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
+  .empty-title { font-size: 14px; font-weight: 500; color: var(--mf-text-secondary); margin-bottom: 4px; }
+  .empty-desc { font-size: 12px; color: var(--mf-text-muted); }
+
+  .chart-bar-wrap { display: flex; align-items: flex-end; gap: 4px; height: 64px; margin-top: 8px; }
+  .chart-bar { flex: 1; border-radius: 3px 3px 0 0; opacity: 0.7; transition: opacity 0.2s; cursor: pointer; }
+  .chart-bar:hover { opacity: 1; }
+
+  .sb-wrap {
+    background: var(--mf-bg-card); border-right: 1px solid var(--mf-border);
+    width: 200px; padding: 16px; border-radius: var(--r-lg) 0 0 var(--r-lg);
+    height: 280px; display: flex; flex-direction: column; gap: 2px;
+  }
+  .sb-logo { display: flex; align-items: center; gap: 8px; padding: 0 8px; margin-bottom: 12px; }
+  .sb-logo-icon { width: 26px; height: 26px; border-radius: 6px; background: linear-gradient(135deg,#00D4FF,#00FFC6); display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#07111F; }
+  .sb-logo-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .sb-item { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 7px; font-size: 12px; color: var(--mf-text-muted); cursor: pointer; transition: all 0.15s; }
+  .sb-item:hover { background: rgba(255,255,255,0.04); color: var(--mf-text-secondary); }
+  .sb-item.active { background: rgba(0,212,255,0.1); color: var(--mf-cyan); }
+  .sb-icon { width: 16px; height: 16px; opacity: 0.6; flex-shrink: 0; }
+  .sb-item.active .sb-icon { opacity: 1; }
+  .sb-section { font-size: 9px; color: var(--mf-text-muted); text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 8px 4px; }
+  .sb-badge-count { margin-left: auto; background: rgba(0,212,255,0.15); color: var(--mf-cyan); font-size: 9px; padding: 1px 5px; border-radius: 10px; }
+
+  .pos-demo {
+    background: var(--mf-bg-deep); border: 1px solid var(--mf-border);
+    border-radius: var(--r-lg); overflow: hidden; font-size: 12px;
+  }
+  .pos-top { background: var(--mf-bg-card); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--mf-border); }
+  .pos-body { display: grid; grid-template-columns: 1fr 1fr; min-height: 180px; }
+  .pos-menu { padding: 12px; border-right: 1px solid var(--mf-border); }
+  .pos-item { padding: 7px 8px; border-radius: 6px; cursor: pointer; margin-bottom: 3px; display: flex; justify-content: space-between; align-items: center; }
+  .pos-item:hover { background: rgba(255,255,255,0.04); }
+  .pos-item.sel { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); }
+  .pos-order { padding: 12px; }
+  .pos-order-item { display: flex; justify-content: space-between; padding: 4px 0; color: var(--mf-text-secondary); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 11px; }
+  .pos-total { display: flex; justify-content: space-between; padding: 8px 0 4px; font-weight: 600; color: #fff; font-size: 13px; }
+  .pos-pay-btn { width: 100%; margin-top: 6px; }
+
+  .qr-demo {
+    background: #fff; border-radius: 12px; padding: 16px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .qr-box { width: 80px; height: 80px; background: #07111F; border-radius: 8px; display: grid; place-items: center; }
+  .qr-pattern { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; width: 56px; height: 56px; }
+  .qr-cell { border-radius: 1px; }
+  .qr-info { flex: 1; }
+  .qr-title { font-size: 15px; font-weight: 700; color: #07111F; margin-bottom: 2px; }
+  .qr-sub { font-size: 11px; color: #666; margin-bottom: 10px; }
+  .qr-cats { display: flex; gap: 6px; flex-wrap: wrap; }
+  .qr-cat { padding: 4px 10px; background: #f0f4f8; border-radius: 20px; font-size: 11px; color: #333; cursor: pointer; }
+  .qr-cat.active { background: #07111F; color: #00D4FF; }
+  .qr-menu-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+  .qr-item-name { font-size: 12px; font-weight: 500; color: #1a1a1a; }
+  .qr-item-desc { font-size: 10px; color: #888; }
+  .qr-item-price { font-size: 12px; font-weight: 600; color: #07111F; }
+
+  .kitchen-demo {
+    background: #0a0a0a; border-radius: var(--r-lg); overflow: hidden;
+  }
+  .kitchen-header { background: #111; padding: 10px 16px; display: flex; justify-content: space-between; border-bottom: 1px solid #222; }
+  .kitchen-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; padding: 10px; }
+  .kitchen-ticket {
+    border-radius: 8px; padding: 10px 12px; font-size: 11px;
+    border: 1px solid;
+  }
+  .kt-new { background: rgba(0,212,255,0.07); border-color: rgba(0,212,255,0.25); }
+  .kt-progress { background: rgba(255,196,0,0.07); border-color: rgba(255,196,0,0.25); }
+  .kt-ready { background: rgba(0,255,198,0.07); border-color: rgba(0,255,198,0.25); }
+  .kt-table { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 600; }
+  .kt-new .kt-table { color: var(--mf-cyan); }
+  .kt-progress .kt-table { color: #FFD700; }
+  .kt-ready .kt-table { color: #00FFC6; }
+  .kt-items { color: #ccc; line-height: 1.6; }
+  .kt-time { font-size: 10px; margin-top: 6px; opacity: 0.5; }
+
+  .mt { margin-top: 12px; }
+  .mb { margin-bottom: 8px; }
+  .flex { display: flex; gap: 8px; }
+  .flex-wrap { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .tailwind-chip {
+    display: inline-block; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25);
+    color: #a5b4fc; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-family: monospace;
+    margin: 2px;
+  }
+  .philosophy-item {
+    display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; padding: 10px;
+    background: var(--mf-bg-panel); border-radius: 8px; border-left: 2px solid var(--mf-cyan);
+  }
+  .phi-num { font-size: 18px; font-weight: 700; color: var(--mf-cyan); flex-shrink: 0; line-height: 1; }
+  .phi-title { font-size: 12px; font-weight: 600; color: var(--mf-text-primary); margin-bottom: 2px; }
+  .phi-desc { font-size: 11px; color: var(--mf-text-muted); line-height: 1.5; }
+</style>
+
+<div class="ds-root">
+  <div class="ds-header">
+    <div class="logo-lockup">
+      <div class="logo-mark">MF</div>
+      <div class="logo-text">
+        <div class="name">MesaFlow</div>
+        <div class="sub">by NautilusTech</div>
+      </div>
+      <span class="ds-badge" style="margin-left:8px">● Design System v1.0</span>
+    </div>
+    <div class="ds-title">Design System — Guía Visual Oficial</div>
+    <div class="ds-subtitle">Sistema de diseño completo para producto SaaS POS premium · Dark Mode First · Inspirado en Stripe, Linear y Toast</div>
+    <div class="ds-meta">
+      <span class="meta-item">Versión <span>1.0.0</span></span>
+      <span class="meta-item">Framework <span>Tailwind CSS v3</span></span>
+      <span class="meta-item">Tipografía <span>Inter + JetBrains Mono</span></span>
+      <span class="meta-item">Modo <span>Dark First</span></span>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('colors')">Colores</button>
+    <button class="nav-tab" onclick="showSection('typography')">Tipografía</button>
+    <button class="nav-tab" onclick="showSection('components')">Componentes</button>
+    <button class="nav-tab" onclick="showSection('dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="showSection('navigation')">Navegación</button>
+    <button class="nav-tab" onclick="showSection('pos')">POS Layout</button>
+    <button class="nav-tab" onclick="showSection('kitchen')">Cocina</button>
+    <button class="nav-tab" onclick="showSection('qr')">Menú QR</button>
+    <button class="nav-tab" onclick="showSection('spacing')">Espaciado</button>
+    <button class="nav-tab" onclick="showSection('states')">Estados</button>
+    <button class="nav-tab" onclick="showSection('philosophy')">Filosofía</button>
+  </div>
+
+  <div class="ds-content">
+
+    <!-- COLORS -->
+    <div class="section active" id="sec-colors">
+      <div class="section-title">Sistema de Colores · Paleta Oficial MesaFlow</div>
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="card">
+          <div class="color-swatch" style="background:#00D4FF">
+            <span class="color-hex" style="color:#07111F">#00D4FF</span>
+          </div>
+          <div class="color-name">Cyan Primary</div>
+          <div class="color-role">Acento principal, CTAs, links activos, foco</div>
+          <div class="mt flex-wrap" style="margin-top:8px">
+            <span class="tailwind-chip">text-[#00D4FF]</span>
+            <span class="tailwind-chip">border-[#00D4FF]</span>
+            <span class="tailwind-chip">bg-[#00D4FF]/10</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="color-swatch" style="background:#00FFC6">
+            <span class="color-hex" style="color:#07111F">#00FFC6</span>
+          </div>
+          <div class="color-name">Mint Accent</div>
+          <div class="color-role">Estados de éxito, badges activos, tendencias positivas</div>
+          <div class="mt flex-wrap" style="margin-top:8px">
+            <span class="tailwind-chip">text-[#00FFC6]</span>
+            <span class="tailwind-chip">bg-[#00FFC6]/10</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="color-swatch" style="background:#07111F; border:1px solid rgba(255,255,255,0.08)">
+            <span class="color-hex" style="color:#8B9FC0">#07111F</span>
+          </div>
+          <div class="color-name">Deep Navy</div>
+          <div class="color-role">Background principal, base de la UI, canvas</div>
+          <div class="mt flex-wrap" style="margin-top:8px">
+            <span class="tailwind-chip">bg-[#07111F]</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="color-swatch" style="background:#0B1726; border:1px solid rgba(255,255,255,0.08)">
+            <span class="color-hex" style="color:#8B9FC0">#0B1726</span>
+          </div>
+          <div class="color-name">Card Navy</div>
+          <div class="color-role">Superficie de cards, sidebars, paneles</div>
+          <div class="mt flex-wrap" style="margin-top:8px">
+            <span class="tailwind-chip">bg-[#0B1726]</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="card">
+          <div class="color-swatch" style="background:#111C2D; border:1px solid rgba(255,255,255,0.06)">
+            <span class="color-hex" style="color:#8B9FC0">#111C2D</span>
+          </div>
+          <div class="color-name">Panel Navy</div>
+          <div class="color-role">Hover states, row backgrounds, separadores</div>
+        </div>
+        <div class="card">
+          <div class="color-swatch" style="background:#FF6B6B">
+            <span class="color-hex" style="color:#fff">#FF6B6B</span>
+          </div>
+          <div class="color-name">Error / Danger</div>
+          <div class="color-role">Alertas, eliminaciones, errores críticos</div>
+        </div>
+        <div class="card">
+          <div class="color-swatch" style="background:#FFD700">
+            <span class="color-hex" style="color:#07111F">#FFD700</span>
+          </div>
+          <div class="color-name">Warning / Pending</div>
+          <div class="color-role">Estados de espera, advertencias, pendientes</div>
+        </div>
+        <div class="card">
+          <div class="color-swatch" style="background:linear-gradient(135deg,#00D4FF,#00FFC6)">
+            <span class="color-hex" style="color:#07111F">Gradient</span>
+          </div>
+          <div class="color-name">Brand Gradient</div>
+          <div class="color-role">Logo, botones primarios, highlights de marca</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Escala de Opacidad · Cómo usar el Cyan sobre dark</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <div style="text-align:center">
+            <div style="width:52px;height:36px;background:rgba(0,212,255,0.05);border-radius:5px;border:1px solid rgba(0,212,255,0.1)"></div>
+            <div class="spacing-label" style="margin-top:3px">5% · bg hover</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:52px;height:36px;background:rgba(0,212,255,0.1);border-radius:5px;border:1px solid rgba(0,212,255,0.15)"></div>
+            <div class="spacing-label" style="margin-top:3px">10% · badge bg</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:52px;height:36px;background:rgba(0,212,255,0.15);border-radius:5px;border:1px solid rgba(0,212,255,0.2)"></div>
+            <div class="spacing-label" style="margin-top:3px">15% · selected</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:52px;height:36px;background:rgba(0,212,255,0.25);border-radius:5px;border:1px solid rgba(0,212,255,0.35)"></div>
+            <div class="spacing-label" style="margin-top:3px">25% · hover border</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:52px;height:36px;background:rgba(0,212,255,0.4);border-radius:5px"></div>
+            <div class="spacing-label" style="margin-top:3px">40% · active</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:52px;height:36px;background:#00D4FF;border-radius:5px"></div>
+            <div class="spacing-label" style="margin-top:3px">100% · solid</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TYPOGRAPHY -->
+    <div class="section" id="sec-typography">
+      <div class="section-title">Tipografía · Sistema de Fuentes MesaFlow</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Fuente Principal · Inter</div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:26px;font-weight:700;color:#fff;line-height:1.1">Display Heading</div>
+            <div class="type-meta">Inter 700 · 26px · #FFFFFF · Pantallas principales</div>
+          </div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:20px;font-weight:600;color:#fff">Section Title</div>
+            <div class="type-meta">Inter 600 · 20px · Títulos de sección</div>
+          </div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:15px;font-weight:500;color:#F0F4FF">Card Heading</div>
+            <div class="type-meta">Inter 500 · 15px · Títulos de componentes</div>
+          </div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:13px;font-weight:400;color:#8B9FC0">Body text secondary — descripciones de elementos de interfaz</div>
+            <div class="type-meta">Inter 400 · 13px · #8B9FC0 · Texto cuerpo</div>
+          </div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:11px;font-weight:500;color:#4A5E7A;text-transform:uppercase;letter-spacing:0.1em">LABEL / CAPTION</div>
+            <div class="type-meta">Inter 500 · 11px · Uppercase · Labels de formulario</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Fuente Monospace · JetBrains Mono</div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:22px;font-weight:700;color:#00D4FF;font-family:monospace">$2,847.50</div>
+            <div class="type-meta">Mono 700 · 22px · Valores monetarios grandes</div>
+          </div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:15px;font-weight:600;color:#00FFC6;font-family:monospace">+12.4%</div>
+            <div class="type-meta">Mono 600 · 15px · Porcentajes, métricas</div>
+          </div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:13px;color:#8B9FC0;font-family:monospace">ORD-2024-001847</div>
+            <div class="type-meta">Mono 400 · 13px · IDs, códigos de orden</div>
+          </div>
+          <div class="type-sample">
+            <div class="preview" style="font-size:11px;color:#4A5E7A;font-family:monospace">14:32:07 · Mesa 4</div>
+            <div class="type-meta">Mono 400 · 11px · Timestamps, referencias</div>
+          </div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--mf-border)">
+            <div class="card-label" style="margin-bottom:8px">Tailwind Config</div>
+            <span class="tailwind-chip">font-sans → Inter</span>
+            <span class="tailwind-chip">font-mono → JetBrains Mono</span>
+            <span class="tailwind-chip">tracking-widest</span>
+            <span class="tailwind-chip">text-white/90</span>
+            <span class="tailwind-chip">text-white/50</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPONENTS -->
+    <div class="section" id="sec-components">
+      <div class="section-title">Componentes Core · Botones · Inputs · Badges</div>
+      <div class="grid-2" style="margin-bottom:12px">
+        <div class="card">
+          <div class="card-label">Botones · Jerarquía de Acciones</div>
+          <div class="flex-wrap" style="margin-bottom:10px">
+            <button class="btn btn-primary">Cobrar mesa</button>
+            <button class="btn btn-mint">Nueva orden</button>
+            <button class="btn btn-secondary">Ver historial</button>
+          </div>
+          <div class="flex-wrap" style="margin-bottom:10px">
+            <button class="btn btn-ghost">Cancelar</button>
+            <button class="btn btn-danger">Eliminar</button>
+            <button class="btn btn-primary btn-sm">Pequeño</button>
+            <button class="btn btn-primary btn-lg">Grande CTA</button>
+          </div>
+          <div style="padding-top:8px;border-top:1px solid var(--mf-border)">
+            <span class="tailwind-chip">bg-gradient-to-r from-[#00D4FF] to-[#00C4ED]</span>
+            <span class="tailwind-chip">bg-[#00D4FF]/10 border border-[#00D4FF]/25</span>
+            <span class="tailwind-chip">hover:bg-white/5</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Inputs · Campos de Formulario</div>
+          <div class="input-wrap">
+            <label class="input-label">Nombre del cliente</label>
+            <input class="mf-input" type="text" placeholder="Ej: Juan García">
+          </div>
+          <div class="input-wrap">
+            <label class="input-label">Email (estado éxito)</label>
+            <input class="mf-input success" type="email" value="juan@email.com">
+          </div>
+          <div class="input-wrap" style="margin-bottom:0">
+            <label class="input-label">Contraseña (estado error)</label>
+            <input class="mf-input error" type="password" placeholder="Mínimo 8 caracteres">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Badges · Sistema de Estados</div>
+        <div class="flex-wrap">
+          <span class="badge badge-active"><span class="dot"></span>Mesa activa</span>
+          <span class="badge badge-pending"><span class="dot"></span>Pendiente</span>
+          <span class="badge badge-closed"><span class="dot"></span>Cerrada</span>
+          <span class="badge badge-info">Delivery</span>
+          <span class="badge badge-gray">Sin orden</span>
+          <span class="badge badge-active">En cocina</span>
+          <span class="badge badge-pending">Por cobrar</span>
+          <span class="badge" style="background:rgba(128,0,255,0.1);color:#A855F7;border:1px solid rgba(128,0,255,0.2)">VIP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="section" id="sec-dashboard">
+      <div class="section-title">Dashboard Widgets · Métricas en Tiempo Real</div>
+      <div class="grid-4" style="margin-bottom:12px">
+        <div class="widget-card">
+          <div class="widget-header">
+            <div class="widget-label">Ventas hoy</div>
+            <div class="icon-pill icon-cyan">$</div>
+          </div>
+          <div class="widget-value">$4,280<span class="unit">MXN</span></div>
+          <div class="widget-trend trend-up">↑ 18.4% vs ayer</div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:74%"></div></div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-header">
+            <div class="widget-label">Mesas activas</div>
+            <div class="icon-pill icon-mint">⬛</div>
+          </div>
+          <div class="widget-value">12<span class="unit">/ 20</span></div>
+          <div class="widget-trend trend-up">↑ 60% ocupación</div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:60%"></div></div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-header">
+            <div class="widget-label">Ticket promedio</div>
+            <div class="icon-pill icon-gold">⟲</div>
+          </div>
+          <div class="widget-value">$342<span class="unit">MXN</span></div>
+          <div class="widget-trend trend-down">↓ 3.2% vs ayer</div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:55%;background:linear-gradient(90deg,#FFD700,#FFA500)"></div></div>
+        </div>
+        <div class="widget-card">
+          <div class="widget-header">
+            <div class="widget-label">Órdenes cocina</div>
+            <div class="icon-pill icon-red">!</div>
+          </div>
+          <div class="widget-value">7<span class="unit">pendientes</span></div>
+          <div class="widget-trend" style="color:#FFD700">⚠ 2 con >15 min</div>
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:35%;background:linear-gradient(90deg,#FF6B6B,#FF4444)"></div></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Ventas por hora · Hoy</div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar" style="height:25%;background:linear-gradient(0deg,#00D4FF,#00A8CC)"></div>
+            <div class="chart-bar" style="height:40%;background:linear-gradient(0deg,#00D4FF,#00A8CC)"></div>
+            <div class="chart-bar" style="height:35%;background:linear-gradient(0deg,#00D4FF,#00A8CC)"></div>
+            <div class="chart-bar" style="height:60%;background:linear-gradient(0deg,#00D4FF,#00A8CC)"></div>
+            <div class="chart-bar" style="height:45%;background:linear-gradient(0deg,#00D4FF,#00A8CC)"></div>
+            <div class="chart-bar" style="height:80%;background:linear-gradient(0deg,#00FFC6,#00D4AA)"></div>
+            <div class="chart-bar" style="height:100%;background:linear-gradient(0deg,#00FFC6,#00D4AA)"></div>
+            <div class="chart-bar" style="height:90%;background:linear-gradient(0deg,#00FFC6,#00D4AA)"></div>
+            <div class="chart-bar" style="height:55%;background:linear-gradient(0deg,#00D4FF,#00A8CC)"></div>
+            <div class="chart-bar" style="height:65%;background:linear-gradient(0deg,#00D4FF,#00A8CC)"></div>
+            <div class="chart-bar" style="height:48%;background:linear-gradient(0deg,#00D4FF,#00A8CC)"></div>
+            <div class="chart-bar" style="height:30%;background:rgba(0,212,255,0.2)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mf-text-muted);margin-top:4px">
+            <span>10am</span><span>12pm</span><span>2pm</span><span>4pm</span><span>6pm</span><span>8pm</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Tabla de mesas · Estado actual</div>
+          <table class="table-demo">
+            <thead><tr><th>Mesa</th><th>Estado</th><th>Personas</th><th>Total</th><th>Tiempo</th></tr></thead>
+            <tbody>
+              <tr><td>Mesa 4</td><td><span class="badge badge-active" style="font-size:10px"><span class="dot"></span>Activa</span></td><td>3</td><td>$284</td><td>22 min</td></tr>
+              <tr><td>Mesa 7</td><td><span class="badge badge-pending" style="font-size:10px"><span class="dot"></span>Cocina</span></td><td>5</td><td>$512</td><td>8 min</td></tr>
+              <tr><td>Mesa 11</td><td><span class="badge badge-info" style="font-size:10px">Por cobrar</span></td><td>2</td><td>$198</td><td>45 min</td></tr>
+              <tr><td>Mesa 2</td><td><span class="badge badge-gray" style="font-size:10px">Libre</span></td><td>—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="section" id="sec-navigation">
+      <div class="section-title">Navegación · Sidebar + Navbar</div>
+      <div style="display:flex;gap:12px;margin-bottom:12px">
+        <div class="sb-wrap">
+          <div class="sb-logo">
+            <div class="sb-logo-icon">MF</div>
+            <div class="sb-logo-name">MesaFlow</div>
+          </div>
+          <div class="sb-section">Principal</div>
+          <div class="sb-item active">
+            <svg class="sb-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+            Dashboard
+          </div>
+          <div class="sb-item">
+            <svg class="sb-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="2"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>
+            Mesas
+            <span class="sb-badge-count">12</span>
+          </div>
+          <div class="sb-item">
+            <svg class="sb-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 8h8M2 13h6"/></svg>
+            Órdenes
+            <span class="sb-badge-count">7</span>
+          </div>
+          <div class="sb-item">
+            <svg class="sb-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M8 4v4l3 2"/></svg>
+            Cocina
+          </div>
+          <div class="sb-section">Gestión</div>
+          <div class="sb-item">
+            <svg class="sb-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h8M4 10h5"/><rect x="1" y="2" width="14" height="12" rx="2"/></svg>
+            Menú
+          </div>
+          <div class="sb-item">
+            <svg class="sb-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L8 6 4 2M4 14l4-4 4 4"/><path d="M2 8h12"/></svg>
+            Reportes
+          </div>
+        </div>
+        <div style="flex:1">
+          <div style="background:var(--mf-bg-card);border:1px solid var(--mf-border);border-radius:10px;overflow:hidden;margin-bottom:10px">
+            <div style="padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--mf-border)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:22px;height:22px;border-radius:5px;background:linear-gradient(135deg,#00D4FF,#00FFC6);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#07111F">MF</div>
+                <span style="font-size:13px;font-weight:600;color:#fff">MesaFlow</span>
+                <span style="font-size:10px;color:var(--mf-text-muted)">/ Dashboard</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="background:var(--mf-bg-panel);border:1px solid var(--mf-border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--mf-text-muted);display:flex;align-items:center;gap:5px">
+                  <span>🔍</span><span>Buscar...</span>
+                  <span style="background:rgba(255,255,255,0.06);border-radius:3px;padding:1px 4px;font-size:9px;margin-left:4px">⌘K</span>
+                </div>
+                <div style="width:8px;height:8px;background:#00FFC6;border-radius:50%;position:relative">
+                  <div style="position:absolute;inset:-2px;background:rgba(0,255,198,0.3);border-radius:50%"></div>
+                </div>
+                <div style="width:28px;height:28px;background:linear-gradient(135deg,#00D4FF,#00FFC6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#07111F">JG</div>
+              </div>
+            </div>
+            <div style="padding:12px 16px;font-size:11px;color:var(--mf-text-muted)">
+              Navbar activo · breadcrumb · search global (⌘K) · indicador de estado online · avatar de usuario
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-label">Tokens de Navegación</div>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+              <div class="flex">
+                <span style="font-size:11px;color:var(--mf-text-secondary);min-width:100px">Sidebar width:</span>
+                <span class="tailwind-chip">w-56 (224px)</span>
+              </div>
+              <div class="flex">
+                <span style="font-size:11px;color:var(--mf-text-secondary);min-width:100px">Nav item activo:</span>
+                <span class="tailwind-chip">bg-[#00D4FF]/10 text-[#00D4FF]</span>
+              </div>
+              <div class="flex">
+                <span style="font-size:11px;color:var(--mf-text-secondary);min-width:100px">Navbar height:</span>
+                <span class="tailwind-chip">h-14 (56px)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POS LAYOUT -->
+    <div class="section" id="sec-pos">
+      <div class="section-title">POS Layout · Punto de Venta en Piso</div>
+      <div class="pos-demo">
+        <div class="pos-top">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge badge-active"><span class="dot"></span>Mesa 7</span>
+            <span style="font-size:11px;color:var(--mf-text-muted)">4 personas · 18 min</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm">Transferir</button>
+            <button class="btn btn-secondary btn-sm">Dividir</button>
+          </div>
+        </div>
+        <div class="pos-body">
+          <div class="pos-menu">
+            <div style="font-size:10px;color:var(--mf-text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Menú · Categorías</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+              <span class="badge badge-info" style="font-size:10px;cursor:pointer">Bebidas</span>
+              <span class="badge badge-gray" style="font-size:10px;cursor:pointer">Entradas</span>
+              <span class="badge badge-gray" style="font-size:10px;cursor:pointer">Principales</span>
+              <span class="badge badge-gray" style="font-size:10px;cursor:pointer">Postres</span>
+            </div>
+            <div class="pos-item sel"><span style="color:#F0F4FF">Margarita Classic</span><span style="color:var(--mf-cyan);font-family:monospace">$120</span></div>
+            <div class="pos-item"><span style="color:var(--mf-text-secondary)">Agua Mineral</span><span style="color:var(--mf-text-muted);font-family:monospace">$45</span></div>
+            <div class="pos-item"><span style="color:var(--mf-text-secondary)">Limonada Natural</span><span style="color:var(--mf-text-muted);font-family:monospace">$65</span></div>
+            <div class="pos-item"><span style="color:var(--mf-text-secondary)">Modelo Especial</span><span style="color:var(--mf-text-muted);font-family:monospace">$75</span></div>
+          </div>
+          <div class="pos-order">
+            <div style="font-size:10px;color:var(--mf-text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Orden actual</div>
+            <div class="pos-order-item"><span>2× Margarita Classic</span><span style="font-family:monospace">$240</span></div>
+            <div class="pos-order-item"><span>1× Agua Mineral</span><span style="font-family:monospace">$45</span></div>
+            <div class="pos-order-item"><span>3× Tacos de Suadero</span><span style="font-family:monospace">$285</span></div>
+            <div class="pos-total"><span>Total</span><span style="color:var(--mf-cyan);font-family:monospace">$570</span></div>
+            <button class="btn btn-primary pos-pay-btn" style="justify-content:center">Cobrar $570</button>
+            <button class="btn btn-ghost pos-pay-btn" style="justify-content:center;margin-top:4px;font-size:11px">Enviar a cocina</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KITCHEN -->
+    <div class="section" id="sec-kitchen">
+      <div class="section-title">Pantalla de Cocina (KDS) · Kitchen Display System</div>
+      <div class="kitchen-demo">
+        <div class="kitchen-header">
+          <span style="font-size:11px;font-weight:600;color:#fff">COCINA · MesaFlow KDS</span>
+          <div style="display:flex;gap:8px">
+            <span class="badge badge-info" style="font-size:10px">7 activas</span>
+            <span class="badge badge-pending" style="font-size:10px">2 urgentes</span>
+            <span style="font-size:11px;color:#666;font-family:monospace">14:37:22</span>
+          </div>
+        </div>
+        <div class="kitchen-grid">
+          <div class="kitchen-ticket kt-new">
+            <div class="kt-table">📋 Mesa 4 · NUEVA</div>
+            <div class="kt-items">
+              2× Tacos de Suadero<br>
+              1× Quesadilla Mixta<br>
+              1× Ensalada César<br>
+              <em style="color:#666;font-size:10px">Nota: sin cilantro en tacos</em>
+            </div>
+            <div class="kt-time">Recibida hace 2 min</div>
+          </div>
+          <div class="kitchen-ticket kt-progress">
+            <div class="kt-table">⚡ Mesa 7 · EN PROCESO</div>
+            <div class="kt-items">
+              3× Enchiladas Verdes<br>
+              2× Arroz con Leche<br>
+              1× Filete al Grill
+            </div>
+            <div class="kt-time" style="color:#FFD700">⚠ 18 min — urgente</div>
+          </div>
+          <div class="kitchen-ticket kt-ready">
+            <div class="kt-table">✓ Mesa 2 · LISTO</div>
+            <div class="kt-items">
+              2× Chilaquiles Rojos<br>
+              1× Huevos Divorciados
+            </div>
+            <div class="kt-time" style="color:#00FFC6">Listo · toca para confirmar</div>
+          </div>
+        </div>
+      </div>
+      <div class="card mt">
+        <div class="card-label">Principios de diseño KDS · UX de Cocina</div>
+        <div style="font-size:11px;color:var(--mf-text-secondary);line-height:1.7">
+          Fuente mínima 14px para legibilidad a distancia · Codificación por color según urgencia (Cyan=nueva, Amarillo=en proceso >10min, Verde=listo) · Sin contraseñas ni login en pantalla de cocina · Touch targets mínimos 48×48px · Alto contraste forzado
+        </div>
+      </div>
+    </div>
+
+    <!-- QR MENU -->
+    <div class="section" id="sec-qr">
+      <div class="section-title">Menú QR · Experiencia del Comensal</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Vista del comensal · Modo claro (accesibilidad)</div>
+          <div class="qr-demo" style="flex-direction:column">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="qr-box">
+                <div class="qr-pattern">
+                  <div class="qr-cell" style="background:#fff;grid-column:span 3;grid-row:span 3;border-radius:4px"></div>
+                  <div class="qr-cell" style="background:#07111F"></div>
+                  <div class="qr-cell" style="background:#07111F"></div>
+                  <div class="qr-cell" style="background:#fff"></div>
+                </div>
+              </div>
+              <div class="qr-info">
+                <div class="qr-title">La Cantina del Puerto</div>
+                <div class="qr-sub">Mesa 7 · Escanea para ver el menú</div>
+                <div class="qr-cats">
+                  <div class="qr-cat active">🍹 Bebidas</div>
+                  <div class="qr-cat">🌮 Tacos</div>
+                  <div class="qr-cat">🥗 Ensaladas</div>
+                  <div class="qr-cat">🍰 Postres</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="qr-menu-item">
+                <div>
+                  <div class="qr-item-name">Margarita Clásica</div>
+                  <div class="qr-item-desc">Tequila blanco, jugo de limón, triple sec</div>
+                </div>
+                <div class="qr-item-price">$120</div>
+              </div>
+              <div class="qr-menu-item">
+                <div>
+                  <div class="qr-item-name">Michelada Artesanal</div>
+                  <div class="qr-item-desc">Cerveza artesanal, clamato, especias</div>
+                </div>
+                <div class="qr-item-price">$95</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Principios UX · Menú QR</div>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:11px">
+            <div style="display:flex;gap:6px;align-items:flex-start;padding:7px;background:var(--mf-bg-panel);border-radius:6px">
+              <span style="color:var(--mf-cyan)">01</span>
+              <span style="color:var(--mf-text-secondary)">Modo claro para el comensal — no dark mode en QR menu, mejor legibilidad bajo luz de día</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:flex-start;padding:7px;background:var(--mf-bg-panel);border-radius:6px">
+              <span style="color:var(--mf-cyan)">02</span>
+              <span style="color:var(--mf-text-secondary)">Navegación por categorías fija en la parte superior (sticky)</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:flex-start;padding:7px;background:var(--mf-bg-panel);border-radius:6px">
+              <span style="color:var(--mf-cyan)">03</span>
+              <span style="color:var(--mf-text-secondary)">Fotos de platillos opcionales — priorizan conversión vs velocidad de carga</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:flex-start;padding:7px;background:var(--mf-bg-panel);border-radius:6px">
+              <span style="color:var(--mf-cyan)">04</span>
+              <span style="color:var(--mf-text-secondary)">Touch targets de 48px mínimo · Precios visibles sin scroll · Sin registro obligatorio</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPACING -->
+    <div class="section" id="sec-spacing">
+      <div class="section-title">Espaciado · Sombras · Radios · Tokens Visuales</div>
+      <div class="grid-2" style="margin-bottom:12px">
+        <div class="card">
+          <div class="card-label">Escala de Espaciado · Base 4px</div>
+          <div class="spacing-demo">
+            <div class="spacing-item"><div class="spacing-box" style="width:4px;height:4px"></div><div class="spacing-label">4px</div><div class="spacing-label" style="color:var(--mf-text-muted)">space-1</div></div>
+            <div class="spacing-item"><div class="spacing-box" style="width:8px;height:8px"></div><div class="spacing-label">8px</div><div class="spacing-label" style="color:var(--mf-text-muted)">space-2</div></div>
+            <div class="spacing-item"><div class="spacing-box" style="width:12px;height:12px"></div><div class="spacing-label">12px</div><div class="spacing-label" style="color:var(--mf-text-muted)">space-3</div></div>
+            <div class="spacing-item"><div class="spacing-box" style="width:16px;height:16px"></div><div class="spacing-label">16px</div><div class="spacing-label" style="color:var(--mf-text-muted)">space-4</div></div>
+            <div class="spacing-item"><div class="spacing-box" style="width:24px;height:24px"></div><div class="spacing-label">24px</div><div class="spacing-label" style="color:var(--mf-text-muted)">space-6</div></div>
+            <div class="spacing-item"><div class="spacing-box" style="width:32px;height:32px"></div><div class="spacing-label">32px</div><div class="spacing-label" style="color:var(--mf-text-muted)">space-8</div></div>
+            <div class="spacing-item"><div class="spacing-box" style="width:48px;height:48px"></div><div class="spacing-label">48px</div><div class="spacing-label" style="color:var(--mf-text-muted)">space-12</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Border Radius System</div>
+          <div class="radius-demo">
+            <div style="text-align:center">
+              <div class="radius-item" style="border-radius:4px"></div>
+              <div class="radius-val">4px · sm</div>
+            </div>
+            <div style="text-align:center">
+              <div class="radius-item" style="border-radius:8px"></div>
+              <div class="radius-val">8px · base</div>
+            </div>
+            <div style="text-align:center">
+              <div class="radius-item" style="border-radius:12px"></div>
+              <div class="radius-val">12px · lg</div>
+            </div>
+            <div style="text-align:center">
+              <div class="radius-item" style="border-radius:16px"></div>
+              <div class="radius-val">16px · xl</div>
+            </div>
+            <div style="text-align:center">
+              <div class="radius-item" style="border-radius:24px"></div>
+              <div class="radius-val">24px · 2xl</div>
+            </div>
+            <div style="text-align:center">
+              <div class="radius-item" style="border-radius:9999px;width:52px;height:24px"></div>
+              <div class="radius-val">full · pill</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Sistema de Sombras · Glow Effects</div>
+        <div class="shadow-demo">
+          <div class="shadow-item" style="box-shadow:0 1px 3px rgba(0,0,0,0.4)">
+            <div style="font-size:11px;color:#fff">Sutil</div>
+            <div class="shadow-label">shadow-sm</div>
+          </div>
+          <div class="shadow-item" style="box-shadow:0 4px 16px rgba(0,0,0,0.5)">
+            <div style="font-size:11px;color:#fff">Card</div>
+            <div class="shadow-label">shadow-md</div>
+          </div>
+          <div class="shadow-item" style="box-shadow:0 0 20px rgba(0,212,255,0.25),0 0 40px rgba(0,212,255,0.1)">
+            <div style="font-size:11px;color:#00D4FF">Glow Cyan</div>
+            <div class="shadow-label">glow-cyan</div>
+          </div>
+          <div class="shadow-item" style="box-shadow:0 0 20px rgba(0,255,198,0.2)">
+            <div style="font-size:11px;color:#00FFC6">Glow Mint</div>
+            <div class="shadow-label">glow-mint</div>
+          </div>
+          <div class="shadow-item" style="box-shadow:0 0 0 1px rgba(0,212,255,0.3),0 0 12px rgba(0,212,255,0.15)">
+            <div style="font-size:11px;color:#00D4FF">Focus Ring</div>
+            <div class="shadow-label">ring-focus</div>
+          </div>
+          <div class="shadow-item" style="box-shadow:0 8px 32px rgba(0,0,0,0.7)">
+            <div style="font-size:11px;color:#fff">Modal</div>
+            <div class="shadow-label">shadow-xl</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATES -->
+    <div class="section" id="sec-states">
+      <div class="section-title">Estados del Sistema · Feedback · Loading · Empty</div>
+      <div class="grid-2" style="margin-bottom:12px">
+        <div class="card">
+          <div class="card-label">Estados de UI</div>
+          <div class="state-grid">
+            <div class="state-item state-success">
+              <div class="state-title">✓ Éxito</div>
+              <div class="state-desc">Orden enviada a cocina</div>
+            </div>
+            <div class="state-item state-error">
+              <div class="state-title">✕ Error</div>
+              <div class="state-desc">Pago rechazado</div>
+            </div>
+            <div class="state-item state-warning">
+              <div class="state-title">⚠ Advertencia</div>
+              <div class="state-desc">Mesa sin mesero asignado</div>
+            </div>
+            <div class="state-item state-info">
+              <div class="state-title">ℹ Info</div>
+              <div class="state-desc">Menú actualizado</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Loading States · Skeleton Screens</div>
+          <div class="loading-row">
+            <div class="skeleton" style="height:14px;width:60%"></div>
+            <div class="skeleton" style="height:11px;width:80%"></div>
+            <div class="skeleton" style="height:11px;width:50%"></div>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <div class="skeleton" style="height:32px;width:52px;border-radius:8px"></div>
+              <div class="skeleton" style="height:32px;width:52px;border-radius:8px"></div>
+              <div class="skeleton" style="height:32px;width:52px;border-radius:8px"></div>
+            </div>
+            <div class="skeleton" style="height:60px;width:100%;border-radius:8px;margin-top:4px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Empty State · Sin datos</div>
+        <div class="empty-state">
+          <div class="empty-icon">⬛</div>
+          <div class="empty-title">No hay órdenes activas</div>
+          <div class="empty-desc">Las órdenes aparecerán aquí cuando las mesas sean activadas</div>
+          <button class="btn btn-secondary btn-sm" style="margin-top:12px">Nueva orden manual</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHILOSOPHY -->
+    <div class="section" id="sec-philosophy">
+      <div class="section-title">Filosofía Visual · Principios de Diseño MesaFlow</div>
+      <div class="philosophy-item">
+        <div class="phi-num">01</div>
+        <div><div class="phi-title">Dark Mode First, no Dark Mode Only</div><div class="phi-desc">El sistema vive en dark por defecto porque el ambiente de restaurante es oscuro (luces tenues, pantallas en cocina). Pero el menú QR del comensal siempre es light para legibilidad en exterior. Diseña primero para dark, después adapta lo público a light.</div></div>
+      </div>
+      <div class="philosophy-item" style="border-left-color:var(--mf-mint)">
+        <div class="phi-num" style="color:var(--mf-mint)">02</div>
+        <div><div class="phi-title">Operational Clarity sobre Aesthetic Beauty</div><div class="phi-desc">En un POS en servicio, un mesero necesita encontrar la información en menos de 1 segundo. La jerarquía visual es funcional: el número de mesa, el total y el estado son siempre los elementos más prominentes. La estética sirve a la velocidad operacional.</div></div>
+      </div>
+      <div class="philosophy-item" style="border-left-color:#FFD700">
+        <div class="phi-num" style="color:#FFD700">03</div>
+        <div><div class="phi-title">Glow con Intención, no Decoración</div><div class="phi-desc">Los glow effects del brand (#00D4FF, #00FFC6) se usan únicamente para estados activos, elementos seleccionados y notificaciones importantes. El glow comunica "atención requerida", no es decorativo.</div></div>
+      </div>
+      <div class="philosophy-item" style="border-left-color:#A855F7">
+        <div class="phi-num" style="color:#A855F7">04</div>
+        <div><div class="phi-title">Componentes Reutilizables con Variantes de Estado</div><div class="phi-desc">Cada componente (badge, card, input) tiene 4 estados diseñados: default, hover, active/selected, disabled. Nunca se improvisa un estado en producción. Esto garantiza consistencia visual en flujos de alta velocidad como POS.</div></div>
+      </div>
+      <div class="philosophy-item" style="border-left-color:#FF6B6B">
+        <div class="phi-num" style="color:#FF6B6B">05</div>
+        <div><div class="phi-title">Touch-First en Dispositivos de Piso</div><div class="phi-desc">Los touch targets mínimos son 44×44px en POS y 48×48px en KDS de cocina. Los elementos de alta frecuencia (cobrar, enviar a cocina) siempre están en la esquina inferior derecha o como CTA principal visible sin scroll.</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

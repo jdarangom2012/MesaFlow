@@ -1,0 +1,662 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.root{background:#07111F;border-radius:16px;overflow:hidden;font-family:system-ui,-apple-system,sans-serif}
+.hdr{background:linear-gradient(135deg,#0B1726 0%,#07111F 100%);border-bottom:1px solid rgba(0,212,255,0.12);padding:22px 28px 18px}
+.hdr-eye{font-size:10px;font-weight:600;color:#4A5E7A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.hdr-h1{font-size:19px;font-weight:700;color:#fff;margin-bottom:3px}
+.hdr-sub{font-size:12px;color:#8B9FC0}
+.tabs{display:flex;gap:2px;background:#0B1726;border-bottom:1px solid rgba(0,212,255,0.1);padding:0 20px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 13px;font-size:11px;font-weight:500;color:#4A5E7A;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-left:none;border-right:none;border-top:none;transition:all .2s}
+.tab:hover{color:#8B9FC0}
+.tab.on{color:#00D4FF;border-bottom-color:#00D4FF}
+.body{padding:22px 26px}
+.sec{display:none}
+.sec.on{display:block}
+
+.sec-lbl{font-size:10px;font-weight:600;color:#4A5E7A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(0,212,255,0.08)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+
+.card{background:#0B1726;border:1px solid rgba(0,212,255,0.1);border-radius:12px;padding:16px}
+.card-lbl{font-size:9px;font-weight:600;color:#4A5E7A;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.card-sub{font-size:10px;color:#4A5E7A;margin-top:8px;line-height:1.5}
+
+.preview-dark{background:#07111F;border-radius:8px;padding:18px;display:flex;align-items:center;justify-content:center;min-height:80px}
+.preview-light{background:#F0F4FF;border-radius:8px;padding:18px;display:flex;align-items:center;justify-content:center;min-height:80px}
+.preview-mid{background:#111C2D;border-radius:8px;padding:18px;display:flex;align-items:center;justify-content:center;min-height:80px}
+.preview-white{background:#FFFFFF;border-radius:8px;padding:18px;display:flex;align-items:center;justify-content:center;min-height:80px;border:1px solid rgba(0,0,0,0.06)}
+
+.fav-row{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-top:4px}
+.fav-item{text-align:center}
+.fav-lbl{font-size:9px;color:#4A5E7A;margin-top:5px;font-family:monospace}
+
+.spec-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}
+.spec-table td{padding:6px 10px;border-bottom:1px solid rgba(0,212,255,0.05);vertical-align:top}
+.spec-table td:first-child{color:#4A5E7A;font-weight:600;width:36%;white-space:nowrap}
+.spec-table td:last-child{color:#8B9FC0}
+.spec-table tr:last-child td{border-bottom:none}
+
+.copy-btn{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);color:#00D4FF;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:monospace;transition:all .15s}
+.copy-btn:hover{background:rgba(0,212,255,0.15)}
+
+.do-card{background:#0B1726;border:1px solid rgba(0,255,198,0.15);border-radius:10px;padding:12px 14px;border-left:3px solid #00FFC6}
+.dont-card{background:#0B1726;border:1px solid rgba(255,107,107,0.15);border-radius:10px;padding:12px 14px;border-left:3px solid #FF6B6B}
+.rule-title{font-size:11px;font-weight:700;color:#fff;margin-bottom:4px}
+.rule-desc{font-size:11px;color:#8B9FC0;line-height:1.5}
+.do-lbl{font-size:9px;font-weight:700;color:#00FFC6;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.dont-lbl{font-size:9px;font-weight:700;color:#FF6B6B;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+
+.export-row{display:flex;flex-direction:column;gap:6px}
+.export-item{display:flex;align-items:center;gap:10px;background:#111C2D;border-radius:7px;padding:8px 12px}
+.export-name{font-size:11px;font-weight:600;color:#F0F4FF;flex:1}
+.export-size{font-size:10px;color:#4A5E7A;font-family:monospace;min-width:80px}
+.export-fmt{display:flex;gap:4px}
+.fmt-tag{background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:#00D4FF;border-radius:3px;padding:2px 6px;font-size:9px;font-family:monospace}
+.fmt-tag.png{background:rgba(0,255,198,0.1);border-color:rgba(0,255,198,0.2);color:#00FFC6}
+.fmt-tag.ico{background:rgba(255,196,0,0.1);border-color:rgba(255,196,0,0.2);color:#FFD700}
+
+.clearzone-demo{background:#07111F;border-radius:8px;padding:20px;display:flex;align-items:center;justify-content:center;position:relative;min-height:120px}
+.cz-box{border:1px dashed rgba(0,212,255,0.3);border-radius:4px;padding:20px;position:relative}
+.cz-label{position:absolute;font-size:9px;color:rgba(0,212,255,0.5);font-family:monospace}
+
+.size-demo{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-top:8px}
+.size-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.size-lbl{font-size:9px;color:#4A5E7A;font-family:monospace}
+
+.mono{font-family:monospace;font-size:10px;color:#8B9FC0}
+</style>
+
+<div class="root">
+<div class="hdr">
+  <div class="hdr-eye">MesaFlow by NautilusTech · Brand Export System v1.0</div>
+  <div class="hdr-h1">Logo Oficial — Kit Completo de Exportación</div>
+  <div class="hdr-sub">Nautilus Grid · 12 variantes · Guía de uso · Especificaciones técnicas</div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="sw(0)">Horizontal</button>
+  <button class="tab" onclick="sw(1)">Vertical</button>
+  <button class="tab" onclick="sw(2)">Isotipo</button>
+  <button class="tab" onclick="sw(3)">Favicons</button>
+  <button class="tab" onclick="sw(4)">App Icon</button>
+  <button class="tab" onclick="sw(5)">Social</button>
+  <button class="tab" onclick="sw(6)">UI Contexts</button>
+  <button class="tab" onclick="sw(7)">Guía de Uso</button>
+  <button class="tab" onclick="sw(8)">Exportaciones</button>
+</div>
+
+<div class="body">
+
+<!-- HORIZONTAL -->
+<div class="sec on" id="s0">
+  <div class="sec-lbl">Logo Horizontal · Versión Primaria Oficial</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-lbl">Dark · Uso principal en UI</div>
+      <div class="preview-dark">
+        <svg width="220" height="52" viewBox="0 0 220 52">
+          <defs>
+            <linearGradient id="ng1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient>
+          </defs>
+          <rect x="4" y="6" width="42" height="42" rx="10" fill="#111C2D"/>
+          <line x1="25" y1="10" x2="25" y2="44" stroke="rgba(0,212,255,0.18)" stroke-width="0.8"/>
+          <line x1="6" y1="27" x2="44" y2="27" stroke="rgba(0,212,255,0.18)" stroke-width="0.8"/>
+          <path d="M25 27 Q25 18 33 18 Q41 18 41 26 Q41 34 33 34 Q29 34 29 30.5 Q29 28.5 31.5 28.5" stroke="url(#ng1)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="31.5" cy="28.5" r="2.2" fill="#00FFC6"/>
+          <rect x="4" y="6" width="42" height="42" rx="10" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+          <text x="56" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" letter-spacing="-0.8">Mesa</text>
+          <text x="105" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="300" fill="#00D4FF" letter-spacing="-0.4">Flow</text>
+          <text x="56" y="40" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#4A5E7A" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-horizontal-dark.svg · Fondo: #07111F, #0B1726, #111C2D</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Light · Menú QR, documentos, impresión</div>
+      <div class="preview-light">
+        <svg width="220" height="52" viewBox="0 0 220 52">
+          <defs>
+            <linearGradient id="ng1l" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0088AA"/><stop offset="100%" stop-color="#009980"/></linearGradient>
+          </defs>
+          <rect x="4" y="6" width="42" height="42" rx="10" fill="#07111F"/>
+          <line x1="25" y1="10" x2="25" y2="44" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+          <line x1="6" y1="27" x2="44" y2="27" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+          <path d="M25 27 Q25 18 33 18 Q41 18 41 26 Q41 34 33 34 Q29 34 29 30.5 Q29 28.5 31.5 28.5" stroke="url(#ng1l)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="31.5" cy="28.5" r="2.2" fill="#009980"/>
+          <rect x="4" y="6" width="42" height="42" rx="10" fill="none" stroke="rgba(0,100,130,0.35)" stroke-width="0.8"/>
+          <text x="56" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="700" fill="#07111F" letter-spacing="-0.8">Mesa</text>
+          <text x="105" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="300" fill="#0088AA" letter-spacing="-0.4">Flow</text>
+          <text x="56" y="40" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#8B9FC0" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-horizontal-light.svg · Fondo: #FFFFFF, #F0F4FF</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Monocromático dark · Documentos, PDF</div>
+      <div class="preview-dark">
+        <svg width="220" height="52" viewBox="0 0 220 52">
+          <rect x="4" y="6" width="42" height="42" rx="10" fill="rgba(255,255,255,0.08)"/>
+          <line x1="25" y1="10" x2="25" y2="44" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="6" y1="27" x2="44" y2="27" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <path d="M25 27 Q25 18 33 18 Q41 18 41 26 Q41 34 33 34 Q29 34 29 30.5 Q29 28.5 31.5 28.5" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="31.5" cy="28.5" r="2.2" fill="#FFFFFF"/>
+          <rect x="4" y="6" width="42" height="42" rx="10" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+          <text x="56" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" letter-spacing="-0.8">Mesa</text>
+          <text x="105" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="300" fill="rgba(255,255,255,0.7)" letter-spacing="-0.4">Flow</text>
+          <text x="56" y="40" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="rgba(255,255,255,0.3)" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-horizontal-mono-white.svg</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Monocromático light · Impresión, grabado</div>
+      <div class="preview-white">
+        <svg width="220" height="52" viewBox="0 0 220 52">
+          <rect x="4" y="6" width="42" height="42" rx="10" fill="#07111F"/>
+          <line x1="25" y1="10" x2="25" y2="44" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="6" y1="27" x2="44" y2="27" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <path d="M25 27 Q25 18 33 18 Q41 18 41 26 Q41 34 33 34 Q29 34 29 30.5 Q29 28.5 31.5 28.5" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="31.5" cy="28.5" r="2.2" fill="#FFFFFF"/>
+          <text x="56" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="700" fill="#07111F" letter-spacing="-0.8">Mesa</text>
+          <text x="105" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="300" fill="#4A5E7A" letter-spacing="-0.4">Flow</text>
+          <text x="56" y="40" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="400" fill="#8B9FC0" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-horizontal-mono-dark.svg</div>
+    </div>
+  </div>
+  <div class="card">
+    <table class="spec-table">
+      <tr><td>Dimensiones base</td><td>220 × 52 px (viewBox nativo)</td></tr>
+      <tr><td>Tipografía</td><td>Inter 700 "Mesa" + Inter 300 "Flow" · tracking -0.8px / -0.4px</td></tr>
+      <tr><td>Tamaño mínimo</td><td>120px ancho · por debajo usar versión isotipo</td></tr>
+      <tr><td>Subtítulo</td><td>"BY NAUTILUSTECH" · 8px · letter-spacing 0.14em · color #4A5E7A</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- VERTICAL -->
+<div class="sec" id="s1">
+  <div class="sec-lbl">Logo Vertical · Uso en espacios cuadrados o centrados</div>
+  <div class="grid3">
+    <div class="card">
+      <div class="card-lbl">Vertical Dark</div>
+      <div class="preview-dark">
+        <svg width="130" height="120" viewBox="0 0 130 120">
+          <defs><linearGradient id="nv1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <rect x="39" y="4" width="52" height="52" rx="13" fill="#111C2D"/>
+          <line x1="65" y1="9" x2="65" y2="52" stroke="rgba(0,212,255,0.18)" stroke-width="0.8"/>
+          <line x1="42" y1="30" x2="88" y2="30" stroke="rgba(0,212,255,0.18)" stroke-width="0.8"/>
+          <path d="M65 30 Q65 19 74 19 Q83 19 83 28 Q83 37 74 37 Q70 37 70 33.5 Q70 31.5 72 31.5" stroke="url(#nv1)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle cx="72" cy="31.5" r="2.5" fill="#00FFC6"/>
+          <rect x="39" y="4" width="52" height="52" rx="13" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+          <text x="65" y="74" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="-0.6">Mesa</text>
+          <text x="65" y="92" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="300" fill="#00D4FF" text-anchor="middle" letter-spacing="-0.4">Flow</text>
+          <text x="65" y="110" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="400" fill="#4A5E7A" text-anchor="middle" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-vertical-dark.svg</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Vertical Light</div>
+      <div class="preview-light">
+        <svg width="130" height="120" viewBox="0 0 130 120">
+          <defs><linearGradient id="nv1l" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0088AA"/><stop offset="100%" stop-color="#009980"/></linearGradient></defs>
+          <rect x="39" y="4" width="52" height="52" rx="13" fill="#07111F"/>
+          <line x1="65" y1="9" x2="65" y2="52" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+          <line x1="42" y1="30" x2="88" y2="30" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+          <path d="M65 30 Q65 19 74 19 Q83 19 83 28 Q83 37 74 37 Q70 37 70 33.5 Q70 31.5 72 31.5" stroke="url(#nv1l)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle cx="72" cy="31.5" r="2.5" fill="#009980"/>
+          <rect x="39" y="4" width="52" height="52" rx="13" fill="none" stroke="rgba(0,80,100,0.3)" stroke-width="0.8"/>
+          <text x="65" y="74" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#07111F" text-anchor="middle" letter-spacing="-0.6">Mesa</text>
+          <text x="65" y="92" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="300" fill="#0088AA" text-anchor="middle" letter-spacing="-0.4">Flow</text>
+          <text x="65" y="110" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="400" fill="#8B9FC0" text-anchor="middle" letter-spacing="0.14em">BY NAUTILUSTECH</text>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-vertical-light.svg</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Vertical Mono White</div>
+      <div class="preview-dark">
+        <svg width="130" height="120" viewBox="0 0 130 120">
+          <rect x="39" y="4" width="52" height="52" rx="13" fill="rgba(255,255,255,0.07)"/>
+          <line x1="65" y1="9" x2="65" y2="52" stroke="rgba(255,255,255,0.12)" stroke-width="0.8"/>
+          <line x1="42" y1="30" x2="88" y2="30" stroke="rgba(255,255,255,0.12)" stroke-width="0.8"/>
+          <path d="M65 30 Q65 19 74 19 Q83 19 83 28 Q83 37 74 37 Q70 37 70 33.5 Q70 31.5 72 31.5" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle cx="72" cy="31.5" r="2.5" fill="#FFFFFF"/>
+          <rect x="39" y="4" width="52" height="52" rx="13" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.8"/>
+          <text x="65" y="74" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">Mesa</text>
+          <text x="65" y="92" font-family="system-ui,-apple-system,sans-serif" font-size="17" font-weight="300" fill="rgba(255,255,255,0.65)" text-anchor="middle">Flow</text>
+          <text x="65" y="110" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="400" fill="rgba(255,255,255,0.3)" text-anchor="middle" letter-spacing="0.12em">BY NAUTILUSTECH</text>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-vertical-mono-white.svg</div>
+    </div>
+  </div>
+  <div class="card">
+    <table class="spec-table">
+      <tr><td>Dimensiones base</td><td>130 × 120 px (viewBox nativo)</td></tr>
+      <tr><td>Uso recomendado</td><td>Splash screens, slides centradas, print centrado, about page</td></tr>
+      <tr><td>Tamaño mínimo</td><td>90px ancho — por debajo usar isotipo standalone</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ISOTIPO -->
+<div class="sec" id="s2">
+  <div class="sec-lbl">Isotipo Standalone · Nautilus Grid mark</div>
+  <div class="grid3">
+    <div class="card">
+      <div class="card-lbl">Isotipo Dark — con contenedor</div>
+      <div class="preview-dark">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <defs><linearGradient id="ni1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <rect x="0" y="0" width="80" height="80" rx="18" fill="#0B1726"/>
+          <rect x="0" y="0" width="80" height="80" rx="18" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+          <line x1="40" y1="12" x2="40" y2="68" stroke="rgba(0,212,255,0.14)" stroke-width="0.8"/>
+          <line x1="12" y1="40" x2="68" y2="40" stroke="rgba(0,212,255,0.14)" stroke-width="0.8"/>
+          <path d="M40 40 Q40 26 51 26 Q62 26 62 37 Q62 48 51 48 Q45.5 48 45.5 44 Q45.5 41.5 48 41.5" stroke="url(#ni1)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="48" cy="41.5" r="3" fill="#00FFC6"/>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-isotipo-dark.svg · 80×80</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Isotipo Light — con contenedor</div>
+      <div class="preview-light">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <defs><linearGradient id="ni1l" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0088AA"/><stop offset="100%" stop-color="#009980"/></linearGradient></defs>
+          <rect x="0" y="0" width="80" height="80" rx="18" fill="#07111F"/>
+          <rect x="0" y="0" width="80" height="80" rx="18" fill="none" stroke="rgba(0,140,180,0.3)" stroke-width="1"/>
+          <line x1="40" y1="12" x2="40" y2="68" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+          <line x1="12" y1="40" x2="68" y2="40" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+          <path d="M40 40 Q40 26 51 26 Q62 26 62 37 Q62 48 51 48 Q45.5 48 45.5 44 Q45.5 41.5 48 41.5" stroke="url(#ni1l)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="48" cy="41.5" r="3" fill="#009980"/>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-isotipo-light.svg · 80×80</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Isotipo sin contenedor · Transparente</div>
+      <div class="preview-mid">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <defs><linearGradient id="ni1t" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <line x1="40" y1="8" x2="40" y2="72" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+          <line x1="8" y1="40" x2="72" y2="40" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+          <path d="M40 40 Q40 24 53 24 Q66 24 66 37 Q66 50 53 50 Q47 50 47 45.5 Q47 42.5 50 42.5" stroke="url(#ni1t)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          <circle cx="50" cy="42.5" r="3.5" fill="#00FFC6"/>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-isotipo-transparent.svg</div>
+    </div>
+  </div>
+  <div class="card">
+    <table class="spec-table">
+      <tr><td>Anatomía</td><td>Espiral logarítmica (ADN Nautilus) + cuadrícula 2×2 sutil + punto terminal mint</td></tr>
+      <tr><td>Uso sin contenedor</td><td>Sobre backgrounds propios del producto (dashboard header, sidebar)</td></tr>
+      <tr><td>Uso con contenedor</td><td>App stores, avatars, badges, social media profiles</td></tr>
+      <tr><td>Tamaño mínimo</td><td>24×24px — por debajo el trazo de la espiral pierde legibilidad</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- FAVICONS -->
+<div class="sec" id="s3">
+  <div class="sec-lbl">Favicons · Sistema Multi-Resolución</div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-lbl">Todas las variantes — fondo dark oficial</div>
+    <div class="fav-row" style="padding:12px 0">
+      <div class="fav-item">
+        <div style="background:#0B1726;border-radius:16px;width:64px;height:64px;display:flex;align-items:center;justify-content:center">
+          <svg width="44" height="44" viewBox="0 0 44 44">
+            <defs><linearGradient id="fv64" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+            <line x1="22" y1="5" x2="22" y2="39" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+            <line x1="5" y1="22" x2="39" y2="22" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+            <path d="M22 22 Q22 13 29 13 Q36 13 36 20 Q36 27 29 27 Q26 27 26 24.5 Q26 23 27.5 23" stroke="url(#fv64)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="27.5" cy="23" r="2" fill="#00FFC6"/>
+          </svg>
+        </div>
+        <div class="fav-lbl">512×512</div>
+        <div class="fav-lbl" style="color:#00FFC6">app icon</div>
+      </div>
+      <div class="fav-item">
+        <div style="background:#0B1726;border-radius:14px;width:57px;height:57px;display:flex;align-items:center;justify-content:center">
+          <svg width="38" height="38" viewBox="0 0 38 38">
+            <defs><linearGradient id="fv57" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+            <line x1="19" y1="4" x2="19" y2="34" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+            <line x1="4" y1="19" x2="34" y2="19" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+            <path d="M19 19 Q19 11 25 11 Q31 11 31 17 Q31 23 25 23 Q22.5 23 22.5 21 Q22.5 20 24 20" stroke="url(#fv57)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <circle cx="24" cy="20" r="1.8" fill="#00FFC6"/>
+          </svg>
+        </div>
+        <div class="fav-lbl">180×180</div>
+        <div class="fav-lbl" style="color:#8B9FC0">iOS</div>
+      </div>
+      <div class="fav-item">
+        <div style="background:#0B1726;border-radius:7px;width:32px;height:32px;display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 22 22">
+            <defs><linearGradient id="fv32" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+            <line x1="11" y1="3" x2="11" y2="19" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+            <line x1="3" y1="11" x2="19" y2="11" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+            <path d="M11 11 Q11 6 15 6 Q19 6 19 10 Q19 14 15 14 Q13.2 14 13.2 12.5 Q13.2 11.5 14.2 11.5" stroke="url(#fv32)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <circle cx="14.2" cy="11.5" r="1.5" fill="#00FFC6"/>
+          </svg>
+        </div>
+        <div class="fav-lbl">32×32</div>
+        <div class="fav-lbl" style="color:#8B9FC0">browser</div>
+      </div>
+      <div class="fav-item">
+        <div style="background:#0B1726;border-radius:4px;width:16px;height:16px;display:flex;align-items:center;justify-content:center">
+          <svg width="11" height="11" viewBox="0 0 11 11">
+            <path d="M5.5 5.5 Q5.5 2 8 2 Q10.5 2 10.5 4.5 Q10.5 7 8 7 Q6.8 7 6.8 6.2 Q6.8 5.7 7.5 5.7" stroke="#00D4FF" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <circle cx="7.5" cy="5.7" r="1" fill="#00FFC6"/>
+          </svg>
+        </div>
+        <div class="fav-lbl">16×16</div>
+        <div class="fav-lbl" style="color:#8B9FC0">tab</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <table class="spec-table">
+      <tr><td>16×16 .ico</td><td>Espiral simplificada + punto terminal · sin cuadrícula · stroke 1.3px</td></tr>
+      <tr><td>32×32 .png</td><td>Espiral con cuadrícula sutil · stroke 1.6px · punto 1.5r</td></tr>
+      <tr><td>180×180 .png</td><td>Versión iOS · mismo isotipo · border-radius 14px en contenedor</td></tr>
+      <tr><td>512×512 .png</td><td>App store / PWA · full detail · border-radius 16% del tamaño</td></tr>
+      <tr><td>Formato .ico</td><td>Multi-size: 16 + 32 + 48 px embebidos en un solo archivo</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- APP ICON 512 -->
+<div class="sec" id="s4">
+  <div class="sec-lbl">App Icon 512×512 · PWA · App Store · Play Store</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-lbl">Versión Dark · App Store / PWA</div>
+      <div class="preview-dark" style="min-height:200px">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <defs><linearGradient id="ap1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <rect x="0" y="0" width="160" height="160" rx="36" fill="#0B1726"/>
+          <rect x="0" y="0" width="160" height="160" rx="36" fill="none" stroke="rgba(0,212,255,0.18)" stroke-width="1.5"/>
+          <line x1="80" y1="20" x2="80" y2="140" stroke="rgba(0,212,255,0.12)" stroke-width="1"/>
+          <line x1="20" y1="80" x2="140" y2="80" stroke="rgba(0,212,255,0.12)" stroke-width="1"/>
+          <path d="M80 80 Q80 50 100 50 Q120 50 120 70 Q120 90 100 90 Q90 90 90 84 Q90 80 94 80" stroke="url(#ap1)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <circle cx="94" cy="80" r="6" fill="#00FFC6"/>
+        </svg>
+      </div>
+      <div class="card-sub mono">mesaflow-appicon-512-dark.png · background #0B1726</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Especificaciones técnicas</div>
+      <table class="spec-table" style="margin-top:0">
+        <tr><td>Tamaño exportación</td><td>512 × 512 px · PNG-32</td></tr>
+        <tr><td>Formato adicional</td><td>1024×1024 para App Store (retina)</td></tr>
+        <tr><td>Border radius</td><td>iOS aplica su propio squircle · exportar en cuadrado perfecto</td></tr>
+        <tr><td>Play Store</td><td>512×512 · sin transparencia · fondo sólido #0B1726</td></tr>
+        <tr><td>PWA manifest</td><td>192×192 + 512×512 · purpose: "any maskable"</td></tr>
+        <tr><td>Android adaptive</td><td>Foreground 108×108dp sobre fondo #0B1726</td></tr>
+        <tr><td>Área segura</td><td>Espiral dentro del 70% central del canvas</td></tr>
+        <tr><td>Stroke mínimo</td><td>4px en 512px = 0.78% del canvas · legible</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL PREVIEW -->
+<div class="sec" id="s5">
+  <div class="sec-lbl">Social Preview · OG Image 1200×630 · Twitter / LinkedIn / WhatsApp</div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-lbl">Open Graph Image oficial · 1200×630px</div>
+    <div style="background:#07111F;border-radius:10px;padding:24px 32px;min-height:160px;display:flex;align-items:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,212,255,0.06) 0%,transparent 70%);pointer-events:none"></div>
+      <div style="position:absolute;bottom:-60px;left:30%;width:160px;height:160px;background:radial-gradient(circle,rgba(0,255,198,0.05) 0%,transparent 70%);pointer-events:none"></div>
+      <div style="flex:1">
+        <svg width="180" height="42" viewBox="0 0 180 42" style="margin-bottom:12px">
+          <defs><linearGradient id="og1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <rect x="0" y="0" width="38" height="38" rx="9" fill="#111C2D"/>
+          <line x1="19" y1="4" x2="19" y2="34" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+          <line x1="3" y1="19" x2="35" y2="19" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+          <path d="M19 19 Q19 11 25 11 Q31 11 31 17 Q31 23 25 23 Q22.5 23 22.5 21 Q22.5 19.5 24 19.5" stroke="url(#og1)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <circle cx="24" cy="19.5" r="2" fill="#00FFC6"/>
+          <rect x="0" y="0" width="38" height="38" rx="9" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+          <text x="47" y="16" font-family="system-ui,-apple-system,sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" letter-spacing="-0.6">Mesa</text>
+          <text x="89" y="16" font-family="system-ui,-apple-system,sans-serif" font-size="15" font-weight="300" fill="#00D4FF" letter-spacing="-0.3">Flow</text>
+          <text x="47" y="30" font-family="system-ui,-apple-system,sans-serif" font-size="7" font-weight="400" fill="#4A5E7A" letter-spacing="0.12em">BY NAUTILUSTECH</text>
+        </svg>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">POS moderno para restaurantes que crecen</div>
+        <div style="font-size:11px;color:#8B9FC0">QR · Cocina · Dashboard · WhatsApp · IA · mesaflow.app</div>
+      </div>
+      <div style="margin-left:24px;text-align:right">
+        <div style="font-size:10px;color:#4A5E7A;margin-bottom:4px">RATIO</div>
+        <div style="font-size:13px;font-weight:700;color:#00D4FF;font-family:monospace">1200×630</div>
+        <div style="font-size:9px;color:#4A5E7A;margin-top:2px">1.91:1</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <table class="spec-table">
+      <tr><td>Dimensión OG</td><td>1200 × 630 px · ratio 1.91:1 · PNG o JPG 85%</td></tr>
+      <tr><td>Twitter Card</td><td>1200 × 628 px · "summary_large_image"</td></tr>
+      <tr><td>LinkedIn</td><td>1200 × 628 px · recomendado PNG</td></tr>
+      <tr><td>WhatsApp preview</td><td>300 × 200 mínimo · thumbnail del OG image</td></tr>
+      <tr><td>Composición</td><td>Logo horizontal izq. · tagline centro · URL der. · ambient glow</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- UI CONTEXTS -->
+<div class="sec" id="s6">
+  <div class="sec-lbl">Contextos de UI · Cómo aparece el logo en el producto</div>
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-lbl">Dashboard — header logo</div>
+      <div style="background:#0B1726;border-radius:8px;overflow:hidden">
+        <div style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,212,255,0.1)">
+          <svg width="150" height="34" viewBox="0 0 150 34">
+            <defs><linearGradient id="hd1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+            <rect x="0" y="1" width="30" height="30" rx="7" fill="#111C2D"/>
+            <line x1="15" y1="5" x2="15" y2="27" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+            <line x1="3" y1="16" x2="27" y2="16" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+            <path d="M15 16 Q15 9 20.5 9 Q26 9 26 14.5 Q26 20 20.5 20 Q18 20 18 18 Q18 16.8 19.5 16.8" stroke="url(#hd1)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <circle cx="19.5" cy="16.8" r="1.6" fill="#00FFC6"/>
+            <rect x="0" y="1" width="30" height="30" rx="7" fill="none" stroke="rgba(0,212,255,0.18)" stroke-width="0.7"/>
+            <text x="38" y="15" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">Mesa</text>
+            <text x="76" y="15" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="300" fill="#00D4FF" letter-spacing="-0.3">Flow</text>
+            <text x="38" y="27" font-family="system-ui,-apple-system,sans-serif" font-size="6" font-weight="400" fill="#4A5E7A" letter-spacing="0.1em">BY NAUTILUSTECH</text>
+          </svg>
+          <div style="width:24px;height:24px;background:linear-gradient(135deg,#00D4FF,#00FFC6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#07111F">JG</div>
+        </div>
+        <div style="padding:10px 16px;font-size:10px;color:#4A5E7A">contenido del dashboard...</div>
+      </div>
+      <div class="card-sub mono">height: 56px · logo 150×34px · padding 16px</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Sidebar — logo compacto</div>
+      <div style="background:#0B1726;border-radius:8px;display:flex;overflow:hidden;min-height:120px">
+        <div style="width:56px;background:#07111F;border-right:1px solid rgba(0,212,255,0.1);padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:16px">
+          <svg width="34" height="34" viewBox="0 0 34 34">
+            <defs><linearGradient id="sb1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+            <rect x="0" y="0" width="34" height="34" rx="8" fill="#111C2D"/>
+            <line x1="17" y1="5" x2="17" y2="29" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+            <line x1="5" y1="17" x2="29" y2="17" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+            <path d="M17 17 Q17 10 22 10 Q27 10 27 15 Q27 20 22 20 Q19.5 20 19.5 18.5 Q19.5 17.5 21 17.5" stroke="url(#sb1)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <circle cx="21" cy="17.5" r="1.5" fill="#00FFC6"/>
+          </svg>
+          <div style="width:20px;height:1px;background:rgba(0,212,255,0.1)"></div>
+          <div style="width:20px;height:3px;background:rgba(255,255,255,0.06);border-radius:2px"></div>
+          <div style="width:20px;height:3px;background:rgba(255,255,255,0.04);border-radius:2px"></div>
+          <div style="width:20px;height:3px;background:rgba(255,255,255,0.04);border-radius:2px"></div>
+        </div>
+        <div style="padding:12px;flex:1;font-size:10px;color:#4A5E7A">sidebar colapsado — solo isotipo 34×34px</div>
+      </div>
+      <div class="card-sub mono">Sidebar collapsed · isotipo 34×34 · sin texto</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-lbl">Menú QR — header versión light</div>
+    <div style="background:#FFFFFF;border-radius:8px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between">
+      <svg width="140" height="30" viewBox="0 0 140 30">
+        <defs><linearGradient id="qr1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0088AA"/><stop offset="100%" stop-color="#009980"/></linearGradient></defs>
+        <rect x="0" y="0" width="28" height="28" rx="6" fill="#07111F"/>
+        <line x1="14" y1="4" x2="14" y2="24" stroke="rgba(0,212,255,0.25)" stroke-width="0.7"/>
+        <line x1="3" y1="14" x2="25" y2="14" stroke="rgba(0,212,255,0.25)" stroke-width="0.7"/>
+        <path d="M14 14 Q14 8 18.5 8 Q23 8 23 12.5 Q23 17 18.5 17 Q16.5 17 16.5 15.5 Q16.5 14.5 18 14.5" stroke="url(#qr1)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <circle cx="18" cy="14.5" r="1.4" fill="#009980"/>
+        <text x="35" y="12" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#07111F" letter-spacing="-0.4">MesaFlow</text>
+        <text x="35" y="24" font-family="system-ui,-apple-system,sans-serif" font-size="6" font-weight="400" fill="#8B9FC0" letter-spacing="0.1em">BY NAUTILUSTECH</text>
+      </svg>
+      <div style="font-size:10px;color:#8B9FC0">Mesa 7 · 4 personas</div>
+    </div>
+    <div class="card-sub mono">QR Menu header · versión light · background #FFFFFF</div>
+  </div>
+</div>
+
+<!-- GUÍA DE USO -->
+<div class="sec" id="s7">
+  <div class="sec-lbl">Guía Oficial de Uso del Logo · Brand Guidelines</div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-lbl">Zona de protección (clear zone)</div>
+    <div class="clearzone-demo">
+      <div class="cz-box">
+        <span class="cz-label" style="top:-16px;left:50%;transform:translateX(-50%)">1× altura del isotipo</span>
+        <span class="cz-label" style="bottom:-16px;left:50%;transform:translateX(-50%)">1× altura del isotipo</span>
+        <span class="cz-label" style="left:-8px;top:50%;transform:translateY(-50%) rotate(0deg);white-space:nowrap">1×</span>
+        <span class="cz-label" style="right:-8px;top:50%;transform:translateY(-50%)">1×</span>
+        <svg width="160" height="38" viewBox="0 0 160 38">
+          <defs><linearGradient id="cz1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <rect x="0" y="0" width="34" height="34" rx="8" fill="#111C2D"/>
+          <line x1="17" y1="4" x2="17" y2="30" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+          <line x1="3" y1="17" x2="31" y2="17" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+          <path d="M17 17 Q17 10 22 10 Q27 10 27 15 Q27 20 22 20 Q19.5 20 19.5 18.5 Q19.5 17.5 21 17.5" stroke="url(#cz1)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <circle cx="21" cy="17.5" r="1.5" fill="#00FFC6"/>
+          <text x="42" y="15" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">Mesa</text>
+          <text x="79" y="15" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="300" fill="#00D4FF">Flow</text>
+          <text x="42" y="27" font-family="system-ui,-apple-system,sans-serif" font-size="6" font-weight="400" fill="#4A5E7A" letter-spacing="0.1em">BY NAUTILUSTECH</text>
+        </svg>
+      </div>
+    </div>
+    <div class="card-sub">La zona de protección mínima es igual a la altura del isotipo en cada lado. Nunca colocar texto, imágenes u otros elementos dentro de esta zona.</div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="do-lbl">Usos correctos</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="do-card"><div class="rule-title">Sobre fondos oscuros oficiales</div><div class="rule-desc">#07111F · #0B1726 · #111C2D — cualquier tono dentro de la paleta dark de MesaFlow</div></div>
+        <div class="do-card"><div class="rule-title">Sobre blanco o gris muy claro</div><div class="rule-desc">Usar versión light · fondo mínimo #F0F0F0 · contraste garantizado</div></div>
+        <div class="do-card"><div class="rule-title">Isotipo solo en espacios pequeños</div><div class="rule-desc">Por debajo de 120px usar solo el isotipo sin texto wordmark</div></div>
+        <div class="do-card"><div class="rule-title">Escala proporcional siempre</div><div class="rule-desc">Mantener ratio ancho/alto bloqueado · nunca deformar el logo</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="dont-lbl">Usos incorrectos</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="dont-card"><div class="rule-title">No usar sobre fondos de color</div><div class="rule-desc">No colocar sobre rojo, verde, morado u otros fondos que no sean de la paleta oficial</div></div>
+        <div class="dont-card"><div class="rule-title">No estirar ni distorsionar</div><div class="rule-desc">Nunca cambiar las proporciones independientemente en X o Y</div></div>
+        <div class="dont-card"><div class="rule-title">No cambiar los colores del gradiente</div><div class="rule-desc">La espiral siempre va de #00D4FF a #00FFC6 — no sustituir por otros colores</div></div>
+        <div class="dont-card"><div class="rule-title">No agregar efectos</div><div class="rule-desc">Sin sombras externas, sin drop-shadows, sin filtros, sin bordes adicionales al isotipo</div></div>
+        <div class="dont-card"><div class="rule-title">No rotar el logo</div><div class="rule-desc">El logo va siempre en posición horizontal o vertical definida — nunca en ángulo</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Tamaños mínimos de uso</div>
+    <div class="size-demo">
+      <div class="size-item">
+        <svg width="120" height="28" viewBox="0 0 120 28">
+          <defs><linearGradient id="sz1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <rect x="0" y="0" width="24" height="24" rx="5" fill="#111C2D"/>
+          <line x1="12" y1="3" x2="12" y2="21" stroke="rgba(0,212,255,0.2)" stroke-width="0.6"/>
+          <line x1="2" y1="12" x2="22" y2="12" stroke="rgba(0,212,255,0.2)" stroke-width="0.6"/>
+          <path d="M12 12 Q12 7 16 7 Q20 7 20 11 Q20 15 16 15 Q14 15 14 13.5 Q14 12.5 15.5 12.5" stroke="url(#sz1)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          <circle cx="15.5" cy="12.5" r="1.3" fill="#00FFC6"/>
+          <text x="28" y="11" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="700" fill="#FFFFFF">Mesa</text>
+          <text x="57" y="11" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="300" fill="#00D4FF">Flow</text>
+          <text x="28" y="21" font-family="system-ui,-apple-system,sans-serif" font-size="5" fill="#4A5E7A" letter-spacing="0.08em">BY NAUTILUSTECH</text>
+        </svg>
+        <div class="size-lbl" style="color:#00FFC6">120px — mínimo horizontal</div>
+      </div>
+      <div class="size-item">
+        <svg width="80" height="24" viewBox="0 0 80 24">
+          <defs><linearGradient id="sz2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <rect x="0" y="0" width="20" height="20" rx="4" fill="#111C2D"/>
+          <path d="M10 10 Q10 5.5 13.5 5.5 Q17 5.5 17 9 Q17 12.5 13.5 12.5 Q11.8 12.5 11.8 11.2 Q11.8 10.4 13 10.4" stroke="url(#sz2)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <circle cx="13" cy="10.4" r="1.1" fill="#00FFC6"/>
+          <text x="24" y="10" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#FFFFFF">Mesa</text>
+          <text x="49" y="10" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="300" fill="#00D4FF">Flow</text>
+          <text x="24" y="19" font-family="system-ui,-apple-system,sans-serif" font-size="4.5" fill="#4A5E7A" letter-spacing="0.07em">BY NAUTILUSTECH</text>
+        </svg>
+        <div class="size-lbl" style="color:#FFD700">80px — límite, legible justo</div>
+      </div>
+      <div class="size-item">
+        <svg width="32" height="32" viewBox="0 0 32 32">
+          <defs><linearGradient id="sz3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00FFC6"/></linearGradient></defs>
+          <rect x="0" y="0" width="32" height="32" rx="7" fill="#0B1726"/>
+          <line x1="16" y1="4" x2="16" y2="28" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+          <line x1="4" y1="16" x2="28" y2="16" stroke="rgba(0,212,255,0.2)" stroke-width="0.7"/>
+          <path d="M16 16 Q16 9 21 9 Q26 9 26 14 Q26 19 21 19 Q18.8 19 18.8 17.5 Q18.8 16.5 20 16.5" stroke="url(#sz3)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <circle cx="20" cy="16.5" r="1.5" fill="#00FFC6"/>
+        </svg>
+        <div class="size-lbl" style="color:#8B9FC0">32px — solo isotipo</div>
+      </div>
+      <div class="size-item">
+        <svg width="16" height="16" viewBox="0 0 16 16">
+          <rect x="0" y="0" width="16" height="16" rx="3" fill="#0B1726"/>
+          <path d="M8 8 Q8 4.5 10.5 4.5 Q13 4.5 13 7 Q13 9.5 10.5 9.5 Q9.3 9.5 9.3 8.5 Q9.3 8 10 8" stroke="#00D4FF" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <circle cx="10" cy="8" r="1" fill="#00FFC6"/>
+        </svg>
+        <div class="size-lbl" style="color:#8B9FC0">16px — favicon</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORTACIONES -->
+<div class="sec" id="s8">
+  <div class="sec-lbl">Plan de Exportación Completo · Archivos y Formatos</div>
+  <div class="export-row" style="margin-bottom:14px">
+    <div class="export-item"><div class="export-name">mesaflow-horizontal-dark</div><div class="export-size">220 × 52</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG@2x</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-horizontal-light</div><div class="export-size">220 × 52</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG@2x</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-horizontal-mono-white</div><div class="export-size">220 × 52</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-horizontal-mono-dark</div><div class="export-size">220 × 52</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-vertical-dark</div><div class="export-size">130 × 120</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG@2x</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-vertical-light</div><div class="export-size">130 × 120</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG@2x</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-isotipo-dark</div><div class="export-size">80 × 80</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG@2x</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-isotipo-light</div><div class="export-size">80 × 80</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG@2x</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-isotipo-transparent</div><div class="export-size">80 × 80</div><div class="export-fmt"><span class="fmt-tag">SVG</span><span class="fmt-tag png">PNG-32</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-favicon-16</div><div class="export-size">16 × 16</div><div class="export-fmt"><span class="fmt-tag ico">ICO</span><span class="fmt-tag png">PNG</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-favicon-32</div><div class="export-size">32 × 32</div><div class="export-fmt"><span class="fmt-tag ico">ICO</span><span class="fmt-tag png">PNG</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-favicon-multi</div><div class="export-size">16+32+48</div><div class="export-fmt"><span class="fmt-tag ico">favicon.ico</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-appicon-512</div><div class="export-size">512 × 512</div><div class="export-fmt"><span class="fmt-tag png">PNG-32</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-appicon-1024</div><div class="export-size">1024 × 1024</div><div class="export-fmt"><span class="fmt-tag png">PNG-32</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-social-og</div><div class="export-size">1200 × 630</div><div class="export-fmt"><span class="fmt-tag png">PNG</span></div></div>
+    <div class="export-item"><div class="export-name">mesaflow-social-square</div><div class="export-size">1080 × 1080</div><div class="export-fmt"><span class="fmt-tag png">PNG</span></div></div>
+  </div>
+  <div class="card">
+    <table class="spec-table">
+      <tr><td>SVG recomendado</td><td>Limpiar metadata · preservar viewBox · optimizar con SVGO · sin px absolutos</td></tr>
+      <tr><td>PNG exportación</td><td>PNG-32 (con canal alpha) para versiones transparentes · PNG-24 para fondos sólidos</td></tr>
+      <tr><td>Escala @2x</td><td>Multiplicar dimensiones × 2 para pantallas retina · guardar como @2x.png</td></tr>
+      <tr><td>Herramientas recomendadas</td><td>Figma Export · SVGO CLI · Squoosh para optimización PNG</td></tr>
+      <tr><td>Naming convention</td><td>kebab-case · producto-variante-tamaño · sin espacios ni caracteres especiales</td></tr>
+      <tr><td>Almacenamiento</td><td>Carpeta /brand/logos/ en repositorio · acceso restringido · versionar con git</td></tr>
+    </table>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+function sw(i){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('s'+i).classList.add('on');
+  document.querySelectorAll('.tab')[i].classList.add('on');
+}
+</script>
