@@ -1,0 +1,64 @@
+Quiero que actúes como un Senior SaaS Product Designer y UX Architect.
+Necesito crear el Design System oficial de MesaFlow by NautilusTech.
+IMPORTANTE: NO quiero un POS antiguo visualmente. NO quiero diseño tipo software viejo. NO quiero estilo Windows antiguo.
+MesaFlow debe sentirse:
+
+* Premium
+* Moderno
+* SaaS
+* Elegante
+* Minimalista
+* Operacional
+* Tecnológico
+* Dark Mode First
+Inspiración visual:
+
+* Stripe
+* Linear
+* Toast POS
+* Uber Eats
+* Notion
+Branding: Empresa: NautilusTech Sitio web: https://nautilustech.app/
+Paleta oficial:
+
+* #00D4FF
+* #00FFC6
+* #07111F
+* #0B1726
+* #111C2D
+Necesito crear el Design System completo incluyendo:
+
+1. Tipografía oficial
+2. Botones
+3. Inputs
+4. Cards
+5. Sidebar
+6. Navbar
+7. Dashboard widgets
+8. Badges
+9. Estados
+10. Tablas
+11. Modal windows
+12. Sistema responsive
+13. Mobile UX
+14. Pantallas cocina
+15. POS layout
+16. QR menu layout
+17. Sombras y glow
+18. Espaciados
+19. Iconografía
+20. Sistema de colores
+21. Dark mode
+22. Estilo visual de gráficas
+23. Estilo de formularios
+24. Loading states
+25. Empty states
+Quiero que generes:
+
+* Guía visual completa
+* Explicación UX
+* Recomendaciones SaaS
+* Tailwind classes sugeridas
+* Filosofía visual
+* Componentes reutilizables
+Todo debe verse extremadamente moderno y profesional.

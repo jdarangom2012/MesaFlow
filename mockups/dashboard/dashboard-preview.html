@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MesaFlow — Dashboard Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --bg:    #07111F;
+  --card:  #0B1726;
+  --panel: #111C2D;
+  --cy:    #00D4FF;
+  --mt:    #00FFC6;
+  --hi:    #E8F3FF;
+  --md:    #5D7A9A;
+  --lo:    #2A3F58;
+  --bd:    rgba(0,212,255,.09);
+  --bdh:   rgba(0,212,255,.2);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); min-height: 100vh; }
+body { font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; color: var(--hi); }
+.sy  { font-family: 'Syne', sans-serif; }
+.mo  { font-family: 'JetBrains Mono', monospace; }
+.gc {
+  background: linear-gradient(128deg, #00D4FF 0%, #00FFC6 54%, rgba(0,212,255,.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+/* layout shell */
+.shell {
+  display: flex; min-height: 100vh;
+}
+/* sidebar */
+.sb {
+  width: 220px; flex-shrink: 0;
+  background: var(--card);
+  border-right: 1px solid var(--bd);
+  display: flex; flex-direction: column;
+  padding: 20px 12px;
+  gap: 2px;
+}
+.sbi {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 11px; border-radius: 9px;
+  font-size: 13px; color: var(--md);
+  cursor: pointer; transition: all .18s;
+  position: relative;
+}
+.sbi:hover { background: rgba(0,212,255,.05); color: var(--hi); }
+.sbi.on { background: rgba(0,212,255,.1); color: var(--cy); font-weight: 500; }
+.sbi .badge {
+  margin-left: auto; font-size: 10px; padding: 2px 6px;
+  border-radius: 20px; font-weight: 600;
+}
+/* main area */
+.main { flex: 1; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+/* cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  transition: border-color .2s;
+}
+.card:hover { border-color: var(--bdh); }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+}
+/* metric cards */
+.kpi {
+  background: var(--panel);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color .22s, transform .22s;
+  cursor: default;
+}
+.kpi:hover { border-color: var(--bdh); transform: translateY(-2px); }
+/* badges */
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 6px; padding: 3px 9px;
+  font-size: 10px; font-weight: 600; letter-spacing: .04em;
+}
+.tag-cy { background: rgba(0,212,255,.11); color: var(--cy); }
+.tag-mt { background: rgba(0,255,198,.09); color: var(--mt); }
+.tag-am { background: rgba(255,184,0,.1); color: #FFB800; }
+.tag-re { background: rgba(255,80,80,.1); color: #FF5252; }
+/* chart bars */
+.bar { border-radius: 3px 3px 0 0; transition: opacity .18s; cursor: pointer; }
+.bar:hover { opacity: .75; }
+/* scan line */
+.scan { position: relative; overflow: hidden; }
+.scan::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0,212,255,.55), transparent);
+  animation: sc 5s linear infinite;
+}
+@keyframes sc { 0%{transform:translateY(-100%)} 100%{transform:translateY(2400%)} }
+/* pulse dot */
+.dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.35;transform:scale(.8)} }
+/* table rows */
+.tr { display: flex; align-items: center; padding: 9px 14px; border-bottom: 1px solid rgba(0,212,255,.05); transition: background .15s; }
+.tr:last-child { border-bottom: none; }
+.tr:hover { background: rgba(0,212,255,.04); }
+/* progress bar */
+.prog { height: 4px; border-radius: 2px; background: var(--lo); overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 2px; transition: width .4s ease; }
+/* mini sparkline path */
+.spark { fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+/* avatar */
+.av {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,212,255,.18); border-radius: 2px; }
+/* responsive: collapse sidebar below 900px */
+@media (max-width: 900px) {
+  .sb { display: none; }
+  .main { padding: 16px; }
+}
+@media (max-width: 640px) {
+  .grid4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid3 { grid-template-columns: 1fr !important; }
+  .grid2 { grid-template-columns: 1fr !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+  <aside class="sb">
+
+    <!-- Logo -->
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 10px;margin-bottom:20px">
+      <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00D4FF"/><stop offset="1" stop-color="#00FFC6"/></linearGradient></defs>
+        <rect width="36" height="36" rx="9" fill="#111C2D"/>
+        <rect width="36" height="36" rx="9" fill="none" stroke="rgba(0,212,255,.22)" stroke-width=".8"/>
+        <line x1="18" y1="5" x2="18" y2="31" stroke="rgba(0,212,255,.15)" stroke-width=".8"/>
+        <line x1="5" y1="18" x2="31" y2="18" stroke="rgba(0,212,255,.15)" stroke-width=".8"/>
+        <path d="M18 18 Q18 10 24 10 Q30 10 30 16 Q30 22 24 22 Q21 22 21 20 Q21 18.5 22.5 18.5" stroke="url(#lg)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <circle cx="22.5" cy="18.5" r="2.3" fill="#00FFC6"/>
+      </svg>
+      <div>
+        <div class="sy" style="font-size:15px;font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1">Mesa<span style="color:var(--cy)">Flow</span></div>
+        <div class="mo" style="font-size:8.5px;color:var(--lo);letter-spacing:.13em;margin-top:2px">BY NAUTILUSTECH</div>
+      </div>
+    </div>
+
+    <!-- Nav group -->
+    <div class="mo" style="font-size:9px;color:var(--lo);letter-spacing:.14em;padding:4px 11px;margin-bottom:4px">OPERACIONES</div>
+    <div class="sbi on">
+      <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="2" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="9" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+      Dashboard
+    </div>
+    <div class="sbi">
+      <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5.5V8l1.5 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Mesas en tiempo real
+      <span class="badge tag-cy">12</span>
+    </div>
+    <div class="sbi">
+      <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.3"/></svg>
+      Pedidos activos
+      <span class="badge tag-am">7</span>
+    </div>
+    <div class="sbi">
+      <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><path d="M2 12V5l6-3 6 3v7" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="5" y="8" width="6" height="4" rx=".5" stroke="currentColor" stroke-width="1.3"/></svg>
+      Kitchen Display
+    </div>
+    <div class="sbi">
+      <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 8h6M5 5.5h3M5 10.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      POS
+    </div>
+
+    <div class="mo" style="font-size:9px;color:var(--lo);letter-spacing:.14em;padding:4px 11px;margin-top:14px;margin-bottom:4px">CRECIMIENTO</div>
+    <div class="sbi">
+      <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><polyline points="2,12 5,7 8,9.5 11,5.5 14,8" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>
+      Analytics
+    </div>
+    <div class="sbi">
+      <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Clientes
+    </div>
+    <div class="sbi">
+      <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><path d="M8 1l1.8 5.5H16l-4.9 3.6 1.8 5.5L8 12.1l-4.9 3.5 1.8-5.5L1 6.5h6.2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      WhatsApp + IA
+    </div>
+
+    <!-- Bottom user -->
+    <div style="margin-top:auto;border-top:1px solid var(--bd);padding-top:14px">
+      <div class="sbi" style="gap:10px">
+        <div class="av" style="background:rgba(0,212,255,.14);color:var(--cy)">JG</div>
+        <div style="min-width:0">
+          <div style="font-size:12.5px;color:var(--hi);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">José García</div>
+          <div style="font-size:10.5px;color:var(--lo)">La Piazza · Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════ MAIN ══════════════════════ -->
+  <main class="main">
+
+    <!-- ── TOPBAR ── -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <div class="sy" style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-.03em">Buenos días, Chef José</div>
+        <div class="mo" style="font-size:11px;color:var(--md);margin-top:3px">Martes 27 mayo · 11:42 AM · Turno Almuerzo</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:9px;background:rgba(0,255,198,.09);border:1px solid rgba(0,255,198,.18)">
+          <div class="dot" style="background:var(--mt)"></div>
+          <span class="mo" style="font-size:11.5px;color:var(--mt)">Sistema operativo</span>
+        </div>
+        <div style="padding:7px 13px;border-radius:9px;background:var(--panel);border:1px solid var(--bd);font-size:12px;color:var(--md);cursor:pointer">
+          Exportar reporte
+        </div>
+      </div>
+    </div>
+
+    <!-- ── KPIs ── -->
+    <div class="grid4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+
+      <!-- Ventas -->
+      <div class="kpi">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div class="mo" style="font-size:10px;color:var(--md);letter-spacing:.05em">VENTAS HOY</div>
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><polyline points="2,12 5,7 8,9.5 11,5.5 14,8" stroke="var(--cy)" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="sy" style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-.04em;margin-bottom:6px">$847K</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="tag tag-mt">▲ +18.4%</span>
+          <span style="font-size:11px;color:var(--lo)">vs ayer</span>
+        </div>
+        <!-- sparkline -->
+        <svg viewBox="0 0 80 24" style="width:100%;margin-top:12px;display:block" preserveAspectRatio="none" height="24">
+          <polyline class="spark" stroke="rgba(0,212,255,.3)" points="0,20 10,16 20,17 30,12 40,13 50,8 60,9 70,4 80,5"/>
+          <polyline class="spark" stroke="var(--cy)" points="60,9 70,4 80,5"/>
+        </svg>
+      </div>
+
+      <!-- Pedidos -->
+      <div class="kpi">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div class="mo" style="font-size:10px;color:var(--md);letter-spacing:.05em">PEDIDOS</div>
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="var(--mt)" stroke-width="1.4"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="var(--mt)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="sy" style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-.04em;margin-bottom:6px">47</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="tag tag-cy">12 activos</span>
+          <span style="font-size:11px;color:var(--lo)">ahora mismo</span>
+        </div>
+        <div style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:10px;color:var(--lo)">Completados</span>
+            <span style="font-size:10px;color:var(--md)">35 / 47</span>
+          </div>
+          <div class="prog"><div class="prog-fill" style="width:74%;background:linear-gradient(90deg,var(--cy),var(--mt))"></div></div>
+        </div>
+      </div>
+
+      <!-- Ticket prom -->
+      <div class="kpi">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div class="mo" style="font-size:10px;color:var(--md);letter-spacing:.05em">TICKET PROM.</div>
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M2 8h12M8 2l4 6-4 6" stroke="var(--cy)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="sy" style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-.04em;margin-bottom:6px">$18K</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="tag tag-mt">▲ +6.4%</span>
+          <span style="font-size:11px;color:var(--lo)">vs semana</span>
+        </div>
+        <svg viewBox="0 0 80 24" style="width:100%;margin-top:12px;display:block" preserveAspectRatio="none" height="24">
+          <polyline class="spark" stroke="rgba(0,255,198,.3)" points="0,18 10,15 20,16 30,11 40,14 50,9 60,10 70,6 80,4"/>
+          <polyline class="spark" stroke="var(--mt)" points="60,10 70,6 80,4"/>
+        </svg>
+      </div>
+
+      <!-- Ocupación -->
+      <div class="kpi">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div class="mo" style="font-size:10px;color:var(--md);letter-spacing:.05em">OCUPACIÓN</div>
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" stroke="var(--cy)" stroke-width="1.4"/><path d="M8 4.5V8l2 2" stroke="var(--cy)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sy" style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-.04em;margin-bottom:6px">8 / 14</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="tag tag-am">57%</span>
+          <span style="font-size:11px;color:var(--lo)">mesas activas</span>
+        </div>
+        <!-- Mini mesa grid -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px">
+          <div style="height:6px;border-radius:2px;background:var(--cy)"></div>
+          <div style="height:6px;border-radius:2px;background:var(--cy)"></div>
+          <div style="height:6px;border-radius:2px;background:var(--cy)"></div>
+          <div style="height:6px;border-radius:2px;background:#FFB800"></div>
+          <div style="height:6px;border-radius:2px;background:var(--mt)"></div>
+          <div style="height:6px;border-radius:2px;background:var(--mt)"></div>
+          <div style="height:6px;border-radius:2px;background:var(--lo)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHARTS ROW ── -->
+    <div class="grid2" style="display:grid;grid-template-columns:2fr 1fr;gap:14px">
+
+      <!-- Bar chart: ventas por hora -->
+      <div class="card scan">
+        <div style="padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)">
+          <div>
+            <div class="sy" style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em">Ventas por hora</div>
+            <div style="font-size:11px;color:var(--md);margin-top:2px">Hoy vs promedio 7 días</div>
+          </div>
+          <div style="display:flex;gap:14px">
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--md)"><div style="width:10px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--cy),var(--mt))"></div>Hoy</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--md)"><div style="width:10px;height:3px;border-radius:2px;background:var(--lo)"></div>Promedio</div>
+          </div>
+        </div>
+        <div style="padding:18px 18px 12px">
+          <!-- Chart area -->
+          <div style="display:flex;align-items:flex-end;gap:5px;height:110px;padding-bottom:0" id="chart-bars">
+            <div class="bar" style="flex:1;height:22%;background:linear-gradient(to top,rgba(0,212,255,.35),rgba(0,255,198,.22))"></div>
+            <div class="bar" style="flex:1;height:18%;background:var(--lo);opacity:.45"></div>
+            <div style="flex:none;width:6px"></div>
+            <div class="bar" style="flex:1;height:38%;background:linear-gradient(to top,rgba(0,212,255,.35),rgba(0,255,198,.22))"></div>
+            <div class="bar" style="flex:1;height:32%;background:var(--lo);opacity:.45"></div>
+            <div style="flex:none;width:6px"></div>
+            <div class="bar" style="flex:1;height:55%;background:linear-gradient(to top,rgba(0,212,255,.35),rgba(0,255,198,.22))"></div>
+            <div class="bar" style="flex:1;height:48%;background:var(--lo);opacity:.45"></div>
+            <div style="flex:none;width:6px"></div>
+            <div class="bar" style="flex:1;height:72%;background:linear-gradient(to top,rgba(0,212,255,.45),rgba(0,255,198,.32))"></div>
+            <div class="bar" style="flex:1;height:60%;background:var(--lo);opacity:.45"></div>
+            <div style="flex:none;width:6px"></div>
+            <div class="bar" style="flex:1;height:88%;background:linear-gradient(to top,#00D4FF,#00FFC6)"></div>
+            <div class="bar" style="flex:1;height:65%;background:var(--lo);opacity:.45"></div>
+            <div style="flex:none;width:6px"></div>
+            <div class="bar" style="flex:1;height:100%;background:linear-gradient(to top,#00D4FF,#00FFC6);box-shadow:0 0 18px rgba(0,212,255,.35)"></div>
+            <div class="bar" style="flex:1;height:70%;background:var(--lo);opacity:.45"></div>
+            <div style="flex:none;width:6px"></div>
+            <div class="bar" style="flex:1;height:78%;background:linear-gradient(to top,rgba(0,212,255,.4),rgba(0,255,198,.28))"></div>
+            <div class="bar" style="flex:1;height:62%;background:var(--lo);opacity:.45"></div>
+            <div style="flex:none;width:6px"></div>
+            <div class="bar" style="flex:1;height:45%;background:linear-gradient(to top,rgba(0,212,255,.28),rgba(0,255,198,.18));opacity:.65"></div>
+            <div class="bar" style="flex:1;height:50%;background:var(--lo);opacity:.38"></div>
+          </div>
+          <!-- X axis -->
+          <div style="display:flex;justify-content:space-around;margin-top:8px;padding:0 4px">
+            <span class="mo" style="font-size:9px;color:var(--lo)">9h</span>
+            <span class="mo" style="font-size:9px;color:var(--lo)">10h</span>
+            <span class="mo" style="font-size:9px;color:var(--lo)">11h</span>
+            <span class="mo" style="font-size:9px;color:var(--lo)">12h</span>
+            <span class="mo" style="font-size:9px;color:var(--cy)">13h</span>
+            <span class="mo" style="font-size:9px;color:var(--cy)">14h</span>
+            <span class="mo" style="font-size:9px;color:var(--lo)">15h</span>
+            <span class="mo" style="font-size:9px;color:var(--lo)">16h</span>
+          </div>
+          <!-- Summary strip -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--bd)">
+            <div>
+              <div style="font-size:10px;color:var(--lo);margin-bottom:3px">Pico del día</div>
+              <div class="mo" style="font-size:13px;color:var(--cy);font-weight:500">14h — 15h</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--lo);margin-bottom:3px">Ventas hora pico</div>
+              <div class="mo" style="font-size:13px;color:var(--hi);font-weight:500">$142,800</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--lo);margin-bottom:3px">vs promedio</div>
+              <div class="mo" style="font-size:13px;color:var(--mt);font-weight:500">+28.4%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut: mix de productos -->
+      <div class="card">
+        <div style="padding:16px 18px;border-bottom:1px solid var(--bd)">
+          <div class="sy" style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em">Mix de ventas</div>
+          <div style="font-size:11px;color:var(--md);margin-top:2px">Por categoría · hoy</div>
+        </div>
+        <div style="padding:18px">
+          <!-- SVG donut -->
+          <div style="display:flex;justify-content:center;margin-bottom:16px">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <defs>
+                <linearGradient id="dg1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00D4FF"/><stop offset="1" stop-color="#00FFC6"/></linearGradient>
+              </defs>
+              <!-- background circle -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="#111C2D" stroke-width="16"/>
+              <!-- Pizzas 38% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="url(#dg1)" stroke-width="16"
+                stroke-dasharray="114.2 187.3" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+              <!-- Carnes 24% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="#FFB800" stroke-width="16"
+                stroke-dasharray="72.1 229.4" stroke-dashoffset="-117" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+              <!-- Bebidas 22% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="rgba(0,212,255,.35)" stroke-width="16"
+                stroke-dasharray="66.1 235.4" stroke-dashoffset="-192" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+              <!-- Postres 16% -->
+              <circle cx="65" cy="65" r="48" fill="none" stroke="#3D5270" stroke-width="16"
+                stroke-dasharray="48.1 253.4" stroke-dashoffset="-261" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+              <!-- Center text -->
+              <text x="65" y="61" text-anchor="middle" font-family="Syne,sans-serif" font-size="17" font-weight="800" fill="#EDF5FF">$847K</text>
+              <text x="65" y="76" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#5D7A9A">total hoy</text>
+            </svg>
+          </div>
+          <!-- Legend -->
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:7px">
+                <div style="width:8px;height:8px;border-radius:2px;background:linear-gradient(135deg,var(--cy),var(--mt))"></div>
+                <span style="font-size:12px;color:var(--md)">Pizzas</span>
+              </div>
+              <span class="mo" style="font-size:12px;color:var(--hi)">38%</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:7px">
+                <div style="width:8px;height:8px;border-radius:2px;background:#FFB800"></div>
+                <span style="font-size:12px;color:var(--md)">Carnes</span>
+              </div>
+              <span class="mo" style="font-size:12px;color:var(--hi)">24%</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:7px">
+                <div style="width:8px;height:8px;border-radius:2px;background:rgba(0,212,255,.4)"></div>
+                <span style="font-size:12px;color:var(--md)">Bebidas</span>
+              </div>
+              <span class="mo" style="font-size:12px;color:var(--hi)">22%</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:7px">
+                <div style="width:8px;height:8px;border-radius:2px;background:var(--lo)"></div>
+                <span style="font-size:12px;color:var(--md)">Postres</span>
+              </div>
+              <span class="mo" style="font-size:12px;color:var(--hi)">16%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BOTTOM ROW ── -->
+    <div class="grid3" style="display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px">
+
+      <!-- Pedidos activos table -->
+      <div class="card">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
+          <div class="sy" style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em">Pedidos activos</div>
+          <div style="display:flex;align-items:center;gap:5px">
+            <div class="dot" style="background:var(--mt)"></div>
+            <span class="mo" style="font-size:10px;color:var(--mt)">Live</span>
+          </div>
+        </div>
+        <!-- Order rows -->
+        <div class="tr">
+          <div class="av" style="background:rgba(0,212,255,.12);color:var(--cy);margin-right:10px">T3</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12.5px;font-weight:500;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Pizza · Risotto · Vino</div>
+            <div style="font-size:10.5px;color:var(--lo);margin-top:2px">4 ítems · hace 12 min</div>
+          </div>
+          <div style="text-align:right;margin-left:10px;flex-shrink:0">
+            <div class="tag tag-cy" style="margin-bottom:3px">Cocinando</div>
+            <div class="mo" style="font-size:10.5px;color:var(--md)">$94K</div>
+          </div>
+        </div>
+        <div class="tr">
+          <div class="av" style="background:rgba(0,255,198,.1);color:var(--mt);margin-right:10px">T7</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12.5px;font-weight:500;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Ensalada · Agua · Café</div>
+            <div style="font-size:10.5px;color:var(--lo);margin-top:2px">3 ítems · hace 6 min</div>
+          </div>
+          <div style="text-align:right;margin-left:10px;flex-shrink:0">
+            <div class="tag tag-mt" style="margin-bottom:3px">Listo</div>
+            <div class="mo" style="font-size:10.5px;color:var(--md)">$38K</div>
+          </div>
+        </div>
+        <div class="tr">
+          <div class="av" style="background:rgba(255,184,0,.12);color:#FFB800;margin-right:10px">T1</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12.5px;font-weight:500;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Filete · Pasta · Postre</div>
+            <div style="font-size:10.5px;color:var(--lo);margin-top:2px">6 ítems · hace 3 min</div>
+          </div>
+          <div style="text-align:right;margin-left:10px;flex-shrink:0">
+            <div class="tag tag-am" style="margin-bottom:3px">Espera</div>
+            <div class="mo" style="font-size:10.5px;color:var(--md)">$156K</div>
+          </div>
+        </div>
+        <div class="tr">
+          <div class="av" style="background:rgba(0,212,255,.12);color:var(--cy);margin-right:10px">T5</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12.5px;font-weight:500;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Burger · Papas · Jugo</div>
+            <div style="font-size:10.5px;color:var(--lo);margin-top:2px">3 ítems · hace 8 min</div>
+          </div>
+          <div style="text-align:right;margin-left:10px;flex-shrink:0">
+            <div class="tag tag-cy" style="margin-bottom:3px">Cocinando</div>
+            <div class="mo" style="font-size:10.5px;color:var(--md)">$62K</div>
+          </div>
+        </div>
+        <div class="tr" style="border-bottom:none">
+          <div class="av" style="background:rgba(0,212,255,.08);color:var(--lo);margin-right:10px">T9</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12.5px;font-weight:500;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Sopa · Ensalada</div>
+            <div style="font-size:10.5px;color:var(--lo);margin-top:2px">2 ítems · hace 1 min</div>
+          </div>
+          <div style="text-align:right;margin-left:10px;flex-shrink:0">
+            <div class="tag tag-cy" style="margin-bottom:3px">Nuevo</div>
+            <div class="mo" style="font-size:10.5px;color:var(--md)">$28K</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mesa map -->
+      <div class="card">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--bd)">
+          <div class="sy" style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em">Estado de mesas</div>
+          <div style="font-size:11px;color:var(--md);margin-top:2px">Planta principal · 14 mesas</div>
+        </div>
+        <div style="padding:16px 18px">
+          <!-- Grid de mesas -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px">
+            <!-- Activas (cyan) -->
+            <div style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,.18)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--cy)">T1</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">4 pax</div>
+            </div>
+            <div style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,.18)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--cy)">T2</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">2 pax</div>
+            </div>
+            <div style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,.18)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--cy)">T3</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">5 pax</div>
+            </div>
+            <!-- Libre (mint) -->
+            <div style="background:rgba(0,255,198,.07);border:1px solid rgba(0,255,198,.2);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,255,198,.14)'" onmouseout="this.style.background='rgba(0,255,198,.07)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--mt)">T4</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">libre</div>
+            </div>
+            <!-- Espera (amber) -->
+            <div style="background:rgba(255,184,0,.09);border:1px solid rgba(255,184,0,.22);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,184,0,.16)'" onmouseout="this.style.background='rgba(255,184,0,.09)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:#FFB800">T5</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">espera</div>
+            </div>
+            <div style="background:rgba(0,255,198,.07);border:1px solid rgba(0,255,198,.2);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,255,198,.14)'" onmouseout="this.style.background='rgba(0,255,198,.07)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--mt)">T6</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">libre</div>
+            </div>
+            <div style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,.18)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--cy)">T7</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">3 pax</div>
+            </div>
+            <div style="background:rgba(255,184,0,.09);border:1px solid rgba(255,184,0,.22);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,184,0,.16)'" onmouseout="this.style.background='rgba(255,184,0,.09)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:#FFB800">T8</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">espera</div>
+            </div>
+            <div style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,.18)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--cy)">T9</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">6 pax</div>
+            </div>
+            <div style="background:rgba(0,255,198,.07);border:1px solid rgba(0,255,198,.2);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,255,198,.14)'" onmouseout="this.style.background='rgba(0,255,198,.07)'">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--mt)">T10</div>
+              <div style="font-size:9px;color:var(--md);margin-top:2px">libre</div>
+            </div>
+            <div style="background:rgba(0,212,255,.06);border:1px solid var(--bd);border-radius:8px;padding:8px 6px;text-align:center;opacity:.5">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--lo)">T11</div>
+              <div style="font-size:9px;color:var(--lo);margin-top:2px">cerrada</div>
+            </div>
+            <div style="background:rgba(0,212,255,.06);border:1px solid var(--bd);border-radius:8px;padding:8px 6px;text-align:center;opacity:.5">
+              <div class="mo" style="font-size:11px;font-weight:600;color:var(--lo)">T12</div>
+              <div style="font-size:9px;color:var(--lo);margin-top:2px">cerrada</div>
+            </div>
+          </div>
+          <!-- Legend -->
+          <div style="display:flex;gap:14px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--lo)">
+              <div style="width:8px;height:8px;border-radius:2px;background:var(--cy)"></div>Activa (8)
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--lo)">
+              <div style="width:8px;height:8px;border-radius:2px;background:var(--mt)"></div>Libre (3)
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--lo)">
+              <div style="width:8px;height:8px;border-radius:2px;background:#FFB800"></div>Espera (2)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: top productos + WhatsApp IA -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+
+        <!-- Top productos -->
+        <div class="card" style="flex:1">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--bd)">
+            <div class="sy" style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-.02em">Top productos</div>
+          </div>
+          <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:12px;color:var(--md)">Pizza Margherita</span>
+                <span class="mo" style="font-size:12px;color:var(--hi)">24</span>
+              </div>
+              <div class="prog"><div class="prog-fill" style="width:88%;background:linear-gradient(90deg,var(--cy),var(--mt))"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:12px;color:var(--md)">Carbonara</span>
+                <span class="mo" style="font-size:12px;color:var(--hi)">18</span>
+              </div>
+              <div class="prog"><div class="prog-fill" style="width:66%;background:linear-gradient(90deg,var(--cy),var(--mt))"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:12px;color:var(--md)">Filete al vino</span>
+                <span class="mo" style="font-size:12px;color:var(--hi)">14</span>
+              </div>
+              <div class="prog"><div class="prog-fill" style="width:51%;background:linear-gradient(90deg,rgba(0,212,255,.7),rgba(0,255,198,.6))"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:12px;color:var(--md)">Tiramisu</span>
+                <span class="mo" style="font-size:12px;color:var(--hi)">11</span>
+              </div>
+              <div class="prog"><div class="prog-fill" style="width:40%;background:rgba(0,212,255,.45)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IA Summary card -->
+        <div style="background:linear-gradient(155deg,rgba(0,212,255,.09) 0%,rgba(0,255,198,.06) 100%);border:1px solid rgba(0,212,255,.2);border-radius:14px;padding:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--cy),var(--mt));display:flex;align-items:center;justify-content:center">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M8 1l1.5 4.5H14l-3.8 2.8 1.5 4.5L8 10l-3.8 2.8 1.5-4.5L2 5.5h4.5z" stroke="#07111F" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="sy" style="font-size:12px;font-weight:700;color:#fff;letter-spacing:-.02em">IA Predictiva</div>
+              <div style="font-size:10px;color:var(--md)">Insights en tiempo real</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:9px 11px;border-left:2px solid var(--cy)">
+              <div style="font-size:11px;color:var(--hi);line-height:1.45">Pico en 30 min. Preparar <strong>+8 pizzas</strong> en cocina.</div>
+            </div>
+            <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:9px 11px;border-left:2px solid var(--mt)">
+              <div style="font-size:11px;color:var(--hi);line-height:1.45">Mesa 4 celebra aniversario → recomendar <strong>postre especial</strong>.</div>
+            </div>
+            <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:9px 11px;border-left:2px solid #FFB800">
+              <div style="font-size:11px;color:var(--hi);line-height:1.45">Vino Malbec casi agotado. <strong>Avisar a sommelier.</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- /bottom row -->
+
+  </main>
+</div>
+
+<script>
+  // Subtle: re-animate bars on load
+  document.querySelectorAll('.bar').forEach((b, i) => {
+    b.style.transition = 'height .6s ease';
+    b.style.transition += ', opacity .3s';
+  });
+</script>
+</body>
+</html>

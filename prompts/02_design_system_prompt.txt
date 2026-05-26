@@ -1,0 +1,47 @@
+Necesito crear la Landing Page oficial de MesaFlow by NautilusTech.
+IMPORTANTE: Debe verse como una startup SaaS premium moderna. NO quiero un sitio genérico. NO quiero apariencia WordPress antigua. NO quiero un POS viejo visualmente.
+Inspiración visual:
+
+Stripe
+Linear
+Vercel
+Notion
+Toast POS
+Uber Eats
+Branding oficial: MesaFlow by NautilusTech https://nautilustech.app/
+Paleta:
+
+#00D4FF
+#00FFC6
+#07111F
+#0B1726
+#111C2D
+La landing debe ser:
+
+Full responsive
+Mobile first
+Dark mode premium
+Animaciones suaves
+Glow tecnológico elegante
+Mucho espacio visual
+Muy moderna
+Debe incluir:
+
+Hero Section impactante
+Navbar moderna
+Dashboard preview
+QR ordering section
+Kitchen display preview
+POS preview
+WhatsApp + IA section
+Pricing cards
+Testimonios mockup
+CTA final
+Footer moderno
+IMPORTANTE: Genera un HTML COMPLETO usando:
+
+TailwindCSS
+Responsive design
+Mobile first
+Componentes modernos
+Layout SaaS premium El resultado debe parecer una startup tecnológica real valorada en millones.

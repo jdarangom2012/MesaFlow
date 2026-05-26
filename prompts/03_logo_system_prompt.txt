@@ -1,0 +1,40 @@
+Perfecto.
+Seleccionamos oficialmente el concepto: 04 · Nautilus Grid
+Ahora necesito preparar el sistema oficial de exportación del logo para MesaFlow by NautilusTech.
+Necesito generar:
+
+1. SVG oficial horizontal
+2. SVG oficial vertical
+3. SVG isotipo standalone
+4. PNG transparente
+5. Versión dark
+6. Versión light
+7. Favicon 16x16
+8. Favicon 32x32
+9. App icon 512x512
+10. Social preview image
+11. Header logo
+12. Sidebar compact logo
+IMPORTANTE:
+
+* Mantener exacta la filosofía visual
+* Mantener el ADN NautilusTech
+* Mantener el estilo SaaS premium
+* Mantener tipografía elegante
+* Mantener glow tecnológico sutil
+* Mantener legibilidad en tamaños pequeños
+Además: Genera una guía de uso del logo indicando:
+
+* tamaños mínimos
+* fondos permitidos
+* separación mínima
+* usos incorrectos
+* exportaciones recomendadas
+Todo debe quedar listo para:
+
+* Landing page
+* Dashboard
+* Favicon
+* Aplicación móvil futura
+* Presentaciones comerciales
+* Documentación oficial
