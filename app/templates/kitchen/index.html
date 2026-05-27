@@ -237,6 +237,10 @@
             border-radius: 8px;
         }
 
+        .empty.hidden {
+            display: none;
+        }
+
         @media (max-width: 720px) {
             .shell {
                 padding: 14px;
@@ -251,6 +255,10 @@
 </head>
 <body>
     <main class="shell">
+        <div style="display:none;">
+            {% csrf_token %}
+        </div>
+
         <header class="topbar">
             <div>
                 <div class="title">Kitchen Display</div>
@@ -259,14 +267,14 @@
 
             <div class="live">
                 <span class="dot"></span>
-                Sin websocket todavía
+                Realtime activo
             </div>
         </header>
 
         {% if orders %}
-            <section class="grid">
+            <section class="grid" id="kitchen-orders-grid">
                 {% for order in orders %}
-                    <article class="order-card {% if order.status == 'PREPARING' %}preparing{% endif %}">
+                    <article class="order-card {% if order.status == 'PREPARING' %}preparing{% endif %}" data-order-id="{{ order.id }}">
                         <div class="card-head">
                             <div>
                                 <div class="order-id">Orden #{{ order.id }}</div>
@@ -322,10 +330,129 @@
                 {% endfor %}
             </section>
         {% else %}
-            <section class="empty">
+            <section class="grid" id="kitchen-orders-grid"></section>
+            <section class="empty" id="kitchen-empty-state">
                 No hay órdenes abiertas en cocina.
             </section>
         {% endif %}
     </main>
+
+    <script>
+        (() => {
+            const grid = document.getElementById("kitchen-orders-grid");
+            const emptyState = document.getElementById("kitchen-empty-state");
+
+            if (!grid || !("WebSocket" in window)) {
+                return;
+            }
+
+            const escapeHtml = (value) => {
+                const node = document.createElement("div");
+                node.textContent = value || "";
+                return node.innerHTML;
+            };
+
+            const getCookie = (name) => {
+                const tokenInput = document.querySelector("[name=csrfmiddlewaretoken]");
+
+                if (name === "csrftoken" && tokenInput) {
+                    return tokenInput.value;
+                }
+
+                return document.cookie
+                    .split(";")
+                    .map((cookie) => cookie.trim())
+                    .find((cookie) => cookie.startsWith(`${name}=`))
+                    ?.split("=")[1] || "";
+            };
+
+            const renderOrder = (order) => {
+                const article = document.createElement("article");
+                article.className = `order-card ${order.status === "PREPARING" ? "preparing" : ""}`;
+                article.dataset.orderId = order.id;
+
+                const items = order.items.length
+                    ? order.items.map((item) => `
+                        <div class="item">
+                            <div class="item-name">${escapeHtml(item.product)}</div>
+                            <div class="quantity">x${item.quantity}</div>
+                        </div>
+                    `).join("")
+                    : `
+                        <div class="item">
+                            <div class="item-name">Sin productos registrados</div>
+                        </div>
+                    `;
+
+                article.innerHTML = `
+                    <div class="card-head">
+                        <div>
+                            <div class="order-id">Orden #${order.id}</div>
+                            <div class="table-name">${escapeHtml(order.table)}</div>
+                        </div>
+
+                        <div class="status-pill ${order.status === "PREPARING" ? "preparing" : ""}">
+                            ${escapeHtml(order.status_label)}
+                        </div>
+                    </div>
+
+                    <div class="meta">
+                        <div class="metric">
+                            <div class="metric-label">Creada</div>
+                            <div class="metric-value">${escapeHtml(order.created_at)}</div>
+                        </div>
+
+                        <div class="metric">
+                            <div class="metric-label">Transcurrido</div>
+                            <div class="metric-value">${escapeHtml(order.elapsed)}</div>
+                        </div>
+                    </div>
+
+                    <div class="items">${items}</div>
+
+                    <div class="actions">
+                        <form method="post">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie("csrftoken")}">
+                            <input type="hidden" name="order_id" value="${order.id}">
+                            <input type="hidden" name="status" value="PREPARING">
+                            <button class="btn-preparing" type="submit">Preparando</button>
+                        </form>
+
+                        <form method="post">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie("csrftoken")}">
+                            <input type="hidden" name="order_id" value="${order.id}">
+                            <input type="hidden" name="status" value="READY">
+                            <button class="btn-ready" type="submit">Listo</button>
+                        </form>
+                    </div>
+                `;
+
+                return article;
+            };
+
+            const addOrder = (order) => {
+                if (grid.querySelector(`[data-order-id="${order.id}"]`)) {
+                    return;
+                }
+
+                if (emptyState) {
+                    emptyState.classList.add("hidden");
+                }
+
+                grid.appendChild(renderOrder(order));
+            };
+
+            const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+            const socket = new WebSocket(`${protocol}://${window.location.host}/ws/kitchen/`);
+
+            socket.addEventListener("message", (event) => {
+                const payload = JSON.parse(event.data);
+
+                if (payload.type === "order.created") {
+                    addOrder(payload.order);
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

@@ -5,6 +5,7 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
+from kitchen.realtime import broadcast_order_created
 from products.models import Product
 from tables.models import RestaurantTable
 
@@ -98,6 +99,14 @@ def create_order(request):
             )
             for item in order_items
         ])
+
+        order = (
+            Order.objects
+            .select_related('table')
+            .prefetch_related('items__product')
+            .get(id=order.id)
+        )
+        transaction.on_commit(lambda: broadcast_order_created(order))
 
     return JsonResponse({
         'success': True,

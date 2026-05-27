@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from products.models import ProductCategory, Product
 from tables.models import RestaurantTable
 
@@ -27,3 +27,27 @@ def pos(request):
     }
 
     return render(request, 'pos/index.html', context)
+
+
+def qr_menu(request, table_id):
+    table = get_object_or_404(RestaurantTable, id=table_id)
+    categories = (
+        ProductCategory.objects
+        .filter(is_active=True)
+        .prefetch_related('products')
+        .order_by('name')
+    )
+    products = (
+        Product.objects
+        .filter(is_available=True)
+        .select_related('category')
+        .order_by('category__name', 'name')
+    )
+
+    context = {
+        'table': table,
+        'categories': categories,
+        'products': products,
+    }
+
+    return render(request, 'menu/index.html', context)
