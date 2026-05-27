@@ -29,7 +29,9 @@ flex-direction:column;
 
             </div>
 
-            <div style="
+            <div
+            id="pos-cart-count"
+            style="
             background:rgba(0,212,255,.12);
             border:1px solid rgba(0,212,255,.20);
             color:#00D4FF;
@@ -39,7 +41,7 @@ flex-direction:column;
             font-weight:700;
             ">
 
-                3 ITEMS
+                0 ITEMS
 
             </div>
 
@@ -49,126 +51,20 @@ flex-direction:column;
 
     <!-- ITEMS -->
 
-    <div style="
+    <div
+    id="pos-cart-items"
+    style="
     flex:1;
     overflow:auto;
     padding:18px;
     ">
-
-        <!-- ITEM -->
-
-        <div style="
-        background:#111C2D;
-        border-radius:18px;
-        padding:16px;
-        margin-bottom:14px;
+        <div id="pos-cart-empty" style="
+        color:#6D87A8;
+        font-size:14px;
+        text-align:center;
+        margin-top:32px;
         ">
-
-            <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:flex-start;
-            ">
-
-                <div>
-
-                    <div style="
-                    font-size:17px;
-                    font-weight:700;
-                    color:white;
-                    ">
-
-                        🍕 Pizza Margherita
-
-                    </div>
-
-                    <div style="
-                    color:#6D87A8;
-                    font-size:13px;
-                    margin-top:5px;
-                    ">
-
-                        Masa artesanal · Extra queso
-
-                    </div>
-
-                </div>
-
-                <div style="
-                color:#00D4FF;
-                font-weight:800;
-                font-size:18px;
-                ">
-
-                    $32K
-
-                </div>
-
-            </div>
-
-            <!-- QTY -->
-
-            <div style="
-            margin-top:14px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            ">
-
-                <div style="
-                display:flex;
-                align-items:center;
-                gap:10px;
-                ">
-
-                    <button style="
-                    width:34px;
-                    height:34px;
-                    border:none;
-                    border-radius:10px;
-                    background:#07111F;
-                    color:white;
-                    font-size:20px;
-                    cursor:pointer;
-                    ">
-                        -
-                    </button>
-
-                    <div style="
-                    font-size:16px;
-                    font-weight:700;
-                    ">
-                        2
-                    </div>
-
-                    <button style="
-                    width:34px;
-                    height:34px;
-                    border:none;
-                    border-radius:10px;
-                    background:#00D4FF;
-                    color:black;
-                    font-size:20px;
-                    font-weight:bold;
-                    cursor:pointer;
-                    ">
-                        +
-                    </button>
-
-                </div>
-
-                <button style="
-                border:none;
-                background:none;
-                color:#FF5B6E;
-                cursor:pointer;
-                font-size:13px;
-                ">
-                    Eliminar
-                </button>
-
-            </div>
-
+            Selecciona productos para iniciar la orden.
         </div>
 
     </div>
@@ -190,7 +86,7 @@ flex-direction:column;
         ">
 
             <span>Subtotal</span>
-            <span>$158.000</span>
+            <span id="pos-subtotal">$0</span>
 
         </div>
 
@@ -203,8 +99,8 @@ flex-direction:column;
         color:#8FA7C0;
         ">
 
-            <span>IVA</span>
-            <span>$30.020</span>
+            <span>IVA 19%</span>
+            <span id="pos-tax">$0</span>
 
         </div>
 
@@ -218,7 +114,7 @@ flex-direction:column;
         ">
 
             <span>Propina</span>
-            <span>$23.700</span>
+            <span id="pos-tip">$0</span>
 
         </div>
 
@@ -238,12 +134,14 @@ flex-direction:column;
                 TOTAL
             </span>
 
-            <span style="
+            <span
+            id="pos-total"
+            style="
             color:#00D4FF;
             font-size:30px;
             font-weight:800;
             ">
-                $188K
+                $0
             </span>
 
         </div>
@@ -295,7 +193,10 @@ flex-direction:column;
 
         <!-- COBRAR -->
 
-        <button style="
+        <button
+        id="pos-checkout-button"
+        type="button"
+        style="
         width:100%;
         height:62px;
         border:none;

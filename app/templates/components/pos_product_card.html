@@ -125,7 +125,14 @@ position:relative;
 
             </div>
 
-            <button style="
+            <button
+            type="button"
+            class="pos-add-product"
+            data-product-id="{{ product.id }}"
+            data-product-name="{{ product.name }}"
+            data-product-price="{{ product.price }}"
+            data-product-description="{{ product.description|default:''|truncatechars:60 }}"
+            style="
             width:42px;
             height:42px;
             border:none;

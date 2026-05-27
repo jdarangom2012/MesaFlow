@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MesaFlow Kitchen</title>
+    <style>
+        :root {
+            --bg: #07111F;
+            --panel: #0B1726;
+            --card: #111C2D;
+            --line: rgba(0, 212, 255, .12);
+            --cyan: #00D4FF;
+            --mint: #00FFC6;
+            --amber: #FFC107;
+            --text: #F4FAFF;
+            --muted: #8FA7C0;
+            --low: #5B789A;
+            --danger: #FF5B6E;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .shell {
+            min-height: 100vh;
+            padding: 22px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 22px;
+            padding: 18px 20px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -.02em;
+        }
+
+        .subtitle {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .live {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--mint);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 9px 12px;
+            border: 1px solid rgba(0, 255, 198, .18);
+            border-radius: 8px;
+            background: rgba(0, 255, 198, .08);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--mint);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 16px;
+        }
+
+        .order-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 360px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .order-card.preparing {
+            border-color: rgba(255, 193, 7, .34);
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 18px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .order-id {
+            color: var(--cyan);
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .table-name {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-pill {
+            height: fit-content;
+            border-radius: 999px;
+            padding: 7px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .04em;
+            color: #07111F;
+            background: var(--cyan);
+        }
+
+        .status-pill.preparing {
+            background: var(--amber);
+        }
+
+        .meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .metric {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, .05);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .metric-label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            margin-top: 5px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .items {
+            flex: 1;
+            padding: 14px 18px;
+        }
+
+        .item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
+            font-size: 15px;
+            font-weight: 750;
+        }
+
+        .quantity {
+            min-width: 44px;
+            text-align: center;
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            border-radius: 8px;
+            padding: 7px 9px;
+            font-weight: 900;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 16px 18px 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        button {
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 850;
+        }
+
+        .btn-preparing {
+            background: rgba(255, 193, 7, .12);
+            color: var(--amber);
+            border: 1px solid rgba(255, 193, 7, .28);
+        }
+
+        .btn-ready {
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            color: #07111F;
+        }
+
+        .empty {
+            padding: 52px 18px;
+            text-align: center;
+            color: var(--muted);
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 720px) {
+            .shell {
+                padding: 14px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="topbar">
+            <div>
+                <div class="title">Kitchen Display</div>
+                <div class="subtitle">Órdenes activas por antigüedad para línea caliente y emplatado.</div>
+            </div>
+
+            <div class="live">
+                <span class="dot"></span>
+                Sin websocket todavía
+            </div>
+        </header>
+
+        {% if orders %}
+            <section class="grid">
+                {% for order in orders %}
+                    <article class="order-card {% if order.status == 'PREPARING' %}preparing{% endif %}">
+                        <div class="card-head">
+                            <div>
+                                <div class="order-id">Orden #{{ order.id }}</div>
+                                <div class="table-name">{{ order.table.name }}</div>
+                            </div>
+
+                            <div class="status-pill {% if order.status == 'PREPARING' %}preparing{% endif %}">
+                                {{ order.get_status_display }}
+                            </div>
+                        </div>
+
+                        <div class="meta">
+                            <div class="metric">
+                                <div class="metric-label">Creada</div>
+                                <div class="metric-value">{{ order.created_at|date:"H:i" }}</div>
+                            </div>
+
+                            <div class="metric">
+                                <div class="metric-label">Transcurrido</div>
+                                <div class="metric-value">{{ order.created_at|timesince }}</div>
+                            </div>
+                        </div>
+
+                        <div class="items">
+                            {% for item in order.items.all %}
+                                <div class="item">
+                                    <div class="item-name">{{ item.product.name }}</div>
+                                    <div class="quantity">x{{ item.quantity }}</div>
+                                </div>
+                            {% empty %}
+                                <div class="item">
+                                    <div class="item-name">Sin productos registrados</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="actions">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <input type="hidden" name="status" value="PREPARING">
+                                <button class="btn-preparing" type="submit">Preparando</button>
+                            </form>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <input type="hidden" name="status" value="READY">
+                                <button class="btn-ready" type="submit">Listo</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section class="empty">
+                No hay órdenes abiertas en cocina.
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>

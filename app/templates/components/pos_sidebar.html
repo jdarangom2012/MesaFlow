@@ -75,7 +75,10 @@ justify-content:space-between;
 
             {% for table in tables %}
 
-            <div style="
+            <div
+            class="pos-table-option"
+            data-table-id="{{ table.id }}"
+            style="
             background:rgba(0,212,255,.08);
             border:1px solid rgba(0,212,255,.22);
             color:#00D4FF;
