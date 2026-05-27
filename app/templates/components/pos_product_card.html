@@ -1,0 +1,148 @@
+<div style="
+background:#0B1726;
+border:1px solid rgba(255,255,255,.06);
+border-radius:20px;
+overflow:hidden;
+cursor:pointer;
+transition:.25s;
+position:relative;
+">
+
+    <!-- IMAGE -->
+
+    <div style="
+    height:130px;
+    background:#EDE7DD;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:52px;
+    ">
+
+        {% if product.category.name == 'Pizzas' %}
+            🍕
+        {% elif product.category.name == 'Pastas' %}
+            🍝
+        {% elif product.category.name == 'Carnes' %}
+            🥩
+        {% elif product.category.name == 'Bebidas' %}
+            🍷
+        {% elif product.category.name == 'Postres' %}
+            🍮
+        {% else %}
+            🍽️
+        {% endif %}
+
+    </div>
+
+    <!-- CONTENT -->
+
+    <div style="padding:16px;">
+
+        <!-- BADGES -->
+
+        <div style="
+        display:flex;
+        gap:6px;
+        margin-bottom:10px;
+        ">
+
+            {% if product.is_featured %}
+
+            <div style="
+            background:#00D4FF;
+            color:black;
+            font-size:11px;
+            font-weight:bold;
+            padding:4px 8px;
+            border-radius:999px;
+            ">
+                TOP
+            </div>
+
+            {% endif %}
+
+            {% if product.is_new %}
+
+            <div style="
+            background:#FFC10722;
+            border:1px solid #FFC10755;
+            color:#FFC107;
+            font-size:11px;
+            font-weight:bold;
+            padding:4px 8px;
+            border-radius:999px;
+            ">
+                NUEVO
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <!-- NAME -->
+
+        <div style="
+        font-size:18px;
+        font-weight:700;
+        color:white;
+        margin-bottom:8px;
+        ">
+
+            {{ product.name }}
+
+        </div>
+
+        <!-- DESCRIPTION -->
+
+        <div style="
+        color:#6D87A8;
+        font-size:13px;
+        line-height:1.4;
+        min-height:38px;
+        ">
+
+            {{ product.description|truncatechars:60 }}
+
+        </div>
+
+        <!-- FOOTER -->
+
+        <div style="
+        margin-top:16px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        ">
+
+            <div style="
+            color:#00D4FF;
+            font-size:24px;
+            font-weight:800;
+            ">
+
+                ${{ product.price }}
+
+            </div>
+
+            <button style="
+            width:42px;
+            height:42px;
+            border:none;
+            border-radius:12px;
+            background:linear-gradient(135deg,#00D4FF,#00FFC6);
+            color:black;
+            font-size:22px;
+            font-weight:bold;
+            cursor:pointer;
+            ">
+
+                +
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

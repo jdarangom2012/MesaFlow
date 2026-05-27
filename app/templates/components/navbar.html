@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MesaFlow — Navbar Component</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --bg:   #07111F;
+    --card: #0B1726;
+    --pnl:  #111C2D;
+    --cy:   #00D4FF;
+    --mt:   #00FFC6;
+    --hi:   #E8F3FF;
+    --md:   #5D7A9A;
+    --lo:   #2A3F58;
+    --bd:   rgba(0,212,255,.09);
+    --bdh:  rgba(0,212,255,.2);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--hi);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 200vh; /* scroll demo */
+  }
+  .sy  { font-family: 'Syne', sans-serif; }
+  .mo  { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── NAVBAR SHELL ── */
+  #nav {
+    position: sticky; top: 0; left: 0; right: 0; z-index: 900;
+    transition: background .35s ease, border-color .35s ease, backdrop-filter .35s ease, box-shadow .35s ease;
+  }
+
+  /* Transparent state (top of page) */
+  #nav.clear {
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  /* Scrolled glass state */
+  #nav.glass {
+    background: rgba(7,17,31,.82);
+    border-bottom: 1px solid var(--bd);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: 0 1px 0 rgba(0,212,255,.04), 0 8px 32px rgba(0,0,0,.28);
+  }
+
+  /* ── INNER CONTAINER ── */
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 20px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+
+  /* ── LOGO ── */
+  .logo-wrap {
+    display: flex; align-items: center; gap: 11px;
+    text-decoration: none; flex-shrink: 0;
+    outline: none;
+    border-radius: 10px;
+    padding: 4px;
+    transition: opacity .18s;
+  }
+  .logo-wrap:hover { opacity: .85; }
+
+  /* ── DESKTOP NAV LINKS ── */
+  #desktop-nav {
+    display: flex; align-items: center; gap: 2px;
+  }
+  .nl {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 5px;
+    color: var(--md);
+    font-size: 14px; font-weight: 400;
+    text-decoration: none;
+    padding: 7px 13px;
+    border-radius: 8px;
+    transition: color .18s, background .18s;
+    white-space: nowrap;
+    outline: none;
+  }
+  .nl:hover { color: var(--hi); background: rgba(0,212,255,.06); }
+  .nl.has-badge::after {
+    content: '';
+    position: absolute; top: 6px; right: 6px;
+    width: 5px; height: 5px;
+    background: var(--mt);
+    border-radius: 50%;
+    animation: blink 2.2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  /* Dropdown trigger */
+  .nl.drop { cursor: pointer; }
+  .nl.drop svg { transition: transform .2s ease; }
+  .nl.drop:hover svg { transform: rotate(180deg); }
+  .nl.drop:hover .dropdown { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+  /* Dropdown panel */
+  .dropdown {
+    position: absolute; top: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%) translateY(-6px);
+    background: rgba(11,23,38,.96);
+    border: 1px solid var(--bd);
+    border-radius: 14px;
+    padding: 8px;
+    min-width: 220px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 48px rgba(0,0,0,.45), 0 0 0 1px rgba(0,212,255,.05);
+    opacity: 0; pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+    z-index: 10;
+  }
+  .di {
+    display: flex; align-items: flex-start; gap: 11px;
+    padding: 10px 11px;
+    border-radius: 9px;
+    text-decoration: none;
+    transition: background .15s;
+    cursor: pointer;
+  }
+  .di:hover { background: rgba(0,212,255,.07); }
+  .di-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── DIVIDER ── */
+  .nd { width: 1px; height: 18px; background: var(--bd); margin: 0 6px; flex-shrink: 0; }
+
+  /* ── STATUS PILL ── */
+  .status {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,255,198,.07);
+    border: 1px solid rgba(0,255,198,.16);
+    border-radius: 100px;
+    padding: 5px 12px;
+    font-size: 12px; color: var(--mt);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .01em;
+    cursor: default;
+    transition: background .2s, border-color .2s;
+    white-space: nowrap;
+  }
+  .status:hover { background: rgba(0,255,198,.11); border-color: rgba(0,255,198,.26); }
+  .sdot {
+    width: 6px; height: 6px;
+    background: var(--mt);
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: blink 2.2s ease-in-out infinite;
+  }
+
+  /* ── CTA BUTTON ── */
+  .cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #00D4FF, #00FFC6);
+    color: #07111F;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -.01em;
+    border: none; border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity .18s, transform .18s, box-shadow .18s;
+    box-shadow: 0 3px 20px rgba(0,212,255,.24);
+    white-space: nowrap;
+    outline: none;
+  }
+  .cta:hover {
+    opacity: .87;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(0,212,255,.38);
+  }
+  .cta:active { transform: scale(.98); }
+  .cta svg { flex-shrink: 0; }
+
+  /* ── HAMBURGER BUTTON ── */
+  #ham {
+    display: none;
+    flex-direction: column; justify-content: center; align-items: center;
+    width: 40px; height: 40px;
+    border-radius: 9px;
+    border: 1px solid var(--bd);
+    background: transparent;
+    cursor: pointer;
+    gap: 5px;
+    transition: border-color .18s, background .18s;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  #ham:hover { border-color: var(--bdh); background: rgba(0,212,255,.05); }
+  #ham span {
+    display: block;
+    width: 18px; height: 1.5px;
+    background: var(--md);
+    border-radius: 2px;
+    transition: transform .28s ease, opacity .28s ease, width .28s ease;
+    transform-origin: center;
+  }
+  #ham.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); background: var(--hi); }
+  #ham.open span:nth-child(2) { opacity: 0; width: 0; }
+  #ham.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); background: var(--hi); }
+
+  /* ── MOBILE DRAWER ── */
+  #drawer {
+    position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+    background: rgba(7,17,31,.97);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid var(--bd);
+    z-index: 800;
+    transform: translateX(100%);
+    transition: transform .32s cubic-bezier(.4,0,.2,1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #drawer.open { transform: translateX(0); }
+
+  .mob-link {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px;
+    color: var(--hi);
+    font-size: 17px; font-weight: 400;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,212,255,.05);
+    transition: background .15s, color .15s;
+  }
+  .mob-link:hover { background: rgba(0,212,255,.05); }
+  .mob-link.active { color: var(--cy); }
+
+  .mob-section {
+    padding: 10px 24px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--lo);
+    margin-top: 8px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    #desktop-nav { display: none !important; }
+    .nd { display: none; }
+    .status { display: none; }
+  }
+  @media (max-width: 640px) {
+    .cta .cta-label { display: none; }
+    .cta { padding: 10px 14px; }
+  }
+  @media (min-width: 901px) {
+    #ham { display: none !important; }
+    #drawer { display: none !important; }
+  }
+  @media (max-width: 900px) {
+    #ham { display: flex !important; }
+  }
+
+  /* ── DEMO PAGE CONTENT ── */
+  .demo-content {
+    max-width: 1200px; margin: 0 auto; padding: 80px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 24px;
+  }
+  .demo-hint {
+    background: rgba(0,212,255,.06);
+    border: 1px solid rgba(0,212,255,.14);
+    border-radius: 12px;
+    padding: 16px 24px;
+    font-size: 13px; color: var(--md);
+    text-align: center;
+    max-width: 500px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+  <header style="
+height:70px;
+background:#0B1726;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 24px;
+border-bottom:1px solid rgba(255,255,255,.06);
+">
+
+    <div style="display:flex;align-items:center;gap:12px;">
+
+        <div style="
+        width:42px;
+        height:42px;
+        border-radius:12px;
+        background:linear-gradient(135deg,#00D4FF,#00FFC6);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:black;
+        font-weight:bold;
+        ">
+            M
+        </div>
+
+        <div>
+
+            <div style="
+            color:#00D4FF;
+            font-size:22px;
+            font-weight:bold;
+            ">
+                MesaFlow
+            </div>
+
+            <div style="
+            color:#8FA7C0;
+            font-size:12px;
+            ">
+                by NautilusTech
+            </div>
+
+        </div>
+
+    </div>
+
+    <div style="
+    display:flex;
+    align-items:center;
+    gap:15px;
+    ">
+
+        <div style="
+        color:#00FFC6;
+        font-size:14px;
+        ">
+            ● Sistema operativo
+        </div>
+
+        <button style="
+        background:#111C2D;
+        border:none;
+        color:white;
+        padding:10px 16px;
+        border-radius:10px;
+        cursor:pointer;
+        ">
+            Exportar reporte
+        </button>
+
+    </div>
+
+</header>
+
+<!-- ═══════════════════════════════════════════
+     MESAFLOW NAVBAR — Standalone Component
+     ─────────────────────────────────────────
+     Usage: drop <nav id="nav"> into any page.
+     Requires: Syne + DM Sans + JetBrains Mono
+               TailwindCSS (optional, for layout)
+═══════════════════════════════════════════ -->
+
+<nav id="nav" class="clear" role="navigation" aria-label="Navegación principal">
+  <div class="nav-inner">
+
+    <!-- ══ LOGO ══ -->
+    <a href="https://nautilustech.app" class="logo-wrap" aria-label="MesaFlow — Ir al inicio">
+      <svg width="34" height="34" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="nlg" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="#00D4FF"/>
+            <stop offset="1" stop-color="#00FFC6"/>
+          </linearGradient>
+        </defs>
+        <!-- Card background -->
+        <rect width="36" height="36" rx="9" fill="#0B1726"/>
+        <!-- Border glow -->
+        <rect width="36" height="36" rx="9" fill="none" stroke="rgba(0,212,255,.22)" stroke-width=".8"/>
+        <!-- Grid lines -->
+        <line x1="18" y1="5" x2="18" y2="31" stroke="rgba(0,212,255,.15)" stroke-width=".8"/>
+        <line x1="5" y1="18" x2="31" y2="18" stroke="rgba(0,212,255,.15)" stroke-width=".8"/>
+        <!-- Nautilus spiral -->
+        <path d="M18 18 Q18 10 24 10 Q30 10 30 16 Q30 22 24 22 Q21 22 21 20 Q21 18.5 22.5 18.5"
+              stroke="url(#nlg)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <!-- Terminus dot -->
+        <circle cx="22.5" cy="18.5" r="2.3" fill="#00FFC6"/>
+      </svg>
+
+      <div>
+        <div class="sy" style="font-size:16px;font-weight:700;color:#fff;letter-spacing:-.025em;line-height:1">
+          Mesa<span style="color:var(--cy)">Flow</span>
+        </div>
+        <div class="mo" style="font-size:8.5px;color:var(--lo);letter-spacing:.16em;line-height:1;margin-top:3px">
+          BY NAUTILUSTECH
+        </div>
+      </div>
+    </a>
+
+    <!-- ══ DESKTOP NAVIGATION ══ -->
+    <div id="desktop-nav" role="menubar" aria-label="Menú de navegación">
+
+      <!-- Producto (dropdown) -->
+      <div class="nl drop" role="none" style="position:relative">
+        <span>Producto</span>
+        <svg width="14" height="14" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <!-- Dropdown -->
+        <div class="dropdown" role="menu">
+          <a class="di" href="#" role="menuitem">
+            <div class="di-icon" style="background:rgba(0,212,255,.12)">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="var(--cy)" stroke-width="1.3"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="var(--cy)" stroke-width="1.3"/></svg>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--hi);margin-bottom:2px">Pedidos QR</div>
+              <div style="font-size:11.5px;color:var(--md);line-height:1.4">Menú digital sin app</div>
+            </div>
+          </a>
+          <a class="di" href="#" role="menuitem">
+            <div class="di-icon" style="background:rgba(0,255,198,.1)">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12V5l6-3 6 3v7" stroke="var(--mt)" stroke-width="1.3" stroke-linejoin="round"/><rect x="5" y="8" width="6" height="4" rx=".5" stroke="var(--mt)" stroke-width="1.3"/></svg>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--hi);margin-bottom:2px">Kitchen Display</div>
+              <div style="font-size:11.5px;color:var(--md);line-height:1.4">Cocina en tiempo real</div>
+            </div>
+          </a>
+          <a class="di" href="#" role="menuitem">
+            <div class="di-icon" style="background:rgba(0,212,255,.12)">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="2" stroke="var(--cy)" stroke-width="1.3"/><path d="M5 8h6M5 5.5h3M5 10.5h4" stroke="var(--cy)" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--hi);margin-bottom:2px">POS Inteligente</div>
+              <div style="font-size:11.5px;color:var(--md);line-height:1.4">Cobros sin fricción</div>
+            </div>
+          </a>
+          <div style="height:1px;background:var(--bd);margin:6px 8px"></div>
+          <a class="di" href="#" role="menuitem">
+            <div class="di-icon" style="background:rgba(255,184,0,.1)">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.5 4.5H14l-3.8 2.8 1.5 4.5L8 10l-3.8 2.8 1.5-4.5L2 5.5h4.5z" stroke="#FFB800" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--hi);margin-bottom:2px">WhatsApp + IA</div>
+              <div style="font-size:11.5px;color:var(--md);line-height:1.4">Reservas automáticas 24/7</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <a href="#" class="nl">Precios</a>
+      <a href="#" class="nl has-badge">Novedades</a>
+      <a href="https://nautilustech.app" class="nl" target="_blank" rel="noopener">
+        NautilusTech
+        <svg width="11" height="11" fill="none" viewBox="0 0 16 16" aria-hidden="true" style="opacity:.5">
+          <path d="M10 2h4v4M14 2L8 8M6 4H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+    </div>
+
+    <!-- ══ RIGHT SIDE ══ -->
+    <div style="display:flex;align-items:center;gap:10px">
+
+      <!-- Status pill (desktop only) -->
+      <div class="status" aria-label="Estado del sistema: operativo">
+        <span class="sdot" aria-hidden="true"></span>
+        99.9% uptime
+      </div>
+
+      <div class="nd" aria-hidden="true"></div>
+
+      <!-- Login link -->
+      <a href="#" class="nl" style="display:none" id="login-link">Entrar</a>
+
+      
+      <!-- Hamburger (mobile only) -->
+      <button id="ham" aria-label="Abrir menú" aria-expanded="false" aria-controls="drawer">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MOBILE DRAWER ══ -->
+<div id="drawer" role="dialog" aria-label="Menú móvil" aria-modal="true" hidden>
+  <div style="padding:12px 24px 0;display:flex;flex-direction:column;gap:0">
+
+    <!-- Quick status -->
+    <div style="display:flex;align-items:center;gap:8px;padding:16px 0;border-bottom:1px solid rgba(0,212,255,.07)">
+      <div class="sdot"></div>
+      <span class="mo" style="font-size:11.5px;color:var(--mt)">Todos los sistemas operativos</span>
+    </div>
+
+  </div>
+
+  <!-- Nav sections -->
+  <div class="mob-section">Producto</div>
+
+  <a href="#" class="mob-link">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,212,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="var(--cy)" stroke-width="1.3"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="var(--cy)" stroke-width="1.3"/></svg>
+      </div>
+      <span>Pedidos QR</span>
+    </div>
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16" style="color:var(--lo)"><path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <a href="#" class="mob-link">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,255,198,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><path d="M2 12V5l6-3 6 3v7" stroke="var(--mt)" stroke-width="1.3" stroke-linejoin="round"/><rect x="5" y="8" width="6" height="4" rx=".5" stroke="var(--mt)" stroke-width="1.3"/></svg>
+      </div>
+      <span>Kitchen Display</span>
+    </div>
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16" style="color:var(--lo)"><path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <a href="#" class="mob-link">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,212,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="var(--cy)" stroke-width="1.3"/><path d="M5 8h6M5 5.5h3M5 10.5h4" stroke="var(--cy)" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <span>POS Inteligente</span>
+    </div>
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16" style="color:var(--lo)"><path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <a href="#" class="mob-link">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,184,0,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="15" height="15" fill="none" viewBox="0 0 16 16"><path d="M8 1l1.5 4.5H14l-3.8 2.8 1.5 4.5L8 10l-3.8 2.8 1.5-4.5L2 5.5h4.5z" stroke="#FFB800" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      </div>
+      <span>WhatsApp + IA</span>
+    </div>
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16" style="color:var(--lo)"><path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <div class="mob-section" style="margin-top:8px">General</div>
+
+  <a href="#" class="mob-link">
+    <span>Precios</span>
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16" style="color:var(--lo)"><path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <a href="#" class="mob-link" style="position:relative">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span>Novedades</span>
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--mt);animation:blink 2.2s infinite"></div>
+    </div>
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16" style="color:var(--lo)"><path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <a href="https://nautilustech.app" class="mob-link" target="_blank" rel="noopener">
+    <span>NautilusTech</span>
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16" style="color:var(--lo)"><path d="M10 2h4v4M14 2L8 8M6 4H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <!-- Mobile CTA -->
+  <div style="padding:20px 0 32px">
+    <a href="#cta" class="cta" style="width:100%;justify-content:center;font-size:15px;padding:15px" id="mob-cta">
+      Empezar gratis — 14 días
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <p style="text-align:center;font-size:12px;color:var(--lo);margin-top:10px">Sin tarjeta de crédito · Sin contratos</p>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     DEMO PAGE BACKGROUND (scroll test)
+══════════════════════════════════════ -->
+
+
+<!-- ══════════════════════════════════════
+     BEHAVIOR SCRIPT
+══════════════════════════════════════ -->
+<script>
+  const nav    = document.getElementById('nav');
+  const ham    = document.getElementById('ham');
+  const drawer = document.getElementById('drawer');
+  let   isOpen = false;
+
+  /* ── Scroll: clear ↔ glass ── */
+  function updateNav() {
+    if (window.scrollY > 16) {
+      nav.classList.remove('clear');
+      nav.classList.add('glass');
+    } else {
+      nav.classList.remove('glass');
+      nav.classList.add('clear');
+    }
+  }
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
+
+  /* ── Mobile drawer toggle ── */
+  function openDrawer() {
+    isOpen = true;
+    drawer.removeAttribute('hidden');
+    requestAnimationFrame(() => drawer.classList.add('open'));
+    ham.classList.add('open');
+    ham.setAttribute('aria-expanded', 'true');
+    ham.setAttribute('aria-label', 'Cerrar menú');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    isOpen = false;
+    drawer.classList.remove('open');
+    ham.classList.remove('open');
+    ham.setAttribute('aria-expanded', 'false');
+    ham.setAttribute('aria-label', 'Abrir menú');
+    document.body.style.overflow = '';
+    setTimeout(() => { drawer.setAttribute('hidden', ''); }, 320);
+  }
+
+  ham.addEventListener('click', () => isOpen ? closeDrawer() : openDrawer());
+
+  /* Close on backdrop tap (click outside content) */
+  drawer.addEventListener('click', (e) => {
+    if (e.target === drawer) closeDrawer();
+  });
+
+  /* Close on escape */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen) closeDrawer();
+  });
+
+  /* Close drawer when a link inside is tapped */
+  drawer.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      if (isOpen) closeDrawer();
+    });
+  });
+
+  /* Resize: auto-close if going wide */
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 900 && isOpen) closeDrawer();
+  });
+
+  /* Show login link on desktop (optional progressive enhancement) */
+  const ll = document.getElementById('login-link');
+  if (ll) {
+    ll.style.display = window.innerWidth > 900 ? 'inline-flex' : 'none';
+    window.addEventListener('resize', () => {
+      ll.style.display = window.innerWidth > 900 ? 'inline-flex' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html>
