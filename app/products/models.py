@@ -1,7 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from restaurants.models import Restaurant
 
 class ProductCategory(models.Model):
@@ -15,6 +12,7 @@ class ProductCategory(models.Model):
 
 
 class Product(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='products')
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True, null=True)

@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import UserRestaurant
+
+
+@admin.register(UserRestaurant)
+class UserRestaurantAdmin(admin.ModelAdmin):
+    list_display = ('user', 'restaurant')
+    search_fields = ('user__username', 'user__email', 'restaurant__name')
+    list_filter = ('restaurant',)

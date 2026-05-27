@@ -1,5 +1,6 @@
 from django.db import models
 from products.models import Product
+from restaurants.models import Restaurant
 from tables.models import RestaurantTable
 
 class Order(models.Model):
@@ -11,6 +12,7 @@ class Order(models.Model):
         ('CANCELLED', 'Cancelada'),
     ]
 
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='orders')
     table = models.ForeignKey(RestaurantTable, on_delete=models.PROTECT, related_name='orders')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OPEN')
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)

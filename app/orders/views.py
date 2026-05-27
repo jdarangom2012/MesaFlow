@@ -33,6 +33,16 @@ def create_order(request):
     except RestaurantTable.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Mesa no encontrada'}, status=404)
 
+    user = getattr(request, 'user', None)
+    request_restaurant = getattr(request, 'restaurant', None)
+
+    if user and user.is_authenticated:
+        if not request_restaurant:
+            return JsonResponse({'success': False, 'error': 'Usuario sin restaurante asignado'}, status=403)
+
+        if table.restaurant_id != request_restaurant.id:
+            return JsonResponse({'success': False, 'error': 'Mesa no pertenece a tu restaurante'}, status=403)
+
     product_quantities = {}
 
     for item in items:
@@ -57,11 +67,14 @@ def create_order(request):
 
         product_quantities[product_id] = product_quantities.get(product_id, 0) + quantity
 
-    products = Product.objects.filter(id__in=product_quantities.keys())
+    products = Product.objects.filter(
+        id__in=product_quantities.keys(),
+        restaurant=table.restaurant,
+    )
     products_by_id = {product.id: product for product in products}
 
     if len(products_by_id) != len(product_quantities):
-        return JsonResponse({'success': False, 'error': 'Uno o más productos no existen'}, status=404)
+        return JsonResponse({'success': False, 'error': 'Uno o más productos no existen para esta mesa'}, status=404)
 
     subtotal = Decimal('0.00')
     order_items = []
@@ -82,6 +95,7 @@ def create_order(request):
 
     with transaction.atomic():
         order = Order.objects.create(
+            restaurant=table.restaurant,
             table=table,
             status='OPEN',
             subtotal=subtotal,
