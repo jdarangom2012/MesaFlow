@@ -6,11 +6,26 @@ from restaurants.models import Restaurant
 
 
 class UserRestaurant(models.Model):
+    ROLE_SUPERADMIN = 'SUPERADMIN'
+    ROLE_ADMIN = 'ADMIN'
+    ROLE_CAJERO = 'CAJERO'
+    ROLE_COCINA = 'COCINA'
+    ROLE_MESERO = 'MESERO'
+
+    ROLE_CHOICES = [
+        (ROLE_SUPERADMIN, 'Superadmin SaaS'),
+        (ROLE_ADMIN, 'Admin restaurante'),
+        (ROLE_CAJERO, 'Cajero'),
+        (ROLE_COCINA, 'Cocina'),
+        (ROLE_MESERO, 'Mesero'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='restaurant_profile')
     restaurant = models.ForeignKey(Restaurant, on_delete=models.PROTECT, related_name='user_profiles', null=True, blank=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_ADMIN)
 
     def __str__(self):
         if self.restaurant:
-            return f'{self.user.username} - {self.restaurant.name}'
+            return f'{self.user.username} - {self.restaurant.name} - {self.role}'
 
-        return self.user.username
+        return f'{self.user.username} - {self.role}'

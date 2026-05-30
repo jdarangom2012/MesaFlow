@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -40,14 +41,10 @@
             padding: 24px;
         }
 
-        .brand {
-            font-size: 28px;
-            font-weight: 950;
-            letter-spacing: -.04em;
-        }
-
-        .brand span {
-            color: var(--cyan);
+        .brand-logo {
+            display: block;
+            width: min(210px, 72vw);
+            height: auto;
         }
 
         .subtitle {
@@ -108,7 +105,7 @@
 </head>
 <body>
     <main class="login-card">
-        <div class="brand">Mesa<span>Flow</span></div>
+        <img class="brand-logo" src="{% static 'img/logo-mesaflow.png' %}" alt="MesaFlow">
         <div class="subtitle">Ingresa a tu operación de restaurante.</div>
 
         {% if form.errors %}

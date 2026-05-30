@@ -1,34 +1,41 @@
-<div style="
+<div
+class="pos-product-card"
+role="button"
+tabindex="0"
+data-product-search="{{ product.name }} {{ product.description|default:'' }} {{ product.category.name }}"
+data-category-id="{{ product.category_id }}"
+data-product-id="{{ product.id }}"
+data-product-name="{{ product.name }}"
+data-product-price="{{ product.price }}"
+data-product-description="{{ product.description|default:''|truncatechars:60 }}"
+style="
 background:#0B1726;
 border:1px solid rgba(255,255,255,.06);
-border-radius:20px;
+border-radius:14px;
 overflow:hidden;
 cursor:pointer;
-transition:.25s;
+transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
 position:relative;
 ">
 
     <!-- IMAGE -->
 
     <div style="
-    height:130px;
-    background:#EDE7DD;
+    height:76px;
+    background:linear-gradient(145deg,rgba(0,212,255,.12),rgba(0,255,198,.05));
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:52px;
+    font-size:30px;
+    color:{{ product.color|default:'#00D4FF' }};
     ">
 
-        {% if product.category.name == 'Pizzas' %}
-            🍕
-        {% elif product.category.name == 'Pastas' %}
-            🍝
-        {% elif product.category.name == 'Carnes' %}
-            🥩
-        {% elif product.category.name == 'Bebidas' %}
-            🍷
-        {% elif product.category.name == 'Postres' %}
-            🍮
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:100%;height:100%;object-fit:cover;display:block;">
+        {% elif product.icon %}
+            {{ product.icon }}
+        {% elif product.category.icon %}
+            {{ product.category.icon }}
         {% else %}
             🍽️
         {% endif %}
@@ -37,43 +44,76 @@ position:relative;
 
     <!-- CONTENT -->
 
-    <div style="padding:16px;">
+    <div style="padding:10px;">
 
         <!-- BADGES -->
 
         <div style="
         display:flex;
-        gap:6px;
-        margin-bottom:10px;
+        gap:5px;
+        margin-bottom:7px;
+        flex-wrap:wrap;
         ">
 
-            {% if product.is_featured %}
+            <div style="
+            background:rgba(0,212,255,.12);
+            border:1px solid rgba(0,212,255,.20);
+            color:#00D4FF;
+            font-size:8.5px;
+            font-weight:bold;
+            padding:3px 6px;
+            border-radius:999px;
+            ">
+                {{ product.category.name }}
+            </div>
+
+            <div style="
+            background:#00FFC6;
+            color:black;
+            font-size:8.5px;
+            font-weight:bold;
+            padding:3px 6px;
+            border-radius:999px;
+            ">
+                ACTIVO
+            </div>
 
             <div style="
             background:#00D4FF;
             color:black;
-            font-size:11px;
+            font-size:8.5px;
             font-weight:bold;
-            padding:4px 8px;
+            padding:3px 6px;
             border-radius:999px;
             ">
-                TOP
+                POS
             </div>
 
-            {% endif %}
-
-            {% if product.is_new %}
-
+            {% if product.is_kitchen_available %}
             <div style="
             background:#FFC10722;
             border:1px solid #FFC10755;
             color:#FFC107;
-            font-size:11px;
+            font-size:8.5px;
             font-weight:bold;
-            padding:4px 8px;
+            padding:3px 6px;
             border-radius:999px;
             ">
-                NUEVO
+                KITCHEN
+            </div>
+            {% endif %}
+
+            {% if product.is_popular %}
+
+            <div style="
+            background:#00D4FF;
+            color:black;
+            font-size:8.5px;
+            font-weight:bold;
+            padding:3px 6px;
+            border-radius:999px;
+            ">
+                TOP
             </div>
 
             {% endif %}
@@ -83,10 +123,10 @@ position:relative;
         <!-- NAME -->
 
         <div style="
-        font-size:18px;
+        font-size:14px;
         font-weight:700;
         color:white;
-        margin-bottom:8px;
+        margin-bottom:4px;
         ">
 
             {{ product.name }}
@@ -97,9 +137,9 @@ position:relative;
 
         <div style="
         color:#6D87A8;
-        font-size:13px;
-        line-height:1.4;
-        min-height:38px;
+        font-size:11.5px;
+        line-height:1.3;
+        min-height:30px;
         ">
 
             {{ product.description|truncatechars:60 }}
@@ -109,7 +149,7 @@ position:relative;
         <!-- FOOTER -->
 
         <div style="
-        margin-top:16px;
+        margin-top:8px;
         display:flex;
         align-items:center;
         justify-content:space-between;
@@ -117,7 +157,7 @@ position:relative;
 
             <div style="
             color:#00D4FF;
-            font-size:24px;
+            font-size:18px;
             font-weight:800;
             ">
 
@@ -133,13 +173,13 @@ position:relative;
             data-product-price="{{ product.price }}"
             data-product-description="{{ product.description|default:''|truncatechars:60 }}"
             style="
-            width:42px;
-            height:42px;
+            width:34px;
+            height:34px;
             border:none;
-            border-radius:12px;
+            border-radius:10px;
             background:linear-gradient(135deg,#00D4FF,#00FFC6);
             color:black;
-            font-size:22px;
+            font-size:18px;
             font-weight:bold;
             cursor:pointer;
             ">

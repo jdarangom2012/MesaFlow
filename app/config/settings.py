@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'daphne',
     'channels',
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,6 +51,8 @@ INSTALLED_APPS = [
     'kitchen',
     'pos',
     'reports',
+    'payments',
+    'cash_register',
     'ai',
     ## app de terceros
     'tailwind',
@@ -79,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'restaurants.context_processors.restaurant_settings',
             ],
         },
     },
@@ -169,3 +173,47 @@ INTERNAL_IPS = [
 ]
 
 NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+
+JAZZMIN_SETTINGS = {
+
+    "site_title": "MesaFlow Admin",
+    "site_header": "MesaFlow",
+    "site_brand": "MesaFlow SaaS",
+
+    "welcome_sign": "Bienvenido a MesaFlow",
+
+    "copyright": "NautilusTech",
+
+    "topmenu_links": [
+
+        {"name": "Dashboard", "url": "/dashboard/"},
+
+        {"model": "auth.User"},
+
+    ],
+
+    "show_sidebar": True,
+    "navigation_expanded": True,
+
+    "icons": {
+
+        "auth": "fas fa-users-cog",
+
+        "auth.user": "fas fa-user",
+
+        "auth.Group": "fas fa-users",
+
+        "restaurants.restaurant": "fas fa-store",
+
+        "products.product": "fas fa-pizza-slice",
+
+        "products.productcategory": "fas fa-list",
+
+        "orders.order": "fas fa-receipt",
+
+        "tables.restauranttable": "fas fa-chair",
+
+        "pos.payment": "fas fa-cash-register",
+
+    },
+}

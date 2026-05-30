@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MesaFlow POS — La Piazza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --bg:   #07111F;
+  --card: #0B1726;
+  --pnl:  #111C2D;
+  --cy:   #00D4FF;
+  --mt:   #00FFC6;
+  --hi:   #E8F4FF;
+  --mid:  #5B789A;
+  --lo:   #243852;
+  --bd:   rgba(0,212,255,.09);
+  --bdh:  rgba(0,212,255,.22);
+  --sid-w: 200px;
+  --cart-w: 320px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg);
+  color: var(--hi);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.sy { font-family: 'Syne', sans-serif; }
+.mo { font-family: 'JetBrains Mono', monospace; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,212,255,.15); border-radius: 2px; }
+
+/* ── LAYOUT SHELL ── */
+.pos-shell {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sid-w);
+  background: var(--card);
+  border-right: 1px solid var(--bd);
+  display: flex; flex-direction: column;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.sb-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px; padding: 14px 8px;
+  cursor: pointer; border-radius: 10px; margin: 2px 8px;
+  transition: background .15s, color .15s;
+  font-size: 11px; color: var(--mid); text-align: center;
+}
+.sb-item:hover { background: rgba(0,212,255,.07); color: var(--hi); }
+.sb-item.on { background: rgba(0,212,255,.1); color: var(--cy); }
+.sb-badge {
+  min-width: 18px; height: 18px; border-radius: 9px;
+  background: var(--cy); color: #07111F;
+  font-size: 10px; font-weight: 700; padding: 0 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+.sb-badge.amber { background: #FFB800; }
+.sb-badge.mint  { background: var(--mt); }
+.sb-divider { height: 1px; background: var(--bd); margin: 6px 12px; }
+
+/* ── MAIN CENTER ── */
+.pos-main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+.pos-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--bd);
+  padding: 0 20px;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-shrink: 0;
+}
+
+/* ── CATEGORIES ── */
+.cat-bar {
+  background: var(--pnl);
+  border-bottom: 1px solid var(--bd);
+  padding: 10px 18px;
+  display: flex; gap: 8px;
+  flex-shrink: 0; overflow-x: auto; scrollbar-width: none;
+}
+.cat-bar::-webkit-scrollbar { display: none; }
+.cat-btn {
+  padding: 8px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 500;
+  white-space: nowrap; flex-shrink: 0;
+  cursor: pointer; border: 1px solid transparent;
+  transition: all .15s;
+}
+.cat-btn.on {
+  background: rgba(0,212,255,.12);
+  border-color: rgba(0,212,255,.28);
+  color: var(--cy);
+}
+.cat-btn.off {
+  background: var(--card); color: var(--mid);
+  border-color: var(--bd);
+}
+.cat-btn.off:hover { border-color: var(--bdh); color: var(--hi); }
+
+/* ── PRODUCT GRID ── */
+.prod-grid {
+  flex: 1; overflow-y: auto;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 12px;
+  align-content: start;
+}
+.prod-card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 14px; overflow: hidden;
+  cursor: pointer;
+  transition: border-color .18s, transform .15s, box-shadow .18s;
+  display: flex; flex-direction: column;
+  -webkit-tap-highlight-color: transparent;
+}
+.prod-card:hover {
+  border-color: var(--bdh);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.prod-card:active { transform: scale(.97); }
+.prod-card.sold-out { opacity: .45; pointer-events: none; }
+.prod-img {
+  background: var(--pnl);
+  font-size: 36px;
+  display: flex; align-items: center; justify-content: center;
+  height: 80px; flex-shrink: 0;
+}
+.prod-body { padding: 10px 11px 11px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.prod-name { font-size: 12.5px; font-weight: 600; color: var(--hi); line-height: 1.3; }
+.prod-desc { font-size: 10.5px; color: var(--mid); line-height: 1.35; }
+.prod-price { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--cy); margin-top: auto; }
+.prod-badge {
+  font-size: 9px; font-weight: 700; padding: 2px 7px;
+  border-radius: 20px; letter-spacing: .04em; display: inline-block;
+}
+.pop-badge { background: linear-gradient(135deg, var(--cy), var(--mt)); color: #07111F; }
+.new-badge { background: rgba(255,184,0,.15); color: #FFB800; border: 1px solid rgba(255,184,0,.25); }
+.out-badge { background: rgba(255,80,80,.1); color: #FF5252; border: 1px solid rgba(255,80,80,.2); }
+
+/* ── ORDER PANEL (RIGHT) ── */
+.order-panel {
+  width: var(--cart-w);
+  background: var(--card);
+  border-left: 1px solid var(--bd);
+  display: flex; flex-direction: column;
+  flex-shrink: 0; z-index: 10;
+}
+.order-hdr {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--bd);
+  flex-shrink: 0;
+}
+.order-items {
+  flex: 1; overflow-y: auto;
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.oi {
+  background: var(--pnl);
+  border: 1px solid var(--bd);
+  border-radius: 11px; padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px;
+  transition: border-color .15s;
+}
+.oi:hover { border-color: var(--bdh); }
+.oi-emoji { font-size: 22px; flex-shrink: 0; }
+.oi-body { flex: 1; min-width: 0; }
+.qty-ctrl {
+  display: flex; align-items: center; gap: 0;
+  background: var(--lo);
+  border-radius: 8px; overflow: hidden; flex-shrink: 0;
+}
+.qty-btn {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  color: var(--cy); transition: background .15s;
+}
+.qty-btn:hover { background: rgba(0,212,255,.12); }
+.qty-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 500; color: var(--hi);
+  min-width: 22px; text-align: center;
+}
+
+/* ── ORDER NOTES ── */
+.note-field {
+  background: var(--pnl); border: 1px solid var(--bd);
+  border-radius: 10px; padding: 9px 12px;
+  font-size: 12px; color: var(--mid);
+  margin: 0 14px; cursor: pointer;
+  transition: border-color .15s;
+  display: flex; align-items: center; gap: 8px;
+}
+.note-field:hover { border-color: var(--bdh); }
+
+/* ── TOTALS ── */
+.totals {
+  padding: 14px 18px;
+  border-top: 1px solid var(--bd);
+  flex-shrink: 0;
+}
+.tot-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12.5px; color: var(--mid);
+  margin-bottom: 6px;
+}
+.tot-row.main {
+  font-size: 16px; font-weight: 700;
+  color: var(--hi); margin-top: 10px; margin-bottom: 14px;
+  padding-top: 10px; border-top: 1px solid var(--bd);
+}
+.tot-row.main .tot-val { color: var(--cy); }
+
+/* ── PAYMENT METHODS ── */
+.pay-methods {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 7px; margin-bottom: 12px;
+}
+.pay-btn {
+  background: var(--pnl); border: 1.5px solid var(--bd);
+  border-radius: 10px; padding: 8px 6px;
+  text-align: center; cursor: pointer;
+  transition: all .15s; font-size: 11px; color: var(--mid);
+}
+.pay-btn:hover { border-color: var(--bdh); color: var(--hi); background: rgba(0,212,255,.05); }
+.pay-btn.on {
+  border-color: var(--cy);
+  background: rgba(0,212,255,.1);
+  color: var(--cy);
+}
+
+/* ── COBRAR BTN ── */
+.cobrar {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: linear-gradient(135deg, var(--cy), var(--mt));
+  color: #07111F;
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 17px; letter-spacing: -.02em;
+  border: none; border-radius: 13px;
+  padding: 16px 20px; width: 100%;
+  cursor: pointer;
+  transition: opacity .18s, transform .15s, box-shadow .18s;
+  box-shadow: 0 4px 28px rgba(0,212,255,.3);
+}
+.cobrar:hover { opacity: .88; transform: translateY(-2px); box-shadow: 0 10px 38px rgba(0,212,255,.42); }
+.cobrar:active { transform: scale(.98); opacity: .92; }
+
+/* ── MESA / CUSTOMER CHIPS ── */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 8px; padding: 5px 11px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all .15s;
+}
+.chip.mesa { background: rgba(0,212,255,.1); border: 1px solid rgba(0,212,255,.22); color: var(--cy); }
+.chip.mesa:hover { background: rgba(0,212,255,.16); }
+.chip.client { background: rgba(0,255,198,.07); border: 1px solid rgba(0,255,198,.18); color: var(--mt); }
+.chip.client:hover { background: rgba(0,255,198,.13); }
+.chip.timer { background: rgba(255,184,0,.09); border: 1px solid rgba(255,184,0,.2); color: #FFB800; }
+
+/* ── STATUS DOT ── */
+.sdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; animation: blink 2.2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* ── DISCOUNT TAG ── */
+.disc-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(0,255,198,.08); border: 1px solid rgba(0,255,198,.18);
+  border-radius: 7px; padding: 4px 9px;
+  font-size: 11px; color: var(--mt); cursor: pointer;
+  transition: all .15s;
+}
+.disc-tag:hover { background: rgba(0,255,198,.14); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  :root { --sid-w: 64px; --cart-w: 280px; }
+  .sb-item-label { display: none; }
+  .sidebar { align-items: center; }
+}
+@media (max-width: 700px) {
+  :root { --cart-w: 0px; }
+  .order-panel { display: none; }
+  .prod-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 480px) {
+  .prod-grid { grid-template-columns: repeat(2,1fr); gap: 8px; padding: 12px; }
+  .cat-bar { padding: 8px 12px; }
+}
+
+/* ── INTERACTIVE STATE ── */
+.prod-card.adding {
+  border-color: var(--cy);
+  box-shadow: 0 0 0 2px rgba(0,212,255,.22);
+  animation: pop .22s ease;
+}
+@keyframes pop { 0%{transform:scale(.97)} 60%{transform:scale(1.03)} 100%{transform:scale(1)} }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     MESAFLOW POS — La Piazza
+     Standalone · Touch-Friendly · SaaS
+════════════════════════════════════ -->
+
+<!-- TOP HEADER BAR -->
+<header style="background:var(--card);border-bottom:1px solid var(--bd);padding:0 18px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:20">
+  <!-- Logo -->
+  <a href="https://nautilustech.app" target="_blank" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0">
+    <svg width="30" height="30" viewBox="0 0 36 36" fill="none">
+      <defs><linearGradient id="hlg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00D4FF"/><stop offset="1" stop-color="#00FFC6"/></linearGradient></defs>
+      <rect width="36" height="36" rx="8" fill="#111C2D"/>
+      <rect width="36" height="36" rx="8" fill="none" stroke="rgba(0,212,255,.22)" stroke-width=".8"/>
+      <line x1="18" y1="5" x2="18" y2="31" stroke="rgba(0,212,255,.15)" stroke-width=".8"/>
+      <line x1="5" y1="18" x2="31" y2="18" stroke="rgba(0,212,255,.15)" stroke-width=".8"/>
+      <path d="M18 18 Q18 10 24 10 Q30 10 30 16 Q30 22 24 22 Q21 22 21 20 Q21 18.5 22.5 18.5" stroke="url(#hlg)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="22.5" cy="18.5" r="2.3" fill="#00FFC6"/>
+    </svg>
+    <div>
+      <div class="sy" style="font-size:14px;font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1">Mesa<span style="color:var(--cy)">Flow</span> <span style="color:var(--lo);font-weight:600">POS</span></div>
+      <div class="mo" style="font-size:8.5px;color:var(--lo);letter-spacing:.14em">LA PIAZZA</div>
+    </div>
+  </a>
+
+  <!-- Center: mesa + client + timer -->
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
+    <div class="chip mesa" onclick="cycleMesa(this)">
+      <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5.5V8l1.5 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span id="mesa-label">Mesa 5</span>
+    </div>
+    <div class="chip client">
+      <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span>4 personas</span>
+    </div>
+    <div class="chip timer" id="timer-chip">
+      <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 6v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M6 2h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span id="timer-display">12:34</span>
+    </div>
+  </div>
+
+  <!-- Right: status + user -->
+  <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:8px;background:rgba(0,255,198,.07);border:1px solid rgba(0,255,198,.15)">
+      <span class="sdot" style="background:var(--mt)"></span>
+      <span class="mo" style="font-size:10.5px;color:var(--mt)">En línea</span>
+    </div>
+    <div style="width:30px;height:30px;border-radius:50%;background:rgba(0,212,255,.12);color:var(--cy);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(0,212,255,.18)">JG</div>
+  </div>
+</header>
+
+<!-- ═ MAIN SHELL ═ -->
+<div class="pos-shell">
+
+  <!-- ═══ LEFT SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <!-- Top nav items -->
+    <div style="flex:1;padding:10px 0;overflow-y:auto">
+
+      <div class="sb-item on">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="2" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="13" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="13" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span class="sb-item-label">POS</span>
+      </div>
+
+      <div class="sb-item" style="position:relative">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span class="sb-item-label">Mesas</span>
+        <div style="position:absolute;top:6px;right:10px"><span class="sb-badge amber">3</span></div>
+      </div>
+
+      <div class="sb-item" style="position:relative">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" stroke="currentColor" stroke-width="1.6"/><rect x="9" y="3" width="6" height="4" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span class="sb-item-label">Pedidos</span>
+        <div style="position:absolute;top:6px;right:10px"><span class="sb-badge">7</span></div>
+      </div>
+
+      <div class="sb-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M3 18V8l9-5 9 5v10" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 18v-6h6v6" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span class="sb-item-label">Cocina</span>
+        <div style="position:absolute;top:6px;right:10px" style="position:relative"><span class="sb-badge mint">5</span></div>
+      </div>
+
+      <div class="sb-divider"></div>
+
+      <div class="sb-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M2 10h20" stroke="currentColor" stroke-width="1.4"/><path d="M6 15h4M15 15h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span class="sb-item-label">Pagos</span>
+      </div>
+
+      <div class="sb-item">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><polyline points="3,18 7,10 12,14.5 16,7.5 21,12" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="sb-item-label">Reportes</span>
+      </div>
+    </div>
+
+    <!-- Bottom: tables quick-switch -->
+    <div style="padding:10px 0;border-top:1px solid var(--bd)">
+      <div style="padding:6px 10px;margin-bottom:4px">
+        <div class="mo" style="font-size:9px;color:var(--lo);letter-spacing:.12em;text-align:center">MESAS</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:0 8px 8px">
+        <div onclick="selectMesa('Mesa 1',this)" class="mesa-quick" style="padding:7px;border-radius:8px;text-align:center;cursor:pointer;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.22);transition:all .15s">
+          <div class="mo" style="font-size:10.5px;color:var(--cy)">T1</div>
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--cy);margin:3px auto 0"></div>
+        </div>
+        <div onclick="selectMesa('Mesa 2',this)" class="mesa-quick" style="padding:7px;border-radius:8px;text-align:center;cursor:pointer;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.22);transition:all .15s">
+          <div class="mo" style="font-size:10.5px;color:var(--cy)">T2</div>
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--cy);margin:3px auto 0"></div>
+        </div>
+        <div onclick="selectMesa('Mesa 3',this)" class="mesa-quick" style="padding:7px;border-radius:8px;text-align:center;cursor:pointer;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.22);transition:all .15s">
+          <div class="mo" style="font-size:10.5px;color:#FFB800">T3</div>
+          <div style="width:5px;height:5px;border-radius:50%;background:#FFB800;margin:3px auto 0;animation:blink 2s infinite"></div>
+        </div>
+        <div onclick="selectMesa('Mesa 5',this)" class="mesa-quick active-mesa" style="padding:7px;border-radius:8px;text-align:center;cursor:pointer;background:rgba(0,212,255,.18);border:2px solid var(--cy);transition:all .15s">
+          <div class="mo" style="font-size:10.5px;color:var(--cy);font-weight:700">T5</div>
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--cy);margin:3px auto 0;animation:blink 2s infinite"></div>
+        </div>
+        <div onclick="selectMesa('Mesa 7',this)" class="mesa-quick" style="padding:7px;border-radius:8px;text-align:center;cursor:pointer;background:rgba(0,255,198,.07);border:1px solid rgba(0,255,198,.2);transition:all .15s">
+          <div class="mo" style="font-size:10.5px;color:var(--mt)">T7</div>
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--mt);margin:3px auto 0"></div>
+        </div>
+        <div style="padding:7px;border-radius:8px;text-align:center;cursor:pointer;background:var(--pnl);border:1px solid var(--lo);opacity:.4">
+          <div class="mo" style="font-size:10.5px;color:var(--lo)">T9</div>
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--lo);margin:3px auto 0"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ CENTER: PRODUCTS ═══ -->
+  <div class="pos-main">
+
+    <!-- POS header row -->
+    <div class="pos-header">
+      <!-- Search -->
+      <div style="flex:1;max-width:320px;position:relative">
+        <svg width="15" height="15" fill="none" viewBox="0 0 16 16" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--lo)"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="Buscar producto..." oninput="filterProds(this.value)"
+          style="width:100%;background:var(--pnl);border:1px solid var(--bd);border-radius:10px;padding:9px 12px 9px 34px;font-size:13px;color:var(--hi);outline:none;font-family:'DM Sans',sans-serif;transition:border-color .18s"
+          onfocus="this.style.borderColor='var(--bdh)'" onblur="this.style.borderColor='var(--bd)'">
+      </div>
+      <!-- Quick actions -->
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="openDiscount()" style="display:flex;align-items:center;gap:6px;background:var(--pnl);border:1px solid var(--bd);border-radius:9px;padding:8px 14px;font-size:12.5px;color:var(--mid);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--bdh)';this.style.color='var(--hi)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--mid)'">
+          <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M12 4L4 12M5.5 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10.5 10.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Descuento
+        </button>
+        <button onclick="splitCheck()" style="display:flex;align-items:center;gap:6px;background:var(--pnl);border:1px solid var(--bd);border-radius:9px;padding:8px 14px;font-size:12.5px;color:var(--mid);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--bdh)';this.style.color='var(--hi)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--mid)'">
+          <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Split
+        </button>
+        <button onclick="voidOrder()" style="display:flex;align-items:center;gap:6px;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.18);border-radius:9px;padding:8px 14px;font-size:12.5px;color:#FF5252;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,80,80,.14)'" onmouseout="this.style.background='rgba(255,80,80,.08)'">
+          <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Anular
+        </button>
+      </div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="cat-bar">
+      <button class="cat-btn on" onclick="filterCat('all',this)">⭐ Todo</button>
+      <button class="cat-btn off" onclick="filterCat('entrada',this)">🥗 Entradas</button>
+      <button class="cat-btn off" onclick="filterCat('pizza',this)">🍕 Pizzas</button>
+      <button class="cat-btn off" onclick="filterCat('pasta',this)">🍝 Pastas</button>
+      <button class="cat-btn off" onclick="filterCat('carne',this)">🥩 Carnes</button>
+      <button class="cat-btn off" onclick="filterCat('bebida',this)">🍷 Bebidas</button>
+      <button class="cat-btn off" onclick="filterCat('postre',this)">🍮 Postres</button>
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div class="prod-grid" id="prod-grid">
+
+      <!-- ENTRADAS -->
+      <div class="prod-card" data-cat="entrada" data-name="Ensalada César" data-price="24000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#f0fff4,#e0f9ea)">🥗</div>
+        <div class="prod-body">
+          <div style="display:flex;gap:5px;align-items:flex-start;flex-wrap:wrap;margin-bottom:3px">
+            <span class="prod-name">Ensalada César</span>
+          </div>
+          <div class="prod-desc">Pollo grillado, crutones, parmesano</div>
+          <div class="prod-price" style="margin-top:8px">$24,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="entrada" data-name="Bruschetta Mixta" data-price="18000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fff8e8,#fef3d0)">🥖</div>
+        <div class="prod-body">
+          <span class="prod-badge new-badge" style="margin-bottom:5px">Nuevo</span>
+          <div class="prod-name">Bruschetta Mixta</div>
+          <div class="prod-desc">Tomate, albahaca, mozzarella</div>
+          <div class="prod-price" style="margin-top:8px">$18,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="entrada" data-name="Carpaccio de Res" data-price="34000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fff0f0,#fde8e8)">🥩</div>
+        <div class="prod-body">
+          <div class="prod-name">Carpaccio de Res</div>
+          <div class="prod-desc">Rúgula, alcaparras, parmesano</div>
+          <div class="prod-price" style="margin-top:8px">$34,000</div>
+        </div>
+      </div>
+
+      <!-- PIZZAS -->
+      <div class="prod-card" data-cat="pizza" data-name="Pizza Margherita" data-price="32000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fff5ee,#feece0)">🍕</div>
+        <div class="prod-body">
+          <div style="display:flex;gap:5px;align-items:flex-start;flex-wrap:wrap;margin-bottom:4px">
+            <span class="prod-name">Pizza Margherita</span>
+            <span class="prod-badge pop-badge">#1</span>
+          </div>
+          <div class="prod-desc">San Marzano, fior di latte, albahaca</div>
+          <div class="prod-price" style="margin-top:8px">$32,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="pizza" data-name="Pizza Prosciutto" data-price="42000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fdf4ff,#f3e0ff)">🍕</div>
+        <div class="prod-body">
+          <div class="prod-name">Pizza Prosciutto</div>
+          <div class="prod-desc">Jamón de Parma, rúgula, mozzarella</div>
+          <div class="prod-price" style="margin-top:8px">$42,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="pizza" data-name="Pizza 4 Quesos" data-price="38000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#f0f8ff,#e0f0ff)">🍕</div>
+        <div class="prod-body">
+          <div class="prod-name">Pizza 4 Quesos</div>
+          <div class="prod-desc">Mozzarella, gorgonzola, brie, parmesano</div>
+          <div class="prod-price" style="margin-top:8px">$38,000</div>
+        </div>
+      </div>
+
+      <!-- PASTAS -->
+      <div class="prod-card" data-cat="pasta" data-name="Carbonara Clásica" data-price="36000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fff0f5,#fde8f0)">🍝</div>
+        <div class="prod-body">
+          <div style="display:flex;gap:5px;align-items:flex-start;flex-wrap:wrap;margin-bottom:4px">
+            <span class="prod-name">Carbonara Clásica</span>
+            <span class="prod-badge new-badge">Chef</span>
+          </div>
+          <div class="prod-desc">Panceta italiana, pecorino, huevo</div>
+          <div class="prod-price" style="margin-top:8px">$36,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="pasta" data-name="Fetuccine al Pesto" data-price="33000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#f0fff5,#e0faea)">🌿</div>
+        <div class="prod-body">
+          <div class="prod-name">Fettuccine al Pesto</div>
+          <div class="prod-desc">Pesto genovés, piñones, parmesano</div>
+          <div class="prod-price" style="margin-top:8px">$33,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="pasta" data-name="Rigatoni Bolognesa" data-price="35000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fff8f0,#feeee0)">🍝</div>
+        <div class="prod-body">
+          <div class="prod-name">Rigatoni Bolognesa</div>
+          <div class="prod-desc">Ragú de res y cerdo, laurel, vino tinto</div>
+          <div class="prod-price" style="margin-top:8px">$35,000</div>
+        </div>
+      </div>
+
+      <!-- CARNES -->
+      <div class="prod-card" data-cat="carne" data-name="Filete al Vino" data-price="58000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fff0f0,#fdecec)">🥩</div>
+        <div class="prod-body">
+          <div style="display:flex;gap:5px;align-items:flex-start;flex-wrap:wrap;margin-bottom:4px">
+            <span class="prod-name">Filete al Vino</span>
+            <span class="prod-badge pop-badge">Top</span>
+          </div>
+          <div class="prod-desc">Reducción Malbec, papas croutons</div>
+          <div class="prod-price" style="margin-top:8px">$58,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="carne" data-name="Pollo alla Cacciatora" data-price="44000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fffbf0,#fef7e0)">🍗</div>
+        <div class="prod-body">
+          <div class="prod-name">Pollo alla Cacciatora</div>
+          <div class="prod-desc">Salsa de tomate, aceitunas, alcaparras</div>
+          <div class="prod-price" style="margin-top:8px">$44,000</div>
+        </div>
+      </div>
+
+      <!-- BEBIDAS -->
+      <div class="prod-card" data-cat="bebida" data-name="Vino Malbec Copa" data-price="22000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#f8f0ff,#f0e4ff)">🍷</div>
+        <div class="prod-body">
+          <div class="prod-name">Vino Malbec Copa</div>
+          <div class="prod-desc">Mendoza, 150ml</div>
+          <div class="prod-price" style="margin-top:8px">$22,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="bebida" data-name="Agua San Pellegrino" data-price="8000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#e8f8ff,#d0f4ff)">💧</div>
+        <div class="prod-body">
+          <div class="prod-name">Agua S. Pellegrino</div>
+          <div class="prod-desc">Con gas, 500ml</div>
+          <div class="prod-price" style="margin-top:8px">$8,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="bebida" data-name="Espresso Doble" data-price="7000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#f5f0e8,#ede0d0)">☕</div>
+        <div class="prod-body">
+          <div class="prod-name">Espresso Doble</div>
+          <div class="prod-desc">Blend italiano, crema densa</div>
+          <div class="prod-price" style="margin-top:8px">$7,000</div>
+        </div>
+      </div>
+
+      <!-- POSTRES -->
+      <div class="prod-card" data-cat="postre" data-name="Tiramisú" data-price="26000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fff8ee,#fef0d8)">🍮</div>
+        <div class="prod-body">
+          <div style="display:flex;gap:5px;align-items:flex-start;flex-wrap:wrap;margin-bottom:4px">
+            <span class="prod-name">Tiramisú</span>
+            <span class="prod-badge pop-badge">Clásico</span>
+          </div>
+          <div class="prod-desc">Mascarpone, espresso, cacao</div>
+          <div class="prod-price" style="margin-top:8px">$26,000</div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-cat="postre" data-name="Panna Cotta" data-price="22000" onclick="addItem(this)">
+        <div class="prod-img" style="background:linear-gradient(145deg,#fff5fa,#feeaf5)">🍓</div>
+        <div class="prod-body">
+          <div class="prod-name">Panna Cotta</div>
+          <div class="prod-desc">Coulis de frutos rojos</div>
+          <div class="prod-price" style="margin-top:8px">$22,000</div>
+        </div>
+      </div>
+
+    </div><!-- /prod-grid -->
+  </div><!-- /pos-main -->
+
+  <!-- ═══ RIGHT: ORDER PANEL ═══ -->
+  <aside class="order-panel">
+
+    <!-- Order header -->
+    <div class="order-hdr">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="sy" style="font-size:14px;font-weight:700;color:var(--hi);letter-spacing:-.02em">Orden actual</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="sdot" style="background:var(--cy)"></span>
+          <span class="mo" style="font-size:10.5px;color:var(--cy)" id="order-count">3 ítems</span>
+        </div>
+      </div>
+      <!-- Order status bar -->
+      <div style="display:flex;gap:6px">
+        <div id="st-nuevo" style="flex:1;padding:5px;border-radius:7px;text-align:center;font-size:10px;font-weight:600;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.25);color:var(--cy);cursor:pointer" onclick="setStatus('nuevo')">Nuevo</div>
+        <div id="st-cocina" style="flex:1;padding:5px;border-radius:7px;text-align:center;font-size:10px;font-weight:600;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.22);color:#FFB800;cursor:pointer" onclick="setStatus('cocina')">Cocina</div>
+        <div id="st-listo" style="flex:1;padding:5px;border-radius:7px;text-align:center;font-size:10px;font-weight:600;background:var(--pnl);border:1px solid var(--lo);color:var(--lo);cursor:pointer" onclick="setStatus('listo')">Listo</div>
+        <div id="st-cobrar" style="flex:1;padding:5px;border-radius:7px;text-align:center;font-size:10px;font-weight:600;background:var(--pnl);border:1px solid var(--lo);color:var(--lo);cursor:pointer" onclick="setStatus('cobrar')">Cobrar</div>
+      </div>
+    </div>
+
+    <!-- Order items list -->
+    <div class="order-items" id="order-items">
+
+      <div class="oi" id="oi-pizza">
+        <div class="oi-emoji">🍕</div>
+        <div class="oi-body">
+          <div style="font-size:12.5px;font-weight:600;color:var(--hi)">Pizza Margherita</div>
+          <div style="font-size:10.5px;color:var(--mid);margin-top:1px">$32,000 c/u</div>
+          <div style="font-size:10px;color:var(--lo);margin-top:2px">Sin gluten en una</div>
+        </div>
+        <div class="qty-ctrl">
+          <div class="qty-btn" onclick="changeQty('pizza',-1)">−</div>
+          <div class="qty-num" id="qty-pizza">2</div>
+          <div class="qty-btn" onclick="changeQty('pizza',1)">+</div>
+        </div>
+      </div>
+
+      <div class="oi" id="oi-carbonara">
+        <div class="oi-emoji">🍝</div>
+        <div class="oi-body">
+          <div style="font-size:12.5px;font-weight:600;color:var(--hi)">Carbonara Clásica</div>
+          <div style="font-size:10.5px;color:var(--mid);margin-top:1px">$36,000 c/u</div>
+        </div>
+        <div class="qty-ctrl">
+          <div class="qty-btn" onclick="changeQty('carbonara',-1)">−</div>
+          <div class="qty-num" id="qty-carbonara">1</div>
+          <div class="qty-btn" onclick="changeQty('carbonara',1)">+</div>
+        </div>
+      </div>
+
+      <div class="oi" id="oi-vino">
+        <div class="oi-emoji">🍷</div>
+        <div class="oi-body">
+          <div style="font-size:12.5px;font-weight:600;color:var(--hi)">Vino Malbec Copa</div>
+          <div style="font-size:10.5px;color:var(--mid);margin-top:1px">$22,000 c/u</div>
+        </div>
+        <div class="qty-ctrl">
+          <div class="qty-btn" onclick="changeQty('vino',-1)">−</div>
+          <div class="qty-num" id="qty-vino">2</div>
+          <div class="qty-btn" onclick="changeQty('vino',1)">+</div>
+        </div>
+      </div>
+
+      <!-- Empty state (hidden by default) -->
+      <div id="empty-state" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;text-align:center">
+        <div style="font-size:36px;margin-bottom:12px;opacity:.4">🛒</div>
+        <div style="font-size:13px;color:var(--lo);font-weight:500">Orden vacía</div>
+        <div style="font-size:12px;color:var(--lo);margin-top:4px">Toca un producto para agregarlo</div>
+      </div>
+
+    </div>
+
+    <!-- Note field -->
+    <div class="note-field" style="margin-bottom:10px" onclick="addNote()">
+      <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M3 3h10v8H3zM3 8h10M6 3v8" stroke="var(--lo)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="note-text">Agregar nota a la orden...</span>
+    </div>
+
+    <!-- TOTALS -->
+    <div class="totals">
+
+      <!-- Discount tag (optional) -->
+      <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <div class="disc-tag" onclick="applyDiscount()" id="disc-btn">
+          <svg width="12" height="12" fill="none" viewBox="0 0 16 16"><path d="M12 4L4 12M5.5 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10.5 10.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span id="disc-label">+ Aplicar descuento</span>
+        </div>
+        <div id="disc-applied" style="display:none;font-size:11px;color:var(--mt)">10% aplicado</div>
+      </div>
+
+      <div class="tot-row"><span>Subtotal</span><span class="mo" id="subtotal">$158,000</span></div>
+      <div class="tot-row"><span>IVA 19%</span><span class="mo" id="tax">$30,020</span></div>
+      <div class="tot-row" style="margin-bottom:4px"><span>Propina sugerida</span><span class="mo" style="color:var(--mid)">$23,700</span></div>
+      <div class="tot-row main">
+        <span>TOTAL</span>
+        <span class="tot-val mo" id="total">$188,020</span>
+      </div>
+
+      <!-- PAYMENT METHODS -->
+      <div class="pay-methods" id="pay-methods">
+        <div class="pay-btn on" onclick="selectPay(this,'efectivo')">
+          <div style="font-size:18px;margin-bottom:3px">💵</div>
+          <div>Efectivo</div>
+        </div>
+        <div class="pay-btn" onclick="selectPay(this,'tarjeta')">
+          <div style="font-size:18px;margin-bottom:3px">💳</div>
+          <div>Tarjeta</div>
+        </div>
+        <div class="pay-btn" onclick="selectPay(this,'digital')">
+          <div style="font-size:18px;margin-bottom:3px">📱</div>
+          <div>Digital</div>
+        </div>
+      </div>
+
+      <!-- COBRAR BUTTON -->
+      <button class="cobrar" id="cobrar-btn" onclick="processCobro()">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M2 10h20" stroke="currentColor" stroke-width="1.8"/><path d="M6 15h4M16 15h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Cobrar $188,020</span>
+      </button>
+
+      <div style="text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--lo);cursor:pointer" onclick="printReceipt()">🖨 Imprimir</span>
+        <span style="color:var(--lo);font-size:11px">·</span>
+        <span style="font-size:11px;color:var(--lo);cursor:pointer" onclick="sendEmail()">📧 Email</span>
+        <span style="color:var(--lo);font-size:11px">·</span>
+        <span style="font-size:11px;color:var(--lo);cursor:pointer" onclick="sendWhatsApp()">💬 WhatsApp</span>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- /pos-shell -->
+
+<!-- ══ TOAST NOTIFICATION ══ -->
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bdh);border-radius:12px;padding:12px 20px;font-size:13px;color:var(--hi);z-index:1000;transition:transform .3s ease;box-shadow:0 12px 36px rgba(0,0,0,.45);white-space:nowrap;display:flex;align-items:center;gap:8px">
+  <span id="toast-icon">✓</span>
+  <span id="toast-msg">Producto agregado</span>
+</div>
+
+<script>
+/* ── STATE ── */
+const state = {
+  mesa: 'Mesa 5',
+  items: { pizza: {qty:2,price:32000}, carbonara: {qty:1,price:36000}, vino: {qty:2,price:22000} },
+  payMethod: 'efectivo',
+  discount: false,
+  seconds: 754, // 12:34
+  discountPct: 0,
+  notes: []
+};
+
+/* ── TIMER ── */
+setInterval(() => {
+  state.seconds++;
+  const m = Math.floor(state.seconds / 60).toString().padStart(2,'0');
+  const s = (state.seconds % 60).toString().padStart(2,'0');
+  document.getElementById('timer-display').textContent = `${m}:${s}`;
+}, 1000);
+
+/* ── FORMAT CURRENCY ── */
+const fmt = n => '$' + n.toLocaleString('es-CO');
+
+/* ── CALCULATE TOTALS ── */
+function calcTotals() {
+  let sub = 0;
+  for (const k in state.items) {
+    const it = state.items[k];
+    sub += it.qty * it.price;
+  }
+  if (state.discountPct) sub = Math.round(sub * (1 - state.discountPct/100));
+  const tax = Math.round(sub * .19);
+  const total = sub + tax;
+  document.getElementById('subtotal').textContent = fmt(sub);
+  document.getElementById('tax').textContent = fmt(tax);
+  document.getElementById('total').textContent = fmt(total);
+  document.getElementById('cobrar-btn').querySelector('span').textContent = `Cobrar ${fmt(total)}`;
+
+  // Update count
+  let count = 0;
+  for (const k in state.items) count += state.items[k].qty;
+  document.getElementById('order-count').textContent = count + (count===1?' ítem':' ítems');
+}
+
+/* ── QTY CONTROL ── */
+function changeQty(id, delta) {
+  if (!state.items[id]) return;
+  state.items[id].qty = Math.max(0, state.items[id].qty + delta);
+  const el = document.getElementById('qty-' + id);
+  if (el) el.textContent = state.items[id].qty;
+  if (state.items[id].qty === 0) {
+    delete state.items[id];
+    const row = document.getElementById('oi-' + id);
+    if (row) row.style.opacity = '0', setTimeout(() => row.remove(), 200);
+  }
+  calcTotals();
+  checkEmpty();
+}
+
+function checkEmpty() {
+  const isEmpty = Object.keys(state.items).length === 0;
+  document.getElementById('empty-state').style.display = isEmpty ? 'flex' : 'none';
+}
+
+/* ── ADD ITEM FROM GRID ── */
+const itemCounter = {};
+function addItem(card) {
+  const name = card.dataset.name;
+  const price = parseInt(card.dataset.price);
+  const key = name.replace(/\s+/g,'_').toLowerCase();
+
+  card.classList.add('adding');
+  setTimeout(() => card.classList.remove('adding'), 260);
+
+  if (state.items[key]) {
+    state.items[key].qty++;
+    const el = document.getElementById('qty-' + key);
+    if (el) { el.textContent = state.items[key].qty; el.parentElement.parentElement.style.borderColor = 'rgba(0,212,255,.3)'; setTimeout(()=>el.parentElement.parentElement.style.borderColor='',400); }
+  } else {
+    state.items[key] = { qty: 1, price };
+    const emoji = card.querySelector('.prod-img').textContent.trim();
+    const li = document.createElement('div');
+    li.className = 'oi'; li.id = 'oi-' + key;
+    li.style.animation = 'pop .22s ease';
+    li.innerHTML = `
+      <div class="oi-emoji">${emoji}</div>
+      <div class="oi-body">
+        <div style="font-size:12.5px;font-weight:600;color:var(--hi)">${name}</div>
+        <div style="font-size:10.5px;color:var(--mid);margin-top:1px">${fmt(price)} c/u</div>
+      </div>
+      <div class="qty-ctrl">
+        <div class="qty-btn" onclick="changeQty('${key}',-1)">−</div>
+        <div class="qty-num" id="qty-${key}">1</div>
+        <div class="qty-btn" onclick="changeQty('${key}',1)">+</div>
+      </div>`;
+    const empEl = document.getElementById('empty-state');
+    document.getElementById('order-items').insertBefore(li, empEl);
+  }
+  checkEmpty();
+  calcTotals();
+  showToast('✓', name + ' agregado');
+}
+
+/* ── FILTER CATEGORY ── */
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => { b.className = 'cat-btn off'; });
+  btn.className = 'cat-btn on';
+  document.querySelectorAll('.prod-card').forEach(card => {
+    card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+  });
+}
+
+/* ── FILTER SEARCH ── */
+function filterProds(q) {
+  const qLower = q.toLowerCase();
+  document.querySelectorAll('.prod-card').forEach(card => {
+    card.style.display = card.dataset.name.toLowerCase().includes(qLower) ? '' : 'none';
+  });
+}
+
+/* ── SELECT PAYMENT ── */
+function selectPay(el, method) {
+  document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  state.payMethod = method;
+}
+
+/* ── SET STATUS ── */
+function setStatus(s) {
+  ['nuevo','cocina','listo','cobrar'].forEach(k => {
+    const el = document.getElementById('st-' + k);
+    const isOn = k === s;
+    const colors = { nuevo:{bg:'rgba(0,212,255,.12)',bd:'rgba(0,212,255,.25)',co:'var(--cy)'}, cocina:{bg:'rgba(255,184,0,.1)',bd:'rgba(255,184,0,.22)',co:'#FFB800'}, listo:{bg:'rgba(0,255,198,.09)',bd:'rgba(0,255,198,.2)',co:'var(--mt)'}, cobrar:{bg:'rgba(0,212,255,.12)',bd:'rgba(0,212,255,.25)',co:'var(--cy)'} };
+    if (isOn) { el.style.background=colors[k].bg; el.style.borderColor=colors[k].bd; el.style.color=colors[k].co; }
+    else { el.style.background='var(--pnl)'; el.style.borderColor='var(--lo)'; el.style.color='var(--lo)'; }
+  });
+  showToast('●', 'Estado: ' + s.charAt(0).toUpperCase() + s.slice(1));
+}
+
+/* ── DISCOUNT ── */
+function applyDiscount() {
+  state.discount = !state.discount;
+  state.discountPct = state.discount ? 10 : 0;
+  document.getElementById('disc-applied').style.display = state.discount ? 'block' : 'none';
+  document.getElementById('disc-label').textContent = state.discount ? '✓ Descuento 10%' : '+ Aplicar descuento';
+  calcTotals();
+  showToast(state.discount ? '%' : '×', state.discount ? 'Descuento 10% aplicado' : 'Descuento eliminado');
+}
+
+/* ── MESA SELECT ── */
+function selectMesa(name, el) {
+  document.querySelectorAll('.mesa-quick').forEach(m => {
+    m.style.outline = 'none'; m.classList.remove('active-mesa');
+    m.style.borderWidth = '1px';
+  });
+  el.style.borderWidth = '2px';
+  el.style.borderColor = 'var(--cy)';
+  state.mesa = name;
+  document.getElementById('mesa-label').textContent = name;
+  showToast('🪑', name + ' seleccionada');
+}
+
+/* ── PROCESS COBRO ── */
+function processCobro() {
+  const btn = document.getElementById('cobrar-btn');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>¡Pago procesado!</span>';
+  btn.style.background = 'linear-gradient(135deg, var(--mt), #00a886)';
+  setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 3000);
+  showToast('💳', 'Pago procesado correctamente');
+}
+
+/* ── NOTE ── */
+function addNote() {
+  const note = prompt('Nota para la orden:');
+  if (note) {
+    document.getElementById('note-text').textContent = '📝 ' + note;
+    document.getElementById('note-text').style.color = 'var(--hi)';
+  }
+}
+
+/* ── QUICK ACTIONS ── */
+function openDiscount() { applyDiscount(); }
+function splitCheck() { showToast('✂', 'División de cuenta abierta'); }
+function voidOrder()  { if (confirm('¿Anular toda la orden?')) { document.getElementById('order-items').querySelectorAll('.oi').forEach(el=>el.remove()); state.items={}; checkEmpty(); calcTotals(); showToast('🗑', 'Orden anulada'); } }
+function printReceipt()  { showToast('🖨', 'Enviando a impresora...'); }
+function sendEmail()     { showToast('📧', 'Recibo por email enviado'); }
+function sendWhatsApp()  { showToast('💬', 'Recibo por WhatsApp enviado'); }
+
+/* ── TOAST ── */
+let toastTimer;
+function showToast(icon, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(80px)'; }, 2400);
+}
+
+/* ── INIT ── */
+calcTotals();
+</script>
+</body>
+</html>

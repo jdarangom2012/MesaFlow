@@ -1,0 +1,764 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MesaFlow Pagos</title>
+    <style>
+        :root {
+            --bg: #07111F;
+            --panel: #0B1726;
+            --card: #111C2D;
+            --line: rgba(0, 212, 255, .12);
+            --line-strong: rgba(0, 212, 255, .22);
+            --cyan: #00D4FF;
+            --mint: #00FFC6;
+            --amber: #FFC107;
+            --danger: #FF5B6E;
+            --text: #F4FAFF;
+            --muted: #8FA7C0;
+            --low: #5B789A;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .shell { min-height: 100vh; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(7, 17, 31, .94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(16px);
+        }
+
+        .topbar-inner {
+            width: min(100%, 1480px);
+            min-height: 68px;
+            margin: 0 auto;
+            padding: 10px 22px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-logo {
+            display: block;
+            width: 168px;
+            height: auto;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        .nav-link {
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text);
+            background: rgba(0, 212, 255, .08);
+        }
+
+        .user-box {
+            justify-self: end;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .logout-link {
+            color: var(--cyan);
+        }
+
+        .content {
+            width: min(100%, 1480px);
+            margin: 0 auto;
+            padding: 18px 22px 28px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: 18px;
+            margin-bottom: 16px;
+            padding: 18px 20px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, .10), rgba(0, 255, 198, .04));
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .title {
+            margin-top: 5px;
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1;
+            font-weight: 950;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .filter-link {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--muted);
+            background: rgba(11, 23, 38, .72);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .filter-link.active,
+        .filter-link:hover {
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            border-color: transparent;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-card,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .summary-card {
+            min-height: 96px;
+            padding: 14px 16px;
+        }
+
+        .summary-label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            margin-top: 8px;
+            color: var(--text);
+            font-size: 26px;
+            font-weight: 950;
+        }
+
+        .summary-value.money { color: var(--cyan); }
+
+        .messages {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .message {
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            color: var(--text);
+            background: rgba(0, 212, 255, .08);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .message.error {
+            border-color: rgba(255, 91, 110, .28);
+            background: rgba(255, 91, 110, .10);
+        }
+
+        .panel {
+            overflow: hidden;
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 860px;
+        }
+
+        th {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-align: left;
+            text-transform: uppercase;
+            padding: 13px 18px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 18px;
+            border-top: 1px solid rgba(255, 255, 255, .05);
+            color: var(--muted);
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .strong {
+            color: var(--text);
+            font-weight: 850;
+        }
+
+        .money {
+            color: var(--cyan);
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 9px;
+            border-radius: 999px;
+            color: #07111F;
+            background: var(--mint);
+            font-size: 10px;
+            font-weight: 950;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-pill.open {
+            color: var(--text);
+            background: rgba(0, 212, 255, .12);
+            border: 1px solid rgba(0, 212, 255, .22);
+        }
+
+        .action-button,
+        .disabled-button {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+            border-radius: 8px;
+            border: 0;
+            font-size: 12px;
+            font-weight: 950;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .action-button {
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            box-shadow: 0 14px 30px rgba(0, 212, 255, .12);
+        }
+
+        .disabled-button {
+            color: var(--low);
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        .empty-state {
+            padding: 54px 20px;
+            text-align: center;
+        }
+
+        .empty-title {
+            color: var(--text);
+            font-size: 20px;
+            font-weight: 950;
+        }
+
+        .empty-copy {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            display: none;
+            place-items: center;
+            padding: 18px;
+            background: rgba(3, 8, 15, .78);
+            backdrop-filter: blur(14px);
+        }
+
+        .modal:target { display: grid; }
+
+        .modal-card {
+            width: min(100%, 520px);
+            max-height: min(760px, 92vh);
+            overflow-y: auto;
+            background: #0B1726;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, .42);
+        }
+
+        .modal-head,
+        .modal-body,
+        .modal-actions {
+            padding: 18px;
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        .modal-title {
+            color: var(--text);
+            font-size: 22px;
+            font-weight: 950;
+        }
+
+        .modal-meta {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .close {
+            color: var(--muted);
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .total-box {
+            padding: 16px;
+            border-radius: 8px;
+            background: rgba(0, 212, 255, .08);
+            border: 1px solid var(--line);
+        }
+
+        .total-label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .total-value {
+            margin-top: 5px;
+            color: var(--cyan);
+            font-size: 32px;
+            font-weight: 950;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .field.full { grid-column: 1 / -1; }
+
+        label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            min-height: 44px;
+            padding: 0 12px;
+            color: var(--text);
+            background: #07111F;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 850;
+        }
+
+        .method-group {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .method-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .method-option span {
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            background: rgba(255, 255, 255, .03);
+            font-size: 12px;
+            font-weight: 950;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .method-option input:checked + span {
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            border-color: transparent;
+        }
+
+        .change-box {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 12px;
+            border-radius: 8px;
+            background: #07111F;
+            border: 1px solid var(--line);
+            color: var(--text);
+            font-weight: 950;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        .secondary-button {
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+            border-radius: 8px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .06);
+            font-size: 12px;
+            font-weight: 950;
+            text-transform: uppercase;
+        }
+
+        .submit-button {
+            min-height: 42px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 8px;
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            font-size: 12px;
+            font-weight: 950;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        @media (max-width: 980px) {
+            .topbar-inner {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .user-box { justify-self: start; }
+
+            .hero {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .filters { justify-content: flex-start; }
+
+            .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 620px) {
+            .brand-logo { width: 142px; }
+            .content { padding: 14px 14px 24px; }
+            .hero { padding: 16px; }
+            .summary { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .method-group { grid-template-columns: 1fr; }
+            .modal-actions { flex-direction: column; }
+            .secondary-button,
+            .submit-button { width: 100%; }
+        }
+    </style>
+    {% include 'components/app_topbar_styles.html' %}
+</head>
+<body>
+    <div class="shell">
+        {% include 'components/app_topbar.html' with active_module='payments' %}
+
+        <main class="content">
+            <section class="hero">
+                <div>
+                    <div class="eyebrow">Operación caja</div>
+                    <div class="title">Pagos</div>
+                    <div class="subtitle">Órdenes listas para cobrar, cierre de mesa y sincronización con cocina.</div>
+                </div>
+
+                <div class="filters">
+                    {% for status in status_filters %}
+                        <a class="filter-link {% if selected_status == status %}active{% endif %}" href="?status={{ status }}">
+                            {{ status }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="summary">
+                <article class="summary-card">
+                    <div class="summary-label">Pagos pendientes</div>
+                    <div class="summary-value">{{ payments_pending }}</div>
+                </article>
+                <article class="summary-card">
+                    <div class="summary-label">Total pendiente</div>
+                    <div class="summary-value money">${{ total_pending|floatformat:0 }}</div>
+                </article>
+                <article class="summary-card">
+                    <div class="summary-label">Pagadas hoy</div>
+                    <div class="summary-value">{{ paid_today }}</div>
+                </article>
+                <article class="summary-card">
+                    <div class="summary-label">Ticket promedio</div>
+                    <div class="summary-value money">${{ average_ticket|floatformat:0 }}</div>
+                </article>
+            </section>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <section class="panel">
+                {% if orders %}
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Orden</th>
+                                    <th>Mesa</th>
+                                    <th>Hora</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>
+                                            <div class="strong">#{{ order.id }}</div>
+                                            <div>{{ order.restaurant.name }}</div>
+                                        </td>
+                                        <td class="strong">{{ order.table.name }}</td>
+                                        <td>{{ order.created_at|date:"H:i" }}</td>
+                                        <td class="money">${{ order.total|floatformat:0 }}</td>
+                                        <td>
+                                            <span class="status-pill {% if order.status == 'OPEN' %}open{% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if order.status == 'READY' %}
+                                                <a class="action-button" href="#pay-{{ order.id }}">Cobrar</a>
+                                                <a class="disabled-button" href="{% url 'orders:print_kitchen_ticket' order.id %}" target="_blank" rel="noopener">Cocina</a>
+                                            {% elif order.status == 'PAID' %}
+                                                <a class="action-button" href="{% url 'orders:print_payment_ticket' order.id %}" target="_blank" rel="noopener">Imprimir factura</a>
+                                            {% else %}
+                                                <span class="disabled-button">No lista</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-title">Caja sin órdenes pendientes</div>
+                        <div class="empty-copy">Cuando cocina marque una orden como lista, aparecerá aquí para cobrarla.</div>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    {% for order in orders %}
+        {% if order.status == 'READY' %}
+            <div class="modal" id="pay-{{ order.id }}">
+                <form class="modal-card payment-form" method="post" action="{% url 'payments:confirm_payment' order.id %}" data-total="{{ order.total }}">
+                    {% csrf_token %}
+                    <div class="modal-head">
+                        <div>
+                            <div class="modal-title">Cobrar orden #{{ order.id }}</div>
+                            <div class="modal-meta">{{ order.table.name }} · {{ order.created_at|date:"H:i" }}</div>
+                        </div>
+                        <a class="close" href="#">×</a>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="total-box">
+                            <div class="total-label">Total a pagar</div>
+                            <div class="total-value">${{ order.total|floatformat:0 }}</div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="tip-{{ order.id }}">Propina</label>
+                                <input id="tip-{{ order.id }}" class="tip-input" type="number" min="0" step="100" value="0" inputmode="decimal">
+                            </div>
+
+                            <div class="field">
+                                <label for="cash-{{ order.id }}">Efectivo recibido</label>
+                                <input id="cash-{{ order.id }}" class="cash-input" type="number" min="0" step="100" value="{{ order.total|floatformat:0 }}" inputmode="decimal">
+                            </div>
+
+                            <div class="field full">
+                                <label>Método</label>
+                                <div class="method-group">
+                                    <label class="method-option">
+                                        <input type="radio" name="payment_method" value="CASH" checked>
+                                        <span>Efectivo</span>
+                                    </label>
+                                    <label class="method-option">
+                                        <input type="radio" name="payment_method" value="CARD">
+                                        <span>Tarjeta</span>
+                                    </label>
+                                    <label class="method-option">
+                                        <input type="radio" name="payment_method" value="DIGITAL">
+                                        <span>QR</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="field full">
+                                <label>Cambio</label>
+                                <div class="change-box">
+                                    <span>Total + propina</span>
+                                    <span class="change-output">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <a class="secondary-button" href="#">Cancelar</a>
+                        <button class="submit-button" type="submit">Confirmar pago</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <script>
+        (() => {
+            const autoPrintReceiptUrl = "{{ auto_print_receipt_url|escapejs }}";
+            const formatMoney = (value) => new Intl.NumberFormat("es-CO", {
+                style: "currency",
+                currency: "COP",
+                maximumFractionDigits: 0
+            }).format(Math.max(0, value || 0));
+
+            if (autoPrintReceiptUrl) {
+                const popup = window.open(autoPrintReceiptUrl, "_blank", "noopener,width=420,height=720");
+
+                if (!popup) {
+                    console.warn("MesaFlow: el navegador bloqueó la impresión automática de caja.");
+                }
+            }
+
+            document.querySelectorAll(".payment-form").forEach((form) => {
+                const total = Number.parseFloat(form.dataset.total || "0");
+                const tipInput = form.querySelector(".tip-input");
+                const cashInput = form.querySelector(".cash-input");
+                const changeOutput = form.querySelector(".change-output");
+
+                const updateChange = () => {
+                    const tip = Number.parseFloat(tipInput.value || "0");
+                    const cash = Number.parseFloat(cashInput.value || "0");
+                    changeOutput.textContent = formatMoney(cash - total - tip);
+                };
+
+                tipInput.addEventListener("input", updateChange);
+                cashInput.addEventListener("input", updateChange);
+                updateChange();
+            });
+        })();
+    </script>
+</body>
+</html>

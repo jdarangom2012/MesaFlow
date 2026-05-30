@@ -1,0 +1,102 @@
+{% if orders %}
+    <section class="grid" id="kitchen-orders-grid">
+        {% for order in orders %}
+            <article class="order-card status-{{ order.status|lower }} age-{{ order.elapsed_level }}" data-order-id="{{ order.id }}" data-order-status="{{ order.status }}">
+                <div class="card-head">
+                    <div class="order-main">
+                        <div class="table-chip">Mesa {{ order.table.name }}</div>
+                        <div class="order-id">Orden #{{ order.id }}</div>
+                    </div>
+
+                    <div class="status-pill status-{{ order.status|lower }}">
+                        {{ order.get_status_display }}
+                    </div>
+                </div>
+
+                <div class="meta">
+                    <div class="metric">
+                        <div class="metric-label">Tiempo</div>
+                        <div class="metric-value elapsed elapsed-{{ order.elapsed_level }}">{{ order.elapsed_label }}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Creada</div>
+                        <div class="metric-value">{{ order.created_at|date:"H:i" }}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Mesero</div>
+                        <div class="metric-value">{{ order.server_label }}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Items</div>
+                        <div class="metric-value">{{ order.items.count }}</div>
+                    </div>
+                </div>
+
+                <div class="items">
+                    {% for item in order.items.all %}
+                        <div class="item">
+                            <div>
+                                <div class="item-name">{{ item.product.name }}</div>
+                                {% if item.notes %}
+                                    <div class="item-note">{{ item.notes }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="quantity">x{{ item.quantity }}</div>
+                        </div>
+                    {% empty %}
+                        <div class="item">
+                            <div class="item-name">Sin productos registrados</div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="actions">
+                    {% if order.status == 'OPEN' %}
+                        <form method="post" data-kitchen-action>
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <input type="hidden" name="status" value="PREPARING">
+                            <button class="btn-preparing" type="submit">Tomar</button>
+                        </form>
+                    {% else %}
+                        <button class="btn-disabled" type="button" disabled>Tomar</button>
+                    {% endif %}
+
+                    {% if order.status == 'PREPARING' %}
+                        <form method="post" data-kitchen-action>
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <input type="hidden" name="status" value="READY">
+                            <button class="btn-ready" type="submit">Lista</button>
+                        </form>
+                    {% else %}
+                        <button class="btn-disabled" type="button" disabled>Lista</button>
+                    {% endif %}
+
+                    {% if order.status == 'READY' %}
+                        <form method="post" data-kitchen-action>
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <input type="hidden" name="status" value="PAID">
+                            <button class="btn-delivered" type="submit">Entregada</button>
+                        </form>
+                    {% else %}
+                        <button class="btn-disabled" type="button" disabled>Entregada</button>
+                    {% endif %}
+                </div>
+
+                <div class="print-row">
+                    <a class="print-link" href="{% url 'orders:print_kitchen_ticket' order.id %}" target="_blank" rel="noopener">Imprimir cocina</a>
+                </div>
+            </article>
+        {% endfor %}
+    </section>
+    <section class="empty hidden" id="kitchen-empty-state">
+        No hay órdenes activas en cocina.
+    </section>
+{% else %}
+    <section class="grid" id="kitchen-orders-grid"></section>
+    <section class="empty" id="kitchen-empty-state">
+        No hay órdenes activas en cocina.
+    </section>
+{% endif %}

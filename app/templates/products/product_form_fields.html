@@ -1,0 +1,54 @@
+<div class="form-grid">
+    <div class="field">
+        <label for="{{ form.name.id_for_label }}">Nombre</label>
+        {{ form.name }}
+        <div class="field-error">{% for error in form.name.errors %}{{ error }}{% endfor %}</div>
+    </div>
+    <div class="field">
+        <label for="{{ form.category.id_for_label }}">Categoría</label>
+        {{ form.category }}
+        <div class="field-error">{% for error in form.category.errors %}{{ error }}{% endfor %}</div>
+    </div>
+    <div class="field full">
+        <label for="{{ form.description.id_for_label }}">Descripción</label>
+        {{ form.description }}
+        <div class="field-error">{% for error in form.description.errors %}{{ error }}{% endfor %}</div>
+    </div>
+    <div class="field">
+        <label for="{{ form.price.id_for_label }}">Precio</label>
+        {{ form.price }}
+        <div class="field-error">{% for error in form.price.errors %}{{ error }}{% endfor %}</div>
+    </div>
+    <div class="field">
+        <label for="{{ form.icon.id_for_label }}">Emoji / icono</label>
+        {{ form.icon }}
+        <div class="field-error">{% for error in form.icon.errors %}{{ error }}{% endfor %}</div>
+    </div>
+    <div class="field">
+        <label for="{{ form.color.id_for_label }}">Color</label>
+        {{ form.color }}
+        <div class="field-error">{% for error in form.color.errors %}{{ error }}{% endfor %}</div>
+    </div>
+    <div class="field">
+        <label for="{{ form.sort_order.id_for_label }}">Orden visual</label>
+        {{ form.sort_order }}
+        <div class="field-error">{% for error in form.sort_order.errors %}{{ error }}{% endfor %}</div>
+    </div>
+    <div class="field full">
+        <label for="{{ form.image.id_for_label }}">Imagen</label>
+        {{ form.image }}
+        <div class="field-error">{% for error in form.image.errors %}{{ error }}{% endfor %}</div>
+    </div>
+    <div class="field">
+        <label>Activo</label>
+        <div class="check-row">{{ form.is_active }} <span>Producto activo</span></div>
+    </div>
+    <div class="field">
+        <label>POS</label>
+        <div class="check-row">{{ form.is_pos_available }} <span>Disponible en POS</span></div>
+    </div>
+    <div class="field">
+        <label>Kitchen</label>
+        <div class="check-row">{{ form.is_kitchen_available }} <span>Disponible en Kitchen</span></div>
+    </div>
+</div>

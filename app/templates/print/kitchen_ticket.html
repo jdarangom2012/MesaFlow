@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocina #{{ order.id }}</title>
+    <style>
+        :root {
+            --paper-width: {% if paper_width == '58' %}58mm{% else %}80mm{% endif %};
+            --ink: #111;
+            --muted: #555;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #081028;
+            color: var(--ink);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .toolbar button,
+        .toolbar a {
+            border: 1px solid rgba(0, 229, 255, .26);
+            border-radius: 8px;
+            background: #0B1726;
+            color: #00E5FF;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .ticket {
+            width: var(--paper-width);
+            margin: 0 auto 24px;
+            padding: 4mm;
+            background: white;
+            font-size: 12px;
+            line-height: 1.28;
+        }
+
+        .center { text-align: center; }
+        .strong { font-weight: 900; }
+        .muted { color: var(--muted); }
+        .line { border-top: 1px dashed #111; margin: 8px 0; }
+        .logo { max-width: 34mm; max-height: 16mm; object-fit: contain; margin-bottom: 4px; }
+        .order-number { font-size: 24px; font-weight: 900; margin: 5px 0; }
+        .group-title { margin-top: 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid #111; }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 6px;
+        }
+
+        .item {
+            padding: 6px 0;
+            border-bottom: 1px dashed #aaa;
+        }
+
+        .item:last-child { border-bottom: none; }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .quantity {
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .totals .row { margin: 3px 0; }
+        .total { font-size: 14px; font-weight: 900; }
+
+        @page {
+            size: var(--paper-width) auto;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                min-height: auto;
+                background: white;
+            }
+
+            .toolbar { display: none; }
+
+            .ticket {
+                width: var(--paper-width);
+                margin: 0;
+                padding: 3mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button type="button" onclick="window.print()">Imprimir cocina</button>
+        <a href="?width=80">80mm</a>
+        <a href="?width=58">58mm</a>
+    </div>
+
+    <main class="ticket">
+        <header class="center">
+            {% if print_logo %}
+                <img class="logo" src="{{ print_logo }}" alt="{{ print_restaurant_name }}">
+            {% endif %}
+            <div class="strong">{{ print_restaurant_name }}</div>
+            <div class="muted">TICKET COCINA</div>
+            <div class="order-number">#{{ order.id }}</div>
+            {% if printer_name %}
+                <div class="muted">Impresora: {{ printer_name }}</div>
+            {% endif %}
+        </header>
+
+        <div class="line"></div>
+
+        <section>
+            <div>Orden: <span class="strong">#{{ order.id }}</span></div>
+            <div>Mesa: <span class="strong">{{ order.table.name }}</span></div>
+            <div>Fecha: {{ order.created_at|date:"d/m/Y H:i" }}</div>
+        </section>
+
+        <div class="line"></div>
+
+        <section>
+            {% for category, items in item_groups %}
+                <div class="group-title">{{ category }}</div>
+                {% for item in items %}
+                    <div class="item row">
+                        <span class="item-name">{{ item.product.name }}</span>
+                        <span class="quantity">x{{ item.quantity }}</span>
+                    </div>
+                {% endfor %}
+            {% empty %}
+                <div class="center muted">Sin productos registrados</div>
+            {% endfor %}
+        </section>
+
+        <div class="line"></div>
+
+        <section class="totals">
+            <div class="row">
+                <span>Subtotal</span>
+                <span>${{ order.subtotal|floatformat:0 }}</span>
+            </div>
+            <div class="row">
+                <span>IVA</span>
+                <span>${{ order.tax|floatformat:0 }}</span>
+            </div>
+            <div class="row total">
+                <span>Total</span>
+                <span>${{ order.total|floatformat:0 }}</span>
+            </div>
+        </section>
+    </main>
+    {% if autoprint %}
+        <script>
+            window.addEventListener("load", () => {
+                window.setTimeout(() => window.print(), 250);
+            });
+        </script>
+    {% endif %}
+</body>
+</html>

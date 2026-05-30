@@ -1,7 +1,9 @@
 from django.contrib import admin
-
-# Register your models here.
-from django.contrib import admin
 from .models import RestaurantTable
 
-admin.site.register(RestaurantTable)
+
+@admin.register(RestaurantTable)
+class RestaurantTableAdmin(admin.ModelAdmin):
+    list_display = ('name', 'restaurant', 'capacity', 'status')
+    list_filter = ('restaurant', 'status')
+    search_fields = ('name', 'restaurant__name')

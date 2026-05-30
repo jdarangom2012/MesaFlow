@@ -1,0 +1,908 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant_name }} Reportes</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: {{ secondary_color }};
+            --panel: #0B1726;
+            --card: #111C2D;
+            --line: rgba(0, 212, 255, .12);
+            --line-strong: rgba(0, 212, 255, .22);
+            --cyan: {{ primary_color }};
+            --mint: #00FFC6;
+            --amber: #FFC107;
+            --danger: #FF5B6E;
+            --text: #F4FAFF;
+            --muted: #8FA7C0;
+            --low: #5B789A;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .app-shell { min-height: 100vh; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(7, 17, 31, .94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(16px);
+        }
+
+        .topbar-inner {
+            width: min(100%, 1480px);
+            min-height: 68px;
+            margin: 0 auto;
+            padding: 10px 22px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-logo {
+            display: block;
+            width: 168px;
+            height: auto;
+        }
+
+        .app-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text);
+            background: rgba(0, 212, 255, .08);
+        }
+
+        .user-chip {
+            min-width: 0;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            text-align: right;
+        }
+
+        .content {
+            width: min(100%, 1480px);
+            margin: 0 auto;
+            padding: 18px 22px 28px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: 18px;
+            margin-bottom: 16px;
+            padding: 18px 20px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, .10), rgba(0, 255, 198, .04));
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .title {
+            margin-top: 5px;
+            font-size: clamp(28px, 4vw, 44px);
+            line-height: 1;
+            font-weight: 950;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .hero-actions {
+            display: grid;
+            gap: 10px;
+            justify-items: end;
+        }
+
+        .filter-link {
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 13px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--muted);
+            background: rgba(11, 23, 38, .72);
+            font-size: 13px;
+            font-weight: 850;
+        }
+
+        .filter-link.active,
+        .filter-link:hover {
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            border-color: transparent;
+        }
+
+        .advanced-filters {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(130px, 1fr)) auto;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding: 14px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+        }
+
+        label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 40px;
+            color: var(--text);
+            background: rgba(255, 255, 255, .035);
+            border: 1px solid rgba(0, 212, 255, .14);
+            border-radius: 8px;
+            padding: 0 10px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .filter-button,
+        .export-button {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, .24);
+            color: var(--text);
+            background: rgba(0, 212, 255, .08);
+            font-size: 12px;
+            font-weight: 950;
+            text-transform: uppercase;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .filter-button {
+            align-self: end;
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            border: none;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .export-button:hover {
+            border-color: rgba(0, 212, 255, .42);
+            box-shadow: 0 12px 32px rgba(0, 212, 255, .08);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .kpi-card,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .kpi-card {
+            min-height: 116px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 16px;
+            transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 212, 255, .34);
+            box-shadow: 0 18px 46px rgba(0, 212, 255, .08);
+        }
+
+        .kpi-label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .kpi-value {
+            margin-top: 12px;
+            color: var(--text);
+            font-size: clamp(22px, 2.4vw, 30px);
+            font-weight: 950;
+            letter-spacing: -.03em;
+        }
+
+        .kpi-accent { color: var(--cyan); }
+
+        .chart-grid,
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .panel { overflow: hidden; }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 950;
+        }
+
+        .panel-subtitle {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .chart-wrap {
+            height: 290px;
+            padding: 16px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-align: left;
+            text-transform: uppercase;
+            padding: 13px 18px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 18px;
+            border-top: 1px solid rgba(255, 255, 255, .05);
+            color: var(--muted);
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        .strong {
+            color: var(--text);
+            font-weight: 850;
+        }
+
+        .money,
+        .quantity {
+            color: var(--cyan);
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 26px;
+            padding: 0 9px;
+            border-radius: 999px;
+            color: var(--text);
+            background: rgba(0, 212, 255, .12);
+            border: 1px solid rgba(0, 212, 255, .22);
+            font-size: 10px;
+            font-weight: 950;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-pill.preparing { color: var(--amber); background: rgba(255, 193, 7, .10); border-color: rgba(255, 193, 7, .22); }
+        .status-pill.ready { color: var(--mint); background: rgba(0, 255, 198, .10); border-color: rgba(0, 255, 198, .22); }
+        .status-pill.paid { color: var(--muted); background: rgba(143, 167, 192, .10); border-color: rgba(143, 167, 192, .18); }
+        .status-pill.cancelled { color: var(--danger); background: rgba(255, 91, 110, .10); border-color: rgba(255, 91, 110, .22); }
+
+        .payment-grid {
+            display: grid;
+            gap: 10px;
+            padding: 16px 18px 18px;
+        }
+
+        .payment-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, .025);
+            border: 1px solid rgba(255, 255, 255, .05);
+            border-radius: 8px;
+        }
+
+        .payment-title {
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .payment-copy {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        .page-link {
+            color: var(--cyan);
+            font-size: 12px;
+            font-weight: 950;
+        }
+
+        .empty-row {
+            padding: 28px 18px;
+            color: var(--low);
+            text-align: center;
+        }
+
+        @media (max-width: 1080px) {
+            .topbar-inner {
+                grid-template-columns: auto 1fr;
+            }
+
+            .user-chip {
+                display: none;
+            }
+
+            .chart-grid,
+            .table-grid,
+            .advanced-filters {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar-inner,
+            .content {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .topbar-inner {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .brand-logo {
+                width: 136px;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                justify-content: flex-start;
+            }
+
+            .hero-actions {
+                justify-items: start;
+            }
+
+            .chart-wrap {
+                height: 250px;
+            }
+        }
+    </style>
+    {% include 'components/app_topbar_styles.html' %}
+</head>
+<body>
+    <main class="app-shell">
+        {% include 'components/app_topbar.html' with active_module='reports' %}
+
+        <section class="content">
+            <header class="hero">
+                <div>
+                    <div class="eyebrow">{{ restaurant_name }} Reportes</div>
+                    <div class="title">Reportes Enterprise</div>
+                </div>
+                <div class="hero-actions">
+                    <div class="filters" aria-label="Filtros de periodo">
+                        <a class="filter-link {% if period == 'today' %}active{% endif %}" href="?period=today">Hoy</a>
+                        <a class="filter-link {% if period == 'week' %}active{% endif %}" href="?period=week">Semana</a>
+                        <a class="filter-link {% if period == 'month' %}active{% endif %}" href="?period=month">Mes</a>
+                    </div>
+                    <div class="export-actions">
+                        <a class="export-button" href="{% url 'reports:export_excel' %}{% if export_query %}?{{ export_query }}{% endif %}">Exportar Excel</a>
+                        <a class="export-button" href="{% url 'reports:export_pdf' %}{% if export_query %}?{{ export_query }}{% endif %}">Exportar PDF</a>
+                    </div>
+                </div>
+            </header>
+
+            <form class="advanced-filters" method="get" aria-label="Filtros avanzados de reportes">
+                <div class="field">
+                    <label for="start_date">Fecha inicio</label>
+                    <input id="start_date" type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
+                </div>
+                <div class="field">
+                    <label for="end_date">Fecha fin</label>
+                    <input id="end_date" type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
+                </div>
+                <div class="field">
+                    <label for="status">Estado</label>
+                    <select id="status" name="status">
+                        {% for status in status_filters %}
+                            <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>
+                                {% if status == 'ALL' %}Todos{% else %}{{ status }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="table">Mesa</label>
+                    <select id="table" name="table">
+                        <option value="ALL" {% if selected_table == 'ALL' %}selected{% endif %}>Todas</option>
+                        {% for table in tables %}
+                            <option value="{{ table.id }}" {% if selected_table == table.id|stringformat:'s' %}selected{% endif %}>{{ table.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="payment_method">Método pago</label>
+                    <select id="payment_method" name="payment_method">
+                        {% for method in payment_filters %}
+                            <option value="{{ method }}" {% if selected_payment == method %}selected{% endif %}>
+                                {% if method == 'ALL' %}Todos{% elif method == 'CASH' %}Efectivo{% elif method == 'CARD' %}Tarjeta{% elif method == 'DIGITAL' %}QR/Digital{% else %}{{ method }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="filter-button" type="submit">Filtrar</button>
+            </form>
+
+            <section class="kpi-grid" aria-label="Indicadores de ventas">
+                <article class="kpi-card">
+                    <div class="kpi-label">Ventas periodo</div>
+                    <div class="kpi-value kpi-accent">${{ total_sales|floatformat:0 }}</div>
+                </article>
+                <article class="kpi-card">
+                    <div class="kpi-label">Órdenes</div>
+                    <div class="kpi-value">{{ total_orders }}</div>
+                </article>
+                <article class="kpi-card">
+                    <div class="kpi-label">Ticket promedio</div>
+                    <div class="kpi-value">${{ average_ticket|floatformat:0 }}</div>
+                </article>
+                <article class="kpi-card">
+                    <div class="kpi-label">IVA total</div>
+                    <div class="kpi-value kpi-accent">${{ total_tax|floatformat:0 }}</div>
+                </article>
+                <article class="kpi-card">
+                    <div class="kpi-label">Propinas</div>
+                    <div class="kpi-value">${{ tips_total|floatformat:0 }}</div>
+                </article>
+            </section>
+
+            <section class="kpi-grid" aria-label="Cierre diario">
+                <article class="kpi-card">
+                    <div class="kpi-label">Cierre del día · ventas</div>
+                    <div class="kpi-value kpi-accent">${{ total_sales|floatformat:0 }}</div>
+                </article>
+                <article class="kpi-card">
+                    <div class="kpi-label">Cierre del día · órdenes</div>
+                    <div class="kpi-value">{{ paid_orders }}</div>
+                </article>
+                <article class="kpi-card">
+                    <div class="kpi-label">Cierre del día · IVA</div>
+                    <div class="kpi-value">${{ total_tax|floatformat:0 }}</div>
+                </article>
+                <article class="kpi-card">
+                    <div class="kpi-label">Cierre del día · métodos pago</div>
+                    <div class="kpi-value">{{ payment_methods|length }}</div>
+                </article>
+            </section>
+
+            <section class="chart-grid" aria-label="Gráficas principales">
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Ventas por hora</div>
+                            <div class="panel-subtitle">Ingresos por hora de pago</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="salesByHourChart"></canvas>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Métodos de pago</div>
+                            <div class="panel-subtitle">Distribución por ingresos</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="paymentMethodsChart"></canvas>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Productos más vendidos</div>
+                            <div class="panel-subtitle">Unidades vendidas</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Mesas más usadas</div>
+                            <div class="panel-subtitle">Órdenes pagadas por mesa</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="tablesUsageChart"></canvas>
+                    </div>
+                </article>
+            </section>
+
+            <section class="table-grid" aria-label="Tablas analíticas">
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Top productos</div>
+                            <div class="panel-subtitle">Detalle por unidades e ingresos</div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cant.</th>
+                                    <th>Ingresos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in top_products %}
+                                    <tr>
+                                        <td class="strong">{{ product.product__name }}</td>
+                                        <td class="quantity">{{ product.quantity_sold }}</td>
+                                        <td class="money">${{ product.revenue|floatformat:0 }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="empty-row">No hay productos vendidos en este periodo.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Métodos de pago</div>
+                            <div class="panel-subtitle">Totales, órdenes y participación</div>
+                        </div>
+                    </div>
+                    <div class="payment-grid">
+                        {% for method in payment_methods %}
+                            <div class="payment-row">
+                                <div>
+                                    <div class="payment-title">{{ method.label }}</div>
+                                    <div class="payment-copy">{{ method.orders }} órdenes · {{ method.percentage|floatformat:1 }}%</div>
+                                </div>
+                                <div class="money">${{ method.total|floatformat:0 }}</div>
+                            </div>
+                        {% empty %}
+                            <div class="empty-row">No hay pagos en este periodo.</div>
+                        {% endfor %}
+                    </div>
+                </article>
+            </section>
+
+            <section class="table-grid" aria-label="Detalle operacional">
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Órdenes filtradas</div>
+                            <div class="panel-subtitle">Detalle exportable por mesa, estado y método de pago</div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Orden</th>
+                                    <th>Mesa</th>
+                                    <th>Total</th>
+                                    <th>IVA</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Método pago</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in page_obj %}
+                                    <tr>
+                                        <td class="strong">#{{ order.id }}</td>
+                                        <td>{{ order.table.name }}</td>
+                                        <td class="money">${{ order.total|floatformat:0 }}</td>
+                                        <td>${{ order.tax|floatformat:0 }}</td>
+                                        <td>
+                                            <span class="status-pill {% if order.status == 'PREPARING' %}preparing{% elif order.status == 'READY' %}ready{% elif order.status == 'PAID' %}paid{% elif order.status == 'CANCELLED' %}cancelled{% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                                        <td>{% if order.payment_method %}{{ order.get_payment_method_display }}{% else %}Sin método{% endif %}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="empty-row">No hay órdenes para los filtros seleccionados.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if page_obj.paginator.num_pages > 1 %}
+                        <div class="pagination">
+                            <div>
+                                {% if page_obj.has_previous %}
+                                    <a class="page-link" href="?{{ export_query }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+                                {% endif %}
+                            </div>
+                            <div class="payment-copy">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</div>
+                            <div>
+                                {% if page_obj.has_next %}
+                                    <a class="page-link" href="?{{ export_query }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Mesas más usadas</div>
+                            <div class="panel-subtitle">Órdenes pagadas por mesa</div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mesa</th>
+                                    <th>Órdenes</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for table in tables_usage %}
+                                    <tr>
+                                        <td class="strong">{{ table.table__name }}</td>
+                                        <td class="quantity">{{ table.orders }}</td>
+                                        <td class="money">${{ table.total|floatformat:0 }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="empty-row">No hay mesas con órdenes pagadas en este periodo.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+        </section>
+    </main>
+
+    {{ chart_data|json_script:"reports-chart-data" }}
+    <script>
+        (() => {
+            const dataNode = document.getElementById("reports-chart-data");
+            const chartData = dataNode ? JSON.parse(dataNode.textContent) : {};
+            const textColor = "#8FA7C0";
+            const gridColor = "rgba(255,255,255,.06)";
+            const cyan = "{{ primary_color }}";
+            const mint = "#00FFC6";
+            const amber = "#FFC107";
+
+            Chart.defaults.color = textColor;
+            Chart.defaults.borderColor = gridColor;
+            Chart.defaults.font.family = "Inter, ui-sans-serif, system-ui, sans-serif";
+
+            const hasValues = (values) => Array.isArray(values) && values.some((value) => Number(value) > 0);
+            const emptyDataset = {
+                labels: ["Sin datos"],
+                values: [0],
+            };
+            const safeData = (dataset) => hasValues(dataset?.values) ? dataset : emptyDataset;
+
+            const lineDataset = safeData(chartData.salesByHour);
+            new Chart(document.getElementById("salesByHourChart"), {
+                type: "line",
+                data: {
+                    labels: lineDataset.labels,
+                    datasets: [{
+                        label: "Ventas",
+                        data: lineDataset.values,
+                        borderColor: cyan,
+                        backgroundColor: "rgba(0,212,255,.16)",
+                        fill: true,
+                        tension: .35,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true },
+                    },
+                },
+            });
+
+            const paymentDataset = safeData(chartData.paymentMethods);
+            new Chart(document.getElementById("paymentMethodsChart"), {
+                type: "doughnut",
+                data: {
+                    labels: paymentDataset.labels,
+                    datasets: [{
+                        data: paymentDataset.values,
+                        backgroundColor: [cyan, mint, amber, "rgba(143,167,192,.65)"],
+                        borderWidth: 0,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: "66%",
+                    plugins: {
+                        legend: { position: "bottom" },
+                    },
+                },
+            });
+
+            const productDataset = safeData(chartData.topProducts);
+            new Chart(document.getElementById("topProductsChart"), {
+                type: "bar",
+                data: {
+                    labels: productDataset.labels,
+                    datasets: [{
+                        label: "Unidades",
+                        data: productDataset.values,
+                        backgroundColor: "rgba(0,212,255,.72)",
+                        borderRadius: 6,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true },
+                    },
+                },
+            });
+
+            const tableDataset = safeData(chartData.tablesUsage);
+            new Chart(document.getElementById("tablesUsageChart"), {
+                type: "bar",
+                data: {
+                    labels: tableDataset.labels,
+                    datasets: [{
+                        label: "Órdenes",
+                        data: tableDataset.values,
+                        backgroundColor: "rgba(0,255,198,.72)",
+                        borderRadius: 6,
+                    }],
+                },
+                options: {
+                    indexAxis: "y",
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true },
+                    },
+                },
+            });
+        })();
+    </script>
+</body>
+</html>

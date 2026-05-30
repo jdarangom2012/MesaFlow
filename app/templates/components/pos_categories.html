@@ -1,22 +1,30 @@
 <div style="
 display:flex;
 align-items:center;
-gap:12px;
-overflow:auto;
-padding-bottom:4px;
+flex-wrap:wrap;
+gap:10px;
+overflow:visible;
+margin-bottom:22px;
+margin-bottom:10px;
+padding:0 0 2px;
 ">
 
     <!-- TODO -->
 
-    <button style="
+    <button
+    type="button"
+    class="pos-category-filter"
+    data-category-id=""
+    style="
     background:#00D4FF;
     color:black;
     border:none;
-    border-radius:14px;
-    padding:12px 18px;
+    border-radius:12px;
+    padding:9px 13px;
     font-weight:700;
     cursor:pointer;
     white-space:nowrap;
+    min-height:38px;
     ">
         ⭐ Todo
     </button>
@@ -25,16 +33,21 @@ padding-bottom:4px;
 
     {% for category in categories %}
 
-    <button style="
+    <button
+    type="button"
+    class="pos-category-filter"
+    data-category-id="{{ category.id }}"
+    style="
     background:#0B1726;
     color:#8FA7C0;
     border:1px solid rgba(255,255,255,.06);
-    border-radius:14px;
-    padding:12px 18px;
+    border-radius:12px;
+    padding:9px 13px;
     font-weight:600;
     cursor:pointer;
     white-space:nowrap;
     transition:.2s;
+    min-height:38px;
     ">
 
         {% if category.icon %}

@@ -12,7 +12,6 @@ flex-direction:column;
     padding:22px;
     border-bottom:1px solid rgba(255,255,255,.06);
     ">
-
         <div style="
         display:flex;
         align-items:center;
@@ -155,7 +154,7 @@ flex-direction:column;
         margin-bottom:18px;
         ">
 
-            <button style="
+            <button type="button" data-payment-method="CASH" style="
             background:#00D4FF;
             color:black;
             border:none;
@@ -167,7 +166,7 @@ flex-direction:column;
                 💵
             </button>
 
-            <button style="
+            <button type="button" data-payment-method="CARD" style="
             background:#111C2D;
             color:white;
             border:1px solid rgba(255,255,255,.06);
@@ -178,7 +177,7 @@ flex-direction:column;
                 💳
             </button>
 
-            <button style="
+            <button type="button" data-payment-method="DIGITAL" style="
             background:#111C2D;
             color:white;
             border:1px solid rgba(255,255,255,.06);
@@ -194,7 +193,7 @@ flex-direction:column;
         <!-- COBRAR -->
 
         <button
-        id="pos-checkout-button"
+        id="pos-send-order-button"
         type="button"
         style="
         width:100%;
@@ -209,10 +208,170 @@ flex-direction:column;
         box-shadow:0 10px 30px rgba(0,212,255,.25);
         ">
 
-            COBRAR
+            ENVIAR A COCINA
+
+        </button>
+
+        <button
+        id="pos-checkout-button"
+        type="button"
+        style="
+        width:100%;
+        height:56px;
+        margin-top:10px;
+        border:1px solid rgba(0,212,255,.24);
+        border-radius:16px;
+        background:#111C2D;
+        color:#00D4FF;
+        font-size:17px;
+        font-weight:850;
+        cursor:pointer;
+        "
+        disabled
+        >
+
+            COBRAR ORDEN LISTA
 
         </button>
 
     </div>
 
 </aside>
+
+<div
+id="pos-payment-modal"
+hidden
+style="
+position:fixed;
+inset:0;
+z-index:1000;
+display:none;
+align-items:center;
+justify-content:center;
+padding:18px;
+background:rgba(7,17,31,.76);
+backdrop-filter:blur(14px);
+">
+    <div style="
+    width:min(100%,440px);
+    background:#0B1726;
+    border:1px solid rgba(0,212,255,.22);
+    border-radius:18px;
+    box-shadow:0 28px 80px rgba(0,0,0,.45);
+    overflow:hidden;
+    ">
+        <div style="padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+            <div>
+                <div style="font-size:22px;font-weight:850;color:white;">Confirmar cobro</div>
+                <div id="pos-payment-order-label" style="margin-top:5px;color:#8FA7C0;font-size:13px;">Selecciona método y registra el pago.</div>
+            </div>
+            <button id="pos-payment-close" type="button" style="width:36px;height:36px;border:none;border-radius:10px;background:#111C2D;color:#8FA7C0;cursor:pointer;font-size:18px;">×</button>
+        </div>
+
+        <div style="padding:22px;">
+            <div style="display:grid;gap:10px;margin-bottom:18px;">
+                <div style="display:flex;justify-content:space-between;color:#8FA7C0;">
+                    <span>Subtotal</span>
+                    <strong id="pos-modal-subtotal" style="color:white;">$0</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;color:#8FA7C0;">
+                    <span>IVA 19%</span>
+                    <strong id="pos-modal-tax" style="color:white;">$0</strong>
+                </div>
+                <div style="height:1px;background:rgba(255,255,255,.06);"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:16px;font-weight:800;color:white;">Total</span>
+                    <strong id="pos-modal-total" style="color:#00D4FF;font-size:28px;">$0</strong>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;">
+                <button type="button" class="pos-modal-method" data-payment-method="CASH" style="height:58px;border-radius:14px;border:1px solid rgba(0,212,255,.24);background:#00D4FF;color:#07111F;font-weight:850;cursor:pointer;">Efectivo</button>
+                <button type="button" class="pos-modal-method" data-payment-method="CARD" style="height:58px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#111C2D;color:white;font-weight:850;cursor:pointer;">Tarjeta</button>
+                <button type="button" class="pos-modal-method" data-payment-method="DIGITAL" style="height:58px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#111C2D;color:white;font-weight:850;cursor:pointer;">Digital</button>
+            </div>
+
+            <button id="pos-confirm-payment" type="button" style="
+            width:100%;
+            height:56px;
+            border:none;
+            border-radius:16px;
+            background:linear-gradient(135deg,#00D4FF,#00FFC6);
+            color:#07111F;
+            font-size:17px;
+            font-weight:900;
+            cursor:pointer;
+            ">
+                Confirmar pago
+            </button>
+
+            <div id="pos-print-actions" hidden style="display:none;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+                <button id="pos-print-ticket" type="button" style="
+                height:46px;
+                border-radius:14px;
+                border:1px solid rgba(0,212,255,.24);
+                background:#111C2D;
+                color:#00D4FF;
+                font-weight:850;
+                cursor:pointer;
+                ">
+                    Imprimir ticket
+                </button>
+                <button id="pos-print-kitchen" type="button" style="
+                height:46px;
+                border-radius:14px;
+                border:1px solid rgba(0,255,198,.24);
+                background:#111C2D;
+                color:#00FFC6;
+                font-weight:850;
+                cursor:pointer;
+                ">
+                    Imprimir cocina
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div
+id="pos-table-required-modal"
+hidden
+style="
+position:fixed;
+inset:0;
+z-index:1001;
+display:none;
+align-items:center;
+justify-content:center;
+padding:18px;
+background:rgba(7,17,31,.76);
+backdrop-filter:blur(14px);
+">
+    <div style="
+    width:min(100%,380px);
+    background:#0B1726;
+    border:1px solid rgba(0,212,255,.22);
+    border-radius:18px;
+    box-shadow:0 28px 80px rgba(0,0,0,.45);
+    padding:22px;
+    ">
+        <div style="font-size:22px;font-weight:850;color:white;">Selecciona una mesa</div>
+        <div style="margin-top:8px;color:#8FA7C0;font-size:14px;line-height:1.45;">
+            Para crear o cobrar una orden, primero elige una mesa en el panel izquierdo.
+        </div>
+        <button id="pos-table-required-close" type="button" style="
+        width:100%;
+        height:48px;
+        margin-top:18px;
+        border:none;
+        border-radius:14px;
+        background:linear-gradient(135deg,#00D4FF,#00FFC6);
+        color:#07111F;
+        font-size:15px;
+        font-weight:900;
+        cursor:pointer;
+        ">
+            Entendido
+        </button>
+    </div>
+</div>

@@ -1,0 +1,571 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MesaFlow Pedidos</title>
+    <style>
+        :root {
+            --bg: #07111F;
+            --panel: #0B1726;
+            --card: #111C2D;
+            --line: rgba(0, 212, 255, .12);
+            --line-strong: rgba(0, 212, 255, .22);
+            --cyan: #00D4FF;
+            --mint: #00FFC6;
+            --amber: #FFC107;
+            --danger: #FF5B6E;
+            --text: #F4FAFF;
+            --muted: #8FA7C0;
+            --low: #5B789A;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .shell { min-height: 100vh; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(7, 17, 31, .94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(16px);
+        }
+
+        .topbar-inner {
+            width: min(100%, 1480px);
+            min-height: 68px;
+            margin: 0 auto;
+            padding: 10px 22px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-logo {
+            display: block;
+            width: 168px;
+            height: auto;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        .nav-link {
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text);
+            background: rgba(0, 212, 255, .08);
+        }
+
+        .restaurant-name {
+            justify-self: end;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .content {
+            width: min(100%, 1480px);
+            margin: 0 auto;
+            padding: 18px 22px 28px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: 18px;
+            margin-bottom: 16px;
+            padding: 18px 20px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, .10), rgba(0, 255, 198, .04));
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .title {
+            margin-top: 5px;
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1;
+            font-weight: 950;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .filter-link {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--muted);
+            background: rgba(11, 23, 38, .72);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .filter-link.active,
+        .filter-link:hover {
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            border-color: transparent;
+        }
+
+        .badge-count {
+            color: inherit;
+            opacity: .72;
+            font-size: 11px;
+        }
+
+        .panel {
+            overflow: hidden;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 980px;
+        }
+
+        th {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-align: left;
+            text-transform: uppercase;
+            padding: 13px 18px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 18px;
+            border-top: 1px solid rgba(255, 255, 255, .05);
+            color: var(--muted);
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .strong {
+            color: var(--text);
+            font-weight: 850;
+        }
+
+        .money {
+            color: var(--cyan);
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 9px;
+            border-radius: 999px;
+            color: #07111F;
+            background: var(--cyan);
+            font-size: 10px;
+            font-weight: 950;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-pill.preparing { background: var(--amber); }
+        .status-pill.ready { background: var(--mint); }
+        .status-pill.paid { background: rgba(0, 255, 198, .82); }
+        .status-pill.cancelled { color: white; background: var(--danger); }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .action-link,
+        .action-button {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, .20);
+            background: rgba(0, 212, 255, .07);
+            color: var(--cyan);
+            font: inherit;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .action-button.ready {
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            border: none;
+        }
+
+        .action-button.paid {
+            color: var(--mint);
+            border-color: rgba(0, 255, 198, .22);
+            background: rgba(0, 255, 198, .08);
+        }
+
+        .action-button.danger {
+            color: var(--danger);
+            border-color: rgba(255, 91, 110, .24);
+            background: rgba(255, 91, 110, .08);
+        }
+
+        .empty-row {
+            padding: 28px 18px;
+            color: var(--low);
+            text-align: center;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(7, 17, 31, .78);
+            backdrop-filter: blur(14px);
+        }
+
+        .modal:target {
+            display: flex;
+        }
+
+        .modal-card {
+            width: min(100%, 560px);
+            max-height: min(760px, calc(100vh - 36px));
+            overflow: auto;
+            background: var(--panel);
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, .45);
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .modal-title {
+            color: var(--text);
+            font-size: 20px;
+            font-weight: 950;
+        }
+
+        .modal-meta {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .close-modal {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--muted);
+            font-size: 20px;
+        }
+
+        .modal-body {
+            padding: 18px 20px 20px;
+        }
+
+        .item-row,
+        .total-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+        }
+
+        .item-row {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+        }
+
+        .item-name {
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 850;
+        }
+
+        .item-meta {
+            margin-top: 4px;
+            color: var(--low);
+            font-size: 12px;
+        }
+
+        .totals {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px dashed rgba(255, 255, 255, .16);
+        }
+
+        .total-row {
+            margin: 8px 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .total-row.final {
+            color: var(--text);
+            font-size: 18px;
+            font-weight: 950;
+        }
+
+        @media (max-width: 980px) {
+            .topbar-inner {
+                grid-template-columns: auto 1fr;
+            }
+
+            .restaurant-name {
+                display: none;
+            }
+
+            .nav {
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar-inner,
+            .content {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .topbar-inner {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .brand-logo {
+                width: 140px;
+            }
+
+            .nav,
+            .filters {
+                justify-content: flex-start;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    {% include 'components/app_topbar_styles.html' %}
+</head>
+<body>
+    <main class="shell">
+        {% include 'components/app_topbar.html' with active_module='orders' %}
+
+        <section class="content">
+            <header class="hero">
+                <div>
+                    <div class="eyebrow">Operación pedidos</div>
+                    <div class="title">Pedidos</div>
+                </div>
+                <div class="filters" aria-label="Filtros de estado">
+                    {% for status in status_filters %}
+                        <a class="filter-link {% if selected_status == status %}active{% endif %}" href="{% url 'orders:list' %}?status={{ status }}">
+                            {{ status }}
+                            <span class="badge-count">
+                                {% if status == 'ALL' %}{{ status_counts.ALL|default:0 }}{% elif status == 'OPEN' %}{{ status_counts.OPEN|default:0 }}{% elif status == 'PREPARING' %}{{ status_counts.PREPARING|default:0 }}{% elif status == 'READY' %}{{ status_counts.READY|default:0 }}{% elif status == 'PAID' %}{{ status_counts.PAID|default:0 }}{% elif status == 'CANCELLED' %}{{ status_counts.CANCELLED|default:0 }}{% endif %}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </header>
+
+            <section class="panel">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Orden</th>
+                                <th>Mesa</th>
+                                <th>Estado</th>
+                                <th>Hora</th>
+                                <th>Total</th>
+                                <th>Restaurante</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td class="strong">#{{ order.id }}</td>
+                                    <td>{{ order.table.name }}</td>
+                                    <td>
+                                        <span class="status-pill {% if order.status == 'PREPARING' %}preparing{% elif order.status == 'READY' %}ready{% elif order.status == 'PAID' %}paid{% elif order.status == 'CANCELLED' %}cancelled{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.created_at|date:"H:i" }}</td>
+                                    <td class="money">${{ order.total|floatformat:0 }}</td>
+                                    <td>{{ order.restaurant.name }}</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a class="action-link" href="#order-{{ order.id }}">Ver detalle</a>
+                                            <a class="action-link" href="{% url 'orders:print_kitchen_ticket' order.id %}" target="_blank" rel="noopener">Imprimir cocina</a>
+
+                                            {% if order.status == 'PAID' %}
+                                                <a class="action-link" href="{% url 'orders:print_payment_ticket' order.id %}" target="_blank" rel="noopener">Reimprimir factura</a>
+                                            {% endif %}
+
+                                            {% if order.status == 'OPEN' or order.status == 'PREPARING' %}
+                                                <form method="post" action="{% url 'orders:action' order.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status_filter" value="{{ selected_status }}">
+                                                    <input type="hidden" name="action" value="mark_ready">
+                                                    <button class="action-button ready" type="submit">Marcar READY</button>
+                                                </form>
+                                            {% endif %}
+
+                                            {% if order.status == 'READY' %}
+                                                <form method="post" action="{% url 'orders:action' order.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status_filter" value="{{ selected_status }}">
+                                                    <input type="hidden" name="action" value="mark_paid">
+                                                    <button class="action-button paid" type="submit">Marcar PAID</button>
+                                                </form>
+                                            {% endif %}
+
+                                            {% if order.status != 'PAID' and order.status != 'CANCELLED' %}
+                                                <form method="post" action="{% url 'orders:action' order.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status_filter" value="{{ selected_status }}">
+                                                    <input type="hidden" name="action" value="cancel">
+                                                    <button class="action-button danger" type="submit">Cancelar</button>
+                                                </form>
+                                            {% endif %}
+
+                                            {% if order.status == 'CANCELLED' %}
+                                                <form method="post" action="{% url 'orders:action' order.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status_filter" value="{{ selected_status }}">
+                                                    <input type="hidden" name="action" value="reopen">
+                                                    <button class="action-button" type="submit">Reabrir</button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" class="empty-row">No hay pedidos para este filtro.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    {% for order in orders %}
+        <section class="modal" id="order-{{ order.id }}" aria-label="Detalle orden {{ order.id }}">
+            <div class="modal-card">
+                <div class="modal-head">
+                    <div>
+                        <div class="modal-title">Orden #{{ order.id }}</div>
+                        <div class="modal-meta">{{ order.table.name }} · {{ order.created_at|date:"d/m/Y H:i" }} · {{ order.get_status_display }}</div>
+                    </div>
+                    <a class="close-modal" href="#">×</a>
+                </div>
+                <div class="modal-body">
+                    {% for item in order.items.all %}
+                        <div class="item-row">
+                            <div>
+                                <div class="item-name">{{ item.product.name }}</div>
+                                <div class="item-meta">{{ item.quantity }} x ${{ item.unit_price|floatformat:0 }}</div>
+                            </div>
+                            <div class="money">${{ item.subtotal|floatformat:0 }}</div>
+                        </div>
+                    {% empty %}
+                        <div class="empty-row">Orden sin productos registrados.</div>
+                    {% endfor %}
+
+                    <div class="totals">
+                        <div class="total-row">
+                            <span>Subtotal</span>
+                            <span>${{ order.subtotal|floatformat:0 }}</span>
+                        </div>
+                        <div class="total-row">
+                            <span>IVA 19%</span>
+                            <span>${{ order.tax|floatformat:0 }}</span>
+                        </div>
+                        <div class="total-row final">
+                            <span>Total</span>
+                            <span>${{ order.total|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endfor %}
+</body>
+</html>

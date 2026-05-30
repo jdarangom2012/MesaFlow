@@ -18,7 +18,9 @@
 
 <body class="bg-[#07111F] text-white min-h-screen">
 
-    {% include 'components/navbar.html' %}
+    {% block navbar %}
+        {% include 'components/navbar.html' %}
+    {% endblock %}
 
     <main>
 

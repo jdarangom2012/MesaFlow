@@ -18,12 +18,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from products.views import categories_dashboard, product_create, product_toggle, product_update, products_dashboard
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),
     path('', include('core.urls')),
     path('orders/', include('orders.urls')),
+    path('tables/', include('tables.urls')),
+    path('reports/', include('reports.urls')),
+    path('payments/', include('payments.urls')),
+    path('cash-register/', include('cash_register.urls')),
+    path('products/', products_dashboard, name='products_dashboard'),
+    path('products/create/', product_create, name='product_create'),
+    path('products/<int:product_id>/update/', product_update, name='product_update'),
+    path('products/<int:product_id>/toggle/', product_toggle, name='product_toggle'),
+    path('categories/', include('products.urls')),
 ]
 
 if settings.DEBUG:

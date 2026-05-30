@@ -1,7 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from restaurants.models import Restaurant
 
 class RestaurantTable(models.Model):
@@ -9,7 +6,7 @@ class RestaurantTable(models.Model):
         ('FREE', 'Libre'),
         ('OCCUPIED', 'Ocupada'),
         ('RESERVED', 'Reservada'),
-        ('CLOSED', 'Cerrada'),
+        ('PAYMENT_PENDING', 'Pago pendiente'),
     ]
 
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='tables')

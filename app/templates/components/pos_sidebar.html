@@ -1,97 +1,44 @@
+{% load static %}
 <aside style="
-width:210px;
+width:92px;
 background:#0B1726;
 border-right:1px solid rgba(0,212,255,.10);
 display:flex;
 flex-direction:column;
-justify-content:space-between;
+justify-content:flex-start;
 ">
 
-    <div style="padding:18px;">
+    <div style="padding:12px 10px;">
 
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
-            <div style="
-            width:36px;
-            height:36px;
-            border-radius:10px;
-            background:#111C2D;
-            border:1px solid rgba(0,212,255,.25);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:#00D4FF;
-            font-weight:bold;
-            ">
-                M
-            </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
 
-            <div>
-                <div style="font-weight:800;color:white;">
-                    Mesa<span style="color:#00D4FF;">Flow</span>
-                </div>
-                <div style="font-size:10px;color:#5B789A;letter-spacing:.15em;">
-                    LA PIAZZA
-                </div>
-            </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:10px;">
-
-            <div style="background:rgba(0,212,255,.12);color:#00D4FF;padding:14px;border-radius:12px;text-align:center;">
+            <div style="background:rgba(0,212,255,.12);color:#00D4FF;padding:10px 8px;border-radius:12px;text-align:center;font-size:12px;font-weight:800;">
                 ▦<br>POS
             </div>
 
-            <div style="color:#5B789A;padding:14px;border-radius:12px;text-align:center;">
+            {% if request.allowed_modules.tables %}<a href="{% url 'tables_dashboard' %}" style="color:#5B789A;padding:10px 8px;border-radius:12px;text-align:center;text-decoration:none;font-size:12px;font-weight:750;">
                 ◷<br>Mesas
-            </div>
+            </a>{% endif %}
 
-            <div style="color:#5B789A;padding:14px;border-radius:12px;text-align:center;">
+            {% if request.allowed_modules.orders %}<a href="{% url 'orders:list' %}" style="color:#5B789A;padding:10px 8px;border-radius:12px;text-align:center;text-decoration:none;font-size:12px;font-weight:750;">
                 ▣<br>Pedidos
-            </div>
+            </a>{% endif %}
 
-            <div style="color:#5B789A;padding:14px;border-radius:12px;text-align:center;">
+            {% if request.allowed_modules.kitchen %}<a href="{% url 'kitchen' %}" style="color:#5B789A;padding:10px 8px;border-radius:12px;text-align:center;text-decoration:none;font-size:12px;font-weight:750;">
                 ⌂<br>Cocina
-            </div>
+            </a>{% endif %}
 
-            <div style="color:#5B789A;padding:14px;border-radius:12px;text-align:center;">
+            {% if request.allowed_modules.payments %}<a href="{% url 'payments:dashboard' %}" style="color:#5B789A;padding:10px 8px;border-radius:12px;text-align:center;text-decoration:none;font-size:12px;font-weight:750;">
                 ▬<br>Pagos
-            </div>
+            </a>{% endif %}
 
-            <div style="color:#5B789A;padding:14px;border-radius:12px;text-align:center;">
+            {% if request.allowed_modules.products %}<a href="/products/" style="color:#5B789A;padding:10px 8px;border-radius:12px;text-align:center;text-decoration:none;font-size:12px;font-weight:750;">
+                ◫<br>Productos
+            </a>{% endif %}
+
+            {% if request.allowed_modules.reports %}<a href="{% url 'reports:dashboard' %}" style="color:#5B789A;padding:10px 8px;border-radius:12px;text-align:center;text-decoration:none;font-size:12px;font-weight:750;">
                 ⌁<br>Reportes
-            </div>
-
-        </div>
-
-    </div>
-
-    <div style="padding:14px;border-top:1px solid rgba(0,212,255,.10);">
-
-        <div style="font-size:10px;color:#243852;letter-spacing:.15em;text-align:center;margin-bottom:10px;">
-            MESAS
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
-
-            {% for table in tables %}
-
-            <div
-            class="pos-table-option"
-            data-table-id="{{ table.id }}"
-            style="
-            background:rgba(0,212,255,.08);
-            border:1px solid rgba(0,212,255,.22);
-            color:#00D4FF;
-            padding:10px;
-            border-radius:10px;
-            text-align:center;
-            font-size:12px;
-            font-weight:bold;
-            ">
-                {{ table.name }}
-            </div>
-
-            {% endfor %}
+            </a>{% endif %}
 
         </div>
 

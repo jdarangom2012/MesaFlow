@@ -1,0 +1,552 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant_name }} Caja</title>
+    <style>
+        :root {
+            --bg: {{ secondary_color }};
+            --panel: #0B1726;
+            --card: #111C2D;
+            --line: rgba(0, 212, 255, .12);
+            --cyan: {{ primary_color }};
+            --mint: #00FFC6;
+            --amber: #FFC107;
+            --danger: #FF5B6E;
+            --text: #F4FAFF;
+            --muted: #8FA7C0;
+            --low: #5B789A;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(7, 17, 31, .94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(16px);
+        }
+
+        .topbar-inner {
+            width: min(100%, 1480px);
+            min-height: 68px;
+            margin: 0 auto;
+            padding: 10px 22px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-logo { display: block; width: 168px; height: auto; }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        .nav-link {
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text);
+            background: rgba(0, 212, 255, .08);
+        }
+
+        .restaurant-name {
+            justify-self: end;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .content {
+            width: min(100%, 1480px);
+            margin: 0 auto;
+            padding: 18px 22px 28px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: 18px;
+            margin-bottom: 16px;
+            padding: 18px 20px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, .10), rgba(0, 255, 198, .04));
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .title {
+            margin-top: 5px;
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1;
+            font-weight: 950;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 0 12px;
+            border-radius: 999px;
+            color: #07111F;
+            background: var(--mint);
+            font-size: 11px;
+            font-weight: 950;
+            text-transform: uppercase;
+        }
+
+        .status-pill.closed {
+            color: var(--text);
+            background: rgba(255, 91, 110, .14);
+            border: 1px solid rgba(255, 91, 110, .28);
+        }
+
+        .hero-actions {
+            display: grid;
+            gap: 10px;
+            justify-items: end;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .export-button {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--cyan);
+            background: rgba(0, 212, 255, .08);
+            border: 1px solid rgba(0, 212, 255, .22);
+            font-size: 12px;
+            font-weight: 950;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-card,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .summary-card { padding: 14px 16px; }
+
+        .summary-card {
+            transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 212, 255, .34);
+            box-shadow: 0 18px 46px rgba(0, 212, 255, .08);
+        }
+
+        .summary-label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            margin-top: 8px;
+            font-size: 26px;
+            font-weight: 950;
+        }
+
+        .money { color: var(--cyan); white-space: nowrap; }
+        .danger-money { color: var(--danger); white-space: nowrap; }
+        .mint-money { color: var(--mint); white-space: nowrap; }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 380px;
+            gap: 16px;
+        }
+
+        .panel { overflow: hidden; }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 15px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+            font-weight: 950;
+        }
+
+        .panel-subtitle {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .panel-body { padding: 18px; }
+
+        .forms {
+            display: grid;
+            gap: 12px;
+        }
+
+        form {
+            display: grid;
+            gap: 10px;
+        }
+
+        label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        input,
+        select {
+            width: 100%;
+            min-height: 42px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: #07111F;
+            color: var(--text);
+            font: inherit;
+            font-weight: 800;
+        }
+
+        button {
+            min-height: 42px;
+            border: 0;
+            border-radius: 8px;
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            font-size: 12px;
+            font-weight: 950;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .secondary-button {
+            color: var(--text);
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .danger-button {
+            color: var(--text);
+            background: rgba(255, 91, 110, .16);
+            border: 1px solid rgba(255, 91, 110, .32);
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            min-width: 760px;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-align: left;
+            text-transform: uppercase;
+            padding: 13px 18px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 18px;
+            border-top: 1px solid rgba(255, 255, 255, .05);
+            color: var(--muted);
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .strong { color: var(--text); font-weight: 850; }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(0, 212, 255, .08);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        @media (max-width: 980px) {
+            .topbar-inner,
+            .hero,
+            .layout { grid-template-columns: 1fr; }
+
+            .restaurant-name { justify-self: start; }
+            .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .hero-actions { justify-items: start; }
+            .export-actions { justify-content: flex-start; }
+        }
+
+        @media (max-width: 620px) {
+            .content { padding: 14px; }
+            .brand-logo { width: 142px; }
+            .summary { grid-template-columns: 1fr; }
+        }
+    </style>
+    {% include 'components/app_topbar_styles.html' %}
+</head>
+<body>
+    {% include 'components/app_topbar.html' with active_module='cash_register' %}
+
+    <main class="content">
+        <section class="hero">
+            <div>
+                <div class="eyebrow">Operación caja</div>
+                <div class="title">Caja / Turno</div>
+            </div>
+            <div class="hero-actions">
+                <div class="status-pill {% if not session %}closed{% endif %}">
+                    {% if session %}Caja abierta{% else %}Sin caja abierta{% endif %}
+                </div>
+                {% if selected_session %}
+                    <div class="export-actions">
+                        <a class="export-button" href="{% url 'cash_register:export_excel' selected_session.id %}">Exportar Excel</a>
+                        <a class="export-button" href="{% url 'cash_register:export_pdf' selected_session.id %}">Exportar PDF</a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <section class="summary">
+            <article class="summary-card">
+                <div class="summary-label">Total efectivo</div>
+                <div class="summary-value money">${{ cash_total|floatformat:0 }}</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">Total QR</div>
+                <div class="summary-value money">${{ digital_total|floatformat:0 }}</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">Total tarjeta</div>
+                <div class="summary-value money">${{ card_total|floatformat:0 }}</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">Esperado cierre</div>
+                <div class="summary-value money">${{ expected_total|floatformat:0 }}</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">Ventas totales</div>
+                <div class="summary-value mint-money">${{ sales_total|floatformat:0 }}</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">IVA</div>
+                <div class="summary-value money">${{ tax_total|floatformat:0 }}</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">Propinas</div>
+                <div class="summary-value money">${{ tips_total|floatformat:0 }}</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">Egresos</div>
+                <div class="summary-value danger-money">${{ expense_total|floatformat:0 }}</div>
+            </article>
+        </section>
+
+        <section class="layout">
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div>Movimientos recientes</div>
+                        <div class="panel-subtitle">
+                            {% if selected_session %}
+                                Turno #{{ selected_session.id }} · {{ selected_session.opened_at|date:"d/m/Y H:i" }}
+                            {% else %}
+                                Sin turno seleccionado
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if selected_session and selected_session.status == 'CLOSED' %}
+                        <span class="status-pill closed">Cerrada</span>
+                    {% endif %}
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Tipo</th>
+                                <th>Método</th>
+                                <th>Monto</th>
+                                <th>Orden</th>
+                                <th>Usuario</th>
+                                <th>Motivo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for movement in movements %}
+                                <tr>
+                                    <td>{{ movement.created_at|date:"H:i" }}</td>
+                                    <td class="strong">{{ movement.get_movement_type_display }}</td>
+                                    <td>{{ movement.get_payment_method_display }}</td>
+                                    <td class="money">${{ movement.amount|floatformat:0 }}</td>
+                                    <td>{% if movement.order %}#{{ movement.order.id }}{% else %}-{% endif %}</td>
+                                    <td>{{ movement.user.username }}</td>
+                                    <td>{{ movement.note|default:"-" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7">No hay movimientos registrados.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <aside class="forms">
+                <article class="panel">
+                    <div class="panel-head">Apertura</div>
+                    <div class="panel-body">
+                        {% if session %}
+                            <div class="strong">Abierta por {{ session.opened_by.username }}</div>
+                            <div style="margin-top:6px;color:var(--muted);font-size:13px;">{{ session.opened_at|date:"d/m/Y H:i" }}</div>
+                            <div style="margin-top:12px;color:var(--muted);font-size:13px;">Monto inicial</div>
+                            <div class="summary-value money">${{ session.opening_amount|floatformat:0 }}</div>
+                        {% else %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="open">
+                                <label for="opening_amount">Monto inicial</label>
+                                <input id="opening_amount" name="opening_amount" type="number" min="0" step="100" value="0">
+                                <button type="submit">Abrir caja</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </article>
+
+                {% if session %}
+                    <article class="panel">
+                        <div class="panel-head">Nuevo movimiento</div>
+                        <div class="panel-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="movement">
+                                <label for="movement_type">Tipo</label>
+                                <select id="movement_type" name="movement_type">
+                                    {% for value, label in movement_types %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="payment_method">Método</label>
+                                <select id="payment_method" name="payment_method">
+                                    {% for value, label in payment_methods %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="amount">Monto</label>
+                                <input id="amount" name="amount" type="number" min="0" step="100" value="0">
+                                <label for="note">Motivo</label>
+                                <input id="note" name="note" type="text" maxlength="255">
+                                <button class="secondary-button" type="submit">Registrar</button>
+                            </form>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-head">Cierre</div>
+                        <div class="panel-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="close">
+                                <div class="summary-label">Efectivo esperado</div>
+                                <div class="summary-value money">${{ expected_total|floatformat:0 }}</div>
+                                <label for="actual_total">Efectivo contado</label>
+                                <input id="actual_total" name="actual_total" type="number" min="0" step="100" value="{{ expected_total|floatformat:0 }}">
+                                <button class="danger-button" type="submit">Cerrar caja</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endif %}
+
+                {% if last_closed_session %}
+                    <article class="panel">
+                        <div class="panel-head">Último cierre</div>
+                        <div class="panel-body">
+                            <div class="strong">Turno #{{ last_closed_session.id }}</div>
+                            <div style="margin-top:6px;color:var(--muted);font-size:13px;">{{ last_closed_session.closed_at|date:"d/m/Y H:i" }}</div>
+                            <div style="margin-top:12px;color:var(--muted);font-size:13px;">Diferencia</div>
+                            <div class="summary-value {% if last_closed_session.difference < 0 %}danger-money{% else %}mint-money{% endif %}">
+                                ${{ last_closed_session.difference|floatformat:0 }}
+                            </div>
+                        </div>
+                    </article>
+                {% endif %}
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -76,6 +77,11 @@
     transition: opacity .18s;
   }
   .logo-wrap:hover { opacity: .85; }
+  .nav-logo-img {
+    display: block;
+    width: 158px;
+    height: auto;
+  }
 
   /* ── DESKTOP NAV LINKS ── */
   #desktop-nav {
@@ -267,6 +273,7 @@
   @media (max-width: 640px) {
     .cta .cta-label { display: none; }
     .cta { padding: 10px 14px; }
+    .nav-logo-img { width: 136px; }
   }
   @media (min-width: 901px) {
     #ham { display: none !important; }
@@ -306,38 +313,9 @@ border-bottom:1px solid rgba(255,255,255,.06);
 
     <div style="display:flex;align-items:center;gap:12px;">
 
-        <div style="
-        width:42px;
-        height:42px;
-        border-radius:12px;
-        background:linear-gradient(135deg,#00D4FF,#00FFC6);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        color:black;
-        font-weight:bold;
-        ">
-            M
-        </div>
-
-        <div>
-
-            <div style="
-            color:#00D4FF;
-            font-size:22px;
-            font-weight:bold;
-            ">
-                MesaFlow
-            </div>
-
-            <div style="
-            color:#8FA7C0;
-            font-size:12px;
-            ">
-                by NautilusTech
-            </div>
-
-        </div>
+            <img src="{% static 'img/logo-mesaflow.png' %}"
+             alt="MesaFlow"
+             style="width:168px;max-width:42vw;height:auto;display:block;">
 
     </div>
 
@@ -382,35 +360,7 @@ border-bottom:1px solid rgba(255,255,255,.06);
 
     <!-- ══ LOGO ══ -->
     <a href="https://nautilustech.app" class="logo-wrap" aria-label="MesaFlow — Ir al inicio">
-      <svg width="34" height="34" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="nlg" x1="0" y1="0" x2="1" y2="1">
-            <stop stop-color="#00D4FF"/>
-            <stop offset="1" stop-color="#00FFC6"/>
-          </linearGradient>
-        </defs>
-        <!-- Card background -->
-        <rect width="36" height="36" rx="9" fill="#0B1726"/>
-        <!-- Border glow -->
-        <rect width="36" height="36" rx="9" fill="none" stroke="rgba(0,212,255,.22)" stroke-width=".8"/>
-        <!-- Grid lines -->
-        <line x1="18" y1="5" x2="18" y2="31" stroke="rgba(0,212,255,.15)" stroke-width=".8"/>
-        <line x1="5" y1="18" x2="31" y2="18" stroke="rgba(0,212,255,.15)" stroke-width=".8"/>
-        <!-- Nautilus spiral -->
-        <path d="M18 18 Q18 10 24 10 Q30 10 30 16 Q30 22 24 22 Q21 22 21 20 Q21 18.5 22.5 18.5"
-              stroke="url(#nlg)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-        <!-- Terminus dot -->
-        <circle cx="22.5" cy="18.5" r="2.3" fill="#00FFC6"/>
-      </svg>
-
-      <div>
-        <div class="sy" style="font-size:16px;font-weight:700;color:#fff;letter-spacing:-.025em;line-height:1">
-          Mesa<span style="color:var(--cy)">Flow</span>
-        </div>
-        <div class="mo" style="font-size:8.5px;color:var(--lo);letter-spacing:.16em;line-height:1;margin-top:3px">
-          BY NAUTILUSTECH
-        </div>
-      </div>
+      <img class="nav-logo-img" src="{% static 'img/logo-mesaflow.png' %}" alt="MesaFlow">
     </a>
 
     <!-- ══ DESKTOP NAVIGATION ══ -->

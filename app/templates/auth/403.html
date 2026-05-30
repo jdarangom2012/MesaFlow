@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MesaFlow - Acceso restringido</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+            background: #07111F;
+            color: #F4FAFF;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .panel {
+            width: min(100%, 460px);
+            padding: 28px;
+            border: 1px solid rgba(0, 212, 255, .16);
+            border-radius: 8px;
+            background: #0B1726;
+            text-align: center;
+        }
+
+        .logo {
+            width: 168px;
+            max-width: 70%;
+            height: auto;
+            margin-bottom: 24px;
+        }
+
+        .eyebrow {
+            color: #00D4FF;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 8px 0 10px;
+            font-size: 30px;
+            line-height: 1;
+        }
+
+        p {
+            margin: 0;
+            color: #8FA7C0;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .actions {
+            margin-top: 22px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        a {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+            border-radius: 8px;
+            color: #07111F;
+            background: linear-gradient(135deg, #00D4FF, #00FFC6);
+            font-size: 12px;
+            font-weight: 950;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <main class="panel">
+        <img class="logo" src="{% static 'img/logo-mesaflow.png' %}" alt="MesaFlow">
+        <div class="eyebrow">Acceso restringido</div>
+        <h1>Permiso requerido</h1>
+        <p>{{ message|default:"Tu rol no tiene acceso a esta sección operacional." }}</p>
+        <div class="actions">
+            {% if request.allowed_modules.dashboard %}
+                <a href="{% url 'dashboard' %}">Volver</a>
+            {% elif request.allowed_modules.pos %}
+                <a href="{% url 'pos' %}">Volver</a>
+            {% elif request.allowed_modules.kitchen %}
+                <a href="{% url 'kitchen' %}">Volver</a>
+            {% elif request.allowed_modules.orders %}
+                <a href="{% url 'orders:list' %}">Volver</a>
+            {% else %}
+                <a href="{% url 'logout' %}">Salir</a>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

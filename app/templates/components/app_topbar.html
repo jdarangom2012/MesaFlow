@@ -1,0 +1,51 @@
+{% load static %}
+<header class="mf-app-topbar" data-mf-topbar style="--brand-primary: {{ primary_color|default:'#00D4FF' }}; --brand-secondary: {{ secondary_color|default:'#07111F' }};">
+    <div class="mf-app-topbar-inner">
+        <a class="mf-app-brand" href="https://nautilustech.app/" target="_blank" rel="noopener noreferrer" aria-label="MesaFlow por NautilusTech">
+            <img class="mf-app-logo" src="{% static 'img/logo-mesaflow.png' %}" alt="MesaFlow">
+        </a>
+
+        <nav class="mf-app-nav" aria-label="Navegación operacional">
+            {% if request.allowed_modules.dashboard %}<a class="mf-app-nav-link {% if active_module == 'dashboard' %}is-active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>{% endif %}
+            {% if request.allowed_modules.pos %}<a class="mf-app-nav-link {% if active_module == 'pos' %}is-active{% endif %}" href="{% url 'pos' %}">POS</a>{% endif %}
+            {% if request.allowed_modules.kitchen %}<a class="mf-app-nav-link {% if active_module == 'kitchen' %}is-active{% endif %}" href="{% url 'kitchen' %}">Kitchen</a>{% endif %}
+            {% if request.allowed_modules.tables %}<a class="mf-app-nav-link {% if active_module == 'tables' %}is-active{% endif %}" href="{% url 'tables_dashboard' %}">Mesas</a>{% endif %}
+            {% if request.allowed_modules.orders %}<a class="mf-app-nav-link {% if active_module == 'orders' %}is-active{% endif %}" href="{% url 'orders:list' %}">Pedidos</a>{% endif %}
+            {% if request.allowed_modules.payments %}<a class="mf-app-nav-link {% if active_module == 'payments' %}is-active{% endif %}" href="{% url 'payments:dashboard' %}">Pagos</a>{% endif %}
+            {% if request.allowed_modules.payments %}<a class="mf-app-nav-link {% if active_module == 'cash_register' %}is-active{% endif %}" href="{% url 'cash_register:dashboard' %}">Caja</a>{% endif %}
+            {% if request.allowed_modules.products %}
+                <div class="mf-app-nav-group">
+                    <a class="mf-app-nav-link {% if active_module == 'products' %}is-active{% endif %}" href="{% url 'products_dashboard' %}" aria-haspopup="true">Productos</a>
+                    <div class="mf-app-nav-dropdown">
+                        <a href="{% url 'products:categories' %}"><span>Categorías</span><span>+</span></a>
+                        <a href="{% url 'products_dashboard' %}"><span>Productos</span><span>+</span></a>
+                    </div>
+                </div>
+            {% endif %}
+            {% if request.allowed_modules.reports %}<a class="mf-app-nav-link {% if active_module == 'reports' %}is-active{% endif %}" href="{% url 'reports:dashboard' %}">Reportes</a>{% endif %}
+        </nav>
+
+        <div class="mf-app-user-menu">
+            <button class="mf-app-user-trigger" type="button" aria-haspopup="true">
+                <span class="mf-app-avatar">{{ request.user.username|slice:":2"|upper }}</span>
+                <span class="mf-app-user-copy">
+                    <span class="mf-app-user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                    <span class="mf-app-user-restaurant">{{ restaurant_name }}</span>
+                </span>
+                <span class="mf-app-chevron">⌄</span>
+            </button>
+
+            <div class="mf-app-user-dropdown">
+                <div class="mf-app-dropdown-block">
+                    <div class="mf-app-dropdown-label">Usuario</div>
+                    <div class="mf-app-dropdown-value">{{ request.user.get_full_name|default:request.user.username }}</div>
+                </div>
+                <div class="mf-app-dropdown-block">
+                    <div class="mf-app-dropdown-label">Restaurante</div>
+                    <div class="mf-app-dropdown-value">{{ restaurant_name }}</div>
+                </div>
+                <a class="mf-app-logout" href="{% url 'logout' %}">Cerrar sesión</a>
+            </div>
+        </div>
+    </div>
+</header>

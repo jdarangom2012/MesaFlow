@@ -1,0 +1,533 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant_name }} Productos</title>
+    <style>
+        :root {
+            --bg: {{ secondary_color|default:'#081028' }};
+            --panel: #0B1726;
+            --card: #111C2D;
+            --line: rgba(0, 212, 255, .12);
+            --line-strong: rgba(0, 212, 255, .24);
+            --cyan: {{ primary_color|default:'#00E5FF' }};
+            --mint: #00FFC6;
+            --danger: #FF5B6E;
+            --amber: #FFC107;
+            --text: #F4FAFF;
+            --muted: #8FA7C0;
+            --low: #5B789A;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        a { color: inherit; text-decoration: none; }
+        button, input, textarea, select { font: inherit; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(7, 17, 31, .94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(16px);
+        }
+        .topbar-inner {
+            width: min(100%, 1480px);
+            min-height: 68px;
+            margin: 0 auto;
+            padding: 10px 22px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 18px;
+        }
+        .brand-logo { display: block; width: 168px; height: auto; }
+        .nav { display: flex; align-items: center; gap: 6px; overflow-x: auto; }
+        .nav-link {
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .nav-link:hover,
+        .nav-link.active { color: var(--text); background: rgba(0, 212, 255, .08); }
+        .nav-group { position: relative; display: inline-flex; align-items: center; }
+        .nav-dropdown {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 8px);
+            z-index: 60;
+            width: 210px;
+            display: none;
+            padding: 8px;
+            background: var(--panel);
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            box-shadow: 0 22px 52px rgba(0, 0, 0, .42);
+        }
+        .nav-group:hover .nav-dropdown,
+        .nav-group:focus-within .nav-dropdown { display: grid; gap: 4px; }
+        .nav-dropdown a {
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 850;
+        }
+        .nav-dropdown a:hover { color: var(--text); background: rgba(0, 212, 255, .08); }
+        .restaurant-name {
+            justify-self: end;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .content {
+            width: min(100%, 1480px);
+            margin: 0 auto;
+            padding: 18px 22px 32px;
+            display: grid;
+            grid-template-columns: 230px minmax(0, 1fr);
+            gap: 16px;
+        }
+        .side, .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+        .side { padding: 16px; align-self: start; position: sticky; top: 86px; }
+        .side-title {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .side-link {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 850;
+        }
+        .side-link.active,
+        .side-link:hover { color: var(--text); background: rgba(0, 212, 255, .08); }
+        .main { min-width: 0; }
+
+        .products-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 10;
+        }
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 7px 0 0;
+            font-size: clamp(30px, 4vw, 44px);
+            line-height: 1;
+            font-weight: 950;
+        }
+        .primary-button,
+        .action-button {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 0;
+            border-radius: 8px;
+            padding: 0 13px;
+            color: #07111F;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            font-size: 12px;
+            font-weight: 950;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .primary-button {
+            min-height: 46px;
+            border-radius: 12px;
+            padding: 0 18px;
+            box-shadow: 0 16px 36px rgba(0, 229, 255, .16);
+        }
+        .action-button.secondary {
+            color: var(--text);
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.08);
+        }
+        .action-button.danger {
+            color: var(--text);
+            background: rgba(255, 91, 110, .14);
+            border: 1px solid rgba(255, 91, 110, .26);
+        }
+        .messages { display: grid; gap: 8px; margin-bottom: 14px; }
+        .toast {
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: rgba(0, 212, 255, .08);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 850;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+        }
+        .product-card {
+            min-height: 100%;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .product-media {
+            height: 150px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(145deg, rgba(0, 212, 255, .12), rgba(0, 255, 198, .05));
+            color: var(--cyan);
+            font-size: 54px;
+            font-weight: 950;
+        }
+        .product-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .product-body { padding: 15px; }
+        .product-title {
+            color: var(--text);
+            font-size: 17px;
+            font-weight: 950;
+        }
+        .product-description {
+            min-height: 38px;
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+        .meta-row,
+        .badge-row,
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .meta-row {
+            justify-content: space-between;
+            margin-top: 13px;
+        }
+        .category-pill,
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 26px;
+            padding: 0 9px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 950;
+            text-transform: uppercase;
+        }
+        .category-pill {
+            color: var(--cyan);
+            background: rgba(0, 212, 255, .08);
+            border: 1px solid var(--line);
+        }
+        .status-pill {
+            color: #07111F;
+            background: var(--mint);
+        }
+        .status-pill.off {
+            color: var(--text);
+            background: rgba(255, 91, 110, .14);
+            border: 1px solid rgba(255, 91, 110, .26);
+        }
+        .status-pill.warn {
+            color: #07111F;
+            background: var(--amber);
+        }
+        .price {
+            color: var(--cyan);
+            font-size: 22px;
+            font-weight: 950;
+        }
+        .badge-row { margin-top: 12px; }
+        .card-actions {
+            justify-content: flex-end;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+        .toggle-form { margin: 0; }
+        .empty {
+            padding: 44px 18px;
+            text-align: center;
+            color: var(--muted);
+            font-weight: 850;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: none;
+            place-items: center;
+            padding: 18px;
+            background: rgba(3, 8, 15, .78);
+            backdrop-filter: blur(14px);
+        }
+        .modal:target { display: grid; }
+        .modal-card {
+            width: min(100%, 720px);
+            max-height: 92vh;
+            overflow-y: auto;
+            background: var(--panel);
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, .46);
+        }
+        .modal-head,
+        .modal-body,
+        .modal-actions { padding: 18px; }
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .modal-title { font-size: 22px; font-weight: 950; }
+        .modal-hint { margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: 750; }
+        .close { color: var(--muted); font-size: 24px; line-height: 1; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .field { display: grid; gap: 7px; }
+        .field.full { grid-column: 1 / -1; }
+        label {
+            color: var(--low);
+            font-size: 10px;
+            font-weight: 950;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        input,
+        textarea,
+        select {
+            width: 100%;
+            min-height: 42px;
+            padding: 0 12px;
+            color: var(--text);
+            background: #07111F;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+        textarea { padding: 10px 12px; resize: vertical; }
+        input[type="checkbox"] { width: auto; min-height: auto; }
+        input[type="file"] { padding: 9px 12px; }
+        .field-error { min-height: 14px; color: var(--danger); font-size: 11px; font-weight: 800; }
+        .check-row {
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 850;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+
+        @media (max-width: 980px) {
+            .topbar-inner,
+            .content { grid-template-columns: 1fr; }
+            .restaurant-name { justify-self: start; }
+            .side { position: static; }
+            .products-header { align-items: flex-start; flex-direction: column; }
+            .nav-dropdown { position: fixed; left: 14px; right: 14px; top: 118px; width: auto; }
+        }
+        @media (max-width: 640px) {
+            .content { padding: 14px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .primary-button,
+            .action-button { width: 100%; }
+            .modal-actions { flex-direction: column; }
+        }
+    </style>
+    {% include 'components/app_topbar_styles.html' %}
+</head>
+<body>
+    {% include 'components/app_topbar.html' with active_module='products' %}
+
+    <main class="content">
+        <aside class="side">
+            <div class="side-title">Productos</div>
+            <a class="side-link" href="/categories/"><span>Categorías</span><span>{{ categories|length }}</span></a>
+            <a class="side-link active" href="/products/"><span>Productos</span><span>{{ products|length }}</span></a>
+        </aside>
+
+        <section class="main">
+            <div class="products-header">
+                <div>
+                    <div class="eyebrow">Catálogo POS</div>
+                    <h1>Productos</h1>
+                </div>
+                {% if can_manage_products %}
+                    <a class="primary-button" href="#create-product"><span>+</span><span>Nuevo producto</span></a>
+                {% endif %}
+            </div>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="toast">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if products %}
+                <section class="product-grid" aria-label="Listado de productos">
+                    {% for product in products %}
+                        <article class="product-card">
+                            <div class="product-media" {% if product.color %}style="color:{{ product.color }};"{% endif %}>
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                    {{ product.icon|default:product.category.icon|default:"+" }}
+                                {% endif %}
+                            </div>
+                            <div class="product-body">
+                                <div class="meta-row">
+                                    <span class="category-pill">{{ product.category.name }}</span>
+                                    <span class="price">${{ product.price|floatformat:0 }}</span>
+                                </div>
+                                <div class="product-title">{{ product.name }}</div>
+                                <div class="product-description">{{ product.description|default:"Sin descripción"|truncatechars:90 }}</div>
+                                <div class="badge-row">
+                                    <span class="status-pill {% if not product.is_active %}off{% endif %}">
+                                        {% if product.is_active %}Activo{% else %}Inactivo{% endif %}
+                                    </span>
+                                    <span class="status-pill {% if not product.is_pos_available %}off{% endif %}">
+                                        {% if product.is_pos_available %}POS{% else %}Sin POS{% endif %}
+                                    </span>
+                                    <span class="status-pill {% if not product.is_kitchen_available %}warn{% endif %}">
+                                        {% if product.is_kitchen_available %}Kitchen{% else %}Sin Kitchen{% endif %}
+                                    </span>
+                                </div>
+
+                                {% if can_manage_products %}
+                                    <div class="card-actions">
+                                        <a class="action-button secondary" href="#edit-product-{{ product.id }}">Editar</a>
+                                        <form class="toggle-form" method="post" action="{% url 'product_toggle' product.id %}">
+                                            {% csrf_token %}
+                                            <button class="action-button {% if product.is_active %}danger{% else %}secondary{% endif %}" type="submit">
+                                                {% if product.is_active %}Desactivar{% else %}Activar{% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </section>
+            {% else %}
+                <section class="panel">
+                    <div class="empty">Aún no hay productos creados para este restaurante.</div>
+                </section>
+            {% endif %}
+        </section>
+    </main>
+
+    {% if can_manage_products %}
+        <div class="modal" id="create-product">
+            <form class="modal-card" method="post" action="{% url 'product_create' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-head">
+                    <div>
+                        <div class="eyebrow">Nuevo producto</div>
+                        <div class="modal-title">Crear producto</div>
+                        <div class="modal-hint">Este producto puede aparecer en POS según sus estados.</div>
+                    </div>
+                    <a class="close" href="#">×</a>
+                </div>
+                <div class="modal-body">
+                    {% include 'products/product_form_fields.html' with form=create_form %}
+                </div>
+                <div class="modal-actions">
+                    <a class="action-button secondary" href="#">Cancelar</a>
+                    <button class="primary-button" type="submit">Guardar</button>
+                </div>
+            </form>
+        </div>
+
+        {% for product in products %}
+            <div class="modal" id="edit-product-{{ product.id }}">
+                <form class="modal-card" method="post" action="{% url 'product_update' product.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-head">
+                        <div>
+                            <div class="eyebrow">Editar producto</div>
+                            <div class="modal-title">{{ product.name }}</div>
+                            <div class="modal-hint">Actualiza catálogo, disponibilidad y presentación visual.</div>
+                        </div>
+                        <a class="close" href="#">×</a>
+                    </div>
+                    <div class="modal-body">
+                        {% include 'products/product_form_fields.html' with form=product.edit_form %}
+                    </div>
+                    <div class="modal-actions">
+                        <a class="action-button secondary" href="#">Cancelar</a>
+                        <button class="primary-button" type="submit">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
