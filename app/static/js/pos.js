@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const popup = window.open(url, "_blank", "noopener,width=420,height=720");
 
         if (!popup) {
-            window.alert("El navegador bloqueó la impresión automática. Permite popups para MesaFlow.");
+            window.showToast("El navegador bloqueó la impresión automática. Permite popups para MesaFlow.", "warning");
         }
     };
 
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const showTableRequiredModal = () => {
         if (!tableRequiredModal) {
-            window.alert("Selecciona una mesa antes de continuar.");
+            window.showToast("Selecciona una mesa antes de continuar.", "warning");
             return;
         }
 
@@ -437,12 +437,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (activeOrder) {
-            window.alert(`La mesa ya tiene la orden #${activeOrder.order_id} en estado ${activeOrder.status_label}.`);
+            window.showToast(`La mesa ya tiene la orden #${activeOrder.order_id} en estado ${activeOrder.status_label}.`, "warning");
             return;
         }
 
         if (cart.size === 0) {
-            window.alert("Selecciona productos para iniciar la orden.");
+            window.showToast("Selecciona productos para iniciar la orden.", "warning");
             return;
         }
 
@@ -489,9 +489,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.auto_print_kitchen) {
                 openPrintWindow(data.kitchen_print_url);
             }
-            window.alert(`Orden #${data.order_id} enviada a cocina.`);
+            window.showToast(`Orden #${data.order_id} enviada a cocina.`, "success");
         } catch (error) {
-            window.alert(error.message);
+            window.showToast(error.message, "error");
         } finally {
             sendOrderButton.disabled = false;
         }
@@ -504,12 +504,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!activeOrder) {
-            window.alert("La mesa seleccionada no tiene una orden activa.");
+            window.showToast("La mesa seleccionada no tiene una orden activa.", "warning");
             return;
         }
 
         if (activeOrder.status !== "READY") {
-            window.alert("Solo puedes cobrar cuando la orden esté en estado Lista.");
+            window.showToast("Solo puedes cobrar cuando la orden esté en estado Lista.", "warning");
             return;
         }
 
@@ -576,9 +576,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (payment.auto_print_cashier) {
                 openPrintWindow(payment.receipt_print_url);
             }
-            window.alert(`Orden #${payment.order_id} pagada por ${formatMoney(Number(payment.total))}.`);
+            window.showToast(`Orden #${payment.order_id} pagada por ${formatMoney(Number(payment.total))}.`, "success");
         } catch (error) {
-            window.alert(error.message);
+            window.showToast(error.message, "error");
             updateCheckoutState();
         } finally {
             confirmPaymentButton.disabled = false;
@@ -662,7 +662,7 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 await fetchActiveOrder(selectedTable.id);
             } catch (error) {
-                window.alert(error.message);
+                window.showToast(error.message, "error");
             }
         });
     });

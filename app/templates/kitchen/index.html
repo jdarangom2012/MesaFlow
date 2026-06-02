@@ -474,29 +474,6 @@
             border-color: rgba(255, 255, 255, .06);
         }
 
-        .toast {
-            position: fixed;
-            right: 22px;
-            bottom: 22px;
-            z-index: 40;
-            max-width: min(360px, calc(100vw - 32px));
-            padding: 12px 14px;
-            border-radius: 8px;
-            color: var(--text);
-            background: rgba(11, 23, 38, .96);
-            border: 1px solid rgba(0, 212, 255, .24);
-            box-shadow: 0 16px 44px rgba(0, 0, 0, .30);
-            transform: translateY(16px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .18s ease, transform .18s ease;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
         .empty {
             padding: 52px 18px;
             text-align: center;
@@ -619,12 +596,9 @@
         </section>
     </main>
 
-    <div class="toast" id="kitchen-toast" role="status" aria-live="polite"></div>
-
     <script>
         (() => {
             const region = document.getElementById("kitchen-orders-region");
-            const toast = document.getElementById("kitchen-toast");
 
             if (!region) {
                 return;
@@ -644,15 +618,7 @@
                     ?.split("=")[1] || "";
             };
 
-            const showToast = (message) => {
-                if (!toast) {
-                    return;
-                }
-
-                toast.textContent = message;
-                toast.classList.add("show");
-                window.setTimeout(() => toast.classList.remove("show"), 2600);
-            };
+            const notify = (message, type = "info") => window.showToast?.(message, type);
 
             const refreshKitchen = async () => {
                 try {
@@ -667,7 +633,7 @@
                     region.innerHTML = await response.text();
                     refreshKpis();
                 } catch (_error) {
-                    showToast("No se pudo actualizar cocina. Reintentando...");
+                    notify("No se pudo actualizar cocina. Reintentando...", "warning");
                 }
             };
 
@@ -731,10 +697,10 @@
                         throw new Error(payload.error || "No se pudo actualizar la orden.");
                     }
 
-                    showToast(`Orden #${payload.order_id} actualizada a ${payload.status_label}.`);
+                    notify(`Orden #${payload.order_id} actualizada a ${payload.status_label}.`, "success");
                     await refreshKitchen();
                 } catch (error) {
-                    showToast(error.message || "No se pudo actualizar la orden.");
+                    notify(error.message || "No se pudo actualizar la orden.", "error");
 
                     if (button) {
                         button.disabled = false;

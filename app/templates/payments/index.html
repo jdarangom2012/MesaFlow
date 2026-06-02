@@ -599,7 +599,7 @@
             {% if messages %}
                 <div class="messages">
                     {% for message in messages %}
-                        <div class="message {{ message.tags }}">{{ message }}</div>
+                        <div class="message {{ message.tags }}" data-toast-message="{{ message|escape }}" data-toast-type="{{ message.tags|default:'info' }}" hidden>{{ message }}</div>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -738,7 +738,9 @@
                 const popup = window.open(autoPrintReceiptUrl, "_blank", "noopener,width=420,height=720");
 
                 if (!popup) {
-                    console.warn("MesaFlow: el navegador bloqueó la impresión automática de caja.");
+                    window.addEventListener("DOMContentLoaded", () => {
+                        window.showToast?.("El navegador bloqueó la impresión automática de caja.", "warning");
+                    });
                 }
             }
 

@@ -377,7 +377,7 @@
 
         {% if messages %}
             {% for message in messages %}
-                <div class="message">{{ message }}</div>
+                <div class="message" data-toast-message="{{ message|escape }}" data-toast-type="{{ message.tags|default:'info' }}" hidden>{{ message }}</div>
             {% endfor %}
         {% endif %}
 

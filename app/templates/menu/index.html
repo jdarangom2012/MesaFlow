@@ -559,9 +559,9 @@
 
                     cart.clear();
                     renderCart();
-                    window.alert(`Pedido #${data.order_id} enviado a cocina.`);
+                    window.showToast(`Pedido #${data.order_id} enviado a cocina.`, "success");
                 } catch (error) {
-                    window.alert(error.message);
+                    window.showToast(error.message, "error");
                     sendButton.disabled = false;
                 }
             });
@@ -569,5 +569,7 @@
             renderCart();
         })();
     </script>
+    {% include 'components/toast_styles.html' %}
+    {% include 'components/toast.html' %}
 </body>
 </html>
