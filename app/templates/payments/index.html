@@ -394,6 +394,46 @@
             border: 1px solid var(--line);
         }
 
+        .payment-section {
+            margin-top: 14px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 8px;
+            background: rgba(7, 17, 31, .34);
+        }
+
+        .payment-section-title {
+            color: var(--cyan);
+            font-size: 10px;
+            font-weight: 950;
+            letter-spacing: .10em;
+            text-transform: uppercase;
+        }
+
+        .payment-summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .payment-summary-row strong { color: var(--text); }
+
+        .payment-final-row {
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        .payment-final-row strong {
+            color: var(--cyan);
+            font-size: 25px;
+            font-weight: 950;
+        }
+
         .total-label {
             color: var(--low);
             font-size: 10px;
@@ -488,6 +528,9 @@
             color: var(--text);
             font-weight: 950;
         }
+        .change-box strong { color: var(--mint); font-size: 18px; }
+        .cash-field.is-disabled { opacity: .52; }
+        .cash-field.is-disabled input { cursor: not-allowed; }
 
         .modal-actions {
             display: flex;
@@ -672,22 +715,25 @@
                     </div>
 
                     <div class="modal-body">
-                        <div class="total-box">
-                            <div class="total-label">Total a pagar</div>
-                            <div class="total-value">${{ order.total|floatformat:0 }}</div>
-                        </div>
-
-                        <div class="form-grid">
-                            <div class="field">
-                                <label for="tip-{{ order.id }}">Propina</label>
-                                <input id="tip-{{ order.id }}" class="tip-input" type="number" min="0" step="100" value="0" inputmode="decimal">
+                        <section class="payment-section">
+                            <div class="payment-section-title">Resumen de cobro</div>
+                            <div class="payment-summary-row">
+                                <span>Total orden</span>
+                                <strong class="order-total-output">${{ order.total|floatformat:0 }}</strong>
                             </div>
-
-                            <div class="field">
-                                <label for="cash-{{ order.id }}">Efectivo recibido</label>
-                                <input id="cash-{{ order.id }}" class="cash-input" type="number" min="0" step="100" value="{{ order.total|floatformat:0 }}" inputmode="decimal">
+                            <div class="payment-summary-row">
+                                <span>Propina</span>
+                                <strong class="tip-output">$0</strong>
                             </div>
+                            <div class="payment-summary-row payment-final-row">
+                                <span>Total final</span>
+                                <strong class="final-total-output">${{ order.total|floatformat:0 }}</strong>
+                            </div>
+                        </section>
 
+                        <section class="payment-section">
+                            <div class="payment-section-title">Pago</div>
+                            <div class="form-grid">
                             <div class="field full">
                                 <label>Método</label>
                                 <div class="method-group">
@@ -707,13 +753,24 @@
                             </div>
 
                             <div class="field full">
+                                <label for="tip-{{ order.id }}">Propina</label>
+                                <input id="tip-{{ order.id }}" class="tip-input" name="tip" type="number" min="0" step="100" value="0" inputmode="decimal">
+                            </div>
+
+                            <div class="field full cash-field">
+                                <label for="cash-{{ order.id }}">Efectivo recibido</label>
+                                <input id="cash-{{ order.id }}" class="cash-input" name="cash_received" type="number" min="0" step="100" value="{{ order.total|floatformat:0 }}" inputmode="decimal" required>
+                            </div>
+
+                            <div class="field full">
                                 <label>Cambio</label>
                                 <div class="change-box">
-                                    <span>Total + propina</span>
-                                    <span class="change-output">$0</span>
+                                    <span>Cambio a devolver</span>
+                                    <strong class="change-output">$0</strong>
                                 </div>
                             </div>
-                        </div>
+                            </div>
+                        </section>
                     </div>
 
                     <div class="modal-actions">
@@ -748,16 +805,40 @@
                 const total = Number.parseFloat(form.dataset.total || "0");
                 const tipInput = form.querySelector(".tip-input");
                 const cashInput = form.querySelector(".cash-input");
+                const cashField = form.querySelector(".cash-field");
                 const changeOutput = form.querySelector(".change-output");
+                const tipOutput = form.querySelector(".tip-output");
+                const finalTotalOutput = form.querySelector(".final-total-output");
+                const paymentMethods = form.querySelectorAll('[name="payment_method"]');
 
                 const updateChange = () => {
-                    const tip = Number.parseFloat(tipInput.value || "0");
-                    const cash = Number.parseFloat(cashInput.value || "0");
-                    changeOutput.textContent = formatMoney(cash - total - tip);
+                    const tip = Math.max(Number.parseFloat(tipInput.value || "0"), 0);
+                    const cash = Math.max(Number.parseFloat(cashInput.value || "0"), 0);
+                    const method = form.querySelector('[name="payment_method"]:checked')?.value || "CASH";
+                    const finalTotal = total + tip;
+                    const change = method === "CASH" ? Math.max(cash - finalTotal, 0) : 0;
+                    tipOutput.textContent = formatMoney(tip);
+                    finalTotalOutput.textContent = formatMoney(finalTotal);
+                    changeOutput.textContent = formatMoney(change);
+                    cashInput.disabled = method !== "CASH";
+                    cashInput.required = method === "CASH";
+                    cashField.classList.toggle("is-disabled", method !== "CASH");
                 };
 
                 tipInput.addEventListener("input", updateChange);
                 cashInput.addEventListener("input", updateChange);
+                paymentMethods.forEach((input) => input.addEventListener("change", updateChange));
+                form.addEventListener("submit", (event) => {
+                    const method = form.querySelector('[name="payment_method"]:checked')?.value || "CASH";
+                    const tip = Math.max(Number.parseFloat(tipInput.value || "0"), 0);
+                    const cash = Math.max(Number.parseFloat(cashInput.value || "0"), 0);
+
+                    if (method === "CASH" && cash < total + tip) {
+                        event.preventDefault();
+                        window.showToast?.("El efectivo recibido no cubre el total", "warning");
+                        cashInput.focus();
+                    }
+                });
                 updateChange();
             });
         })();

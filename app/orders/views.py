@@ -302,6 +302,15 @@ def pay_order(request, order_id):
         if order.status != 'READY':
             return JsonResponse({'success': False, 'error': 'Solo se pueden cobrar órdenes listas'}, status=400)
 
+        try:
+            tip = max(Decimal(str(payload.get('tip', 0) or 0)), Decimal('0'))
+            cash_received = max(Decimal(str(payload.get('cash_received', 0) or 0)), Decimal('0'))
+        except InvalidOperation:
+            return JsonResponse({'success': False, 'error': 'Revisa los valores ingresados para el pago'}, status=400)
+
+        if payment_method == 'CASH' and cash_received < order.total + tip:
+            return JsonResponse({'success': False, 'error': 'El efectivo recibido no cubre el total'}, status=400)
+
         order.status = 'PAID'
         order.payment_method = payment_method
         order.paid_at = timezone.now()

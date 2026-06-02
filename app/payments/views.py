@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from django.db.models import Avg, Count, DecimalField, Sum, Value
 from django.db.models.functions import Coalesce
@@ -92,6 +93,17 @@ def confirm_payment(request, order_id):
 
         if order.status != 'READY':
             messages.error(request, 'Solo se pueden cobrar órdenes en estado READY.')
+            return redirect('payments:dashboard')
+
+        try:
+            tip = max(Decimal(request.POST.get('tip', '0') or '0'), Decimal('0'))
+            cash_received = max(Decimal(request.POST.get('cash_received', '0') or '0'), Decimal('0'))
+        except InvalidOperation:
+            messages.error(request, 'Revisa los valores ingresados para el pago.')
+            return redirect('payments:dashboard')
+
+        if payment_method == 'CASH' and cash_received < order.total + tip:
+            messages.warning(request, 'El efectivo recibido no cubre el total')
             return redirect('payments:dashboard')
 
         order.status = 'PAID'

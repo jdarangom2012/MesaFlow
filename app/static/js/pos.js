@@ -34,7 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalMethodButtons = document.querySelectorAll(".pos-modal-method");
     const modalSubtotalNode = document.getElementById("pos-modal-subtotal");
     const modalTaxNode = document.getElementById("pos-modal-tax");
-    const modalTotalNode = document.getElementById("pos-modal-total");
+    const modalFinalTotalNode = document.getElementById("pos-modal-final-total");
+    const modalTipInput = document.getElementById("pos-modal-tip");
+    const modalTipOutput = document.getElementById("pos-modal-tip-output");
+    const modalCashInput = document.getElementById("pos-modal-cash");
+    const modalCashField = document.getElementById("pos-modal-cash-field");
+    const modalChangeNode = document.getElementById("pos-modal-change");
     const printActions = document.getElementById("pos-print-actions");
     const printTicketButton = document.getElementById("pos-print-ticket");
     const printKitchenButton = document.getElementById("pos-print-kitchen");
@@ -205,6 +210,26 @@ document.addEventListener("DOMContentLoaded", () => {
             button.style.color = isSelected ? "#07111F" : "white";
             button.style.borderColor = isSelected ? "rgba(0,212,255,.24)" : "rgba(255,255,255,.08)";
         });
+        updatePaymentModalTotals();
+    };
+
+    const getPaymentModalTotals = () => {
+        const orderTotal = Number(activeOrder?.total || 0);
+        const tip = Math.max(Number.parseFloat(modalTipInput?.value || "0"), 0);
+        const cash = Math.max(Number.parseFloat(modalCashInput?.value || "0"), 0);
+        const finalTotal = orderTotal + tip;
+        const change = selectedPaymentMethod === "CASH" ? Math.max(cash - finalTotal, 0) : 0;
+
+        return { orderTotal, tip, cash, finalTotal, change };
+    };
+
+    const updatePaymentModalTotals = () => {
+        const totals = getPaymentModalTotals();
+        if (modalTipOutput) modalTipOutput.textContent = formatMoney(totals.tip);
+        if (modalFinalTotalNode) modalFinalTotalNode.textContent = formatMoney(totals.finalTotal);
+        if (modalChangeNode) modalChangeNode.textContent = formatMoney(totals.change);
+        if (modalCashInput) modalCashInput.disabled = selectedPaymentMethod !== "CASH";
+        if (modalCashField) modalCashField.style.opacity = selectedPaymentMethod === "CASH" ? "1" : ".52";
     };
 
     const updateCheckoutState = () => {
@@ -524,7 +549,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         modalSubtotalNode.textContent = formatMoney(Number(activeOrder.subtotal || 0));
         modalTaxNode.textContent = formatMoney(Number(activeOrder.tax || 0));
-        modalTotalNode.textContent = formatMoney(Number(activeOrder.total || 0));
+        if (modalTipInput) modalTipInput.value = "0";
+        if (modalCashInput) modalCashInput.value = String(Number(activeOrder.total || 0));
+        updatePaymentModalTotals();
         paymentModal.hidden = false;
         paymentModal.style.display = "flex";
     };
@@ -547,6 +574,8 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify({
                 payment_method: selectedPaymentMethod,
+                tip: getPaymentModalTotals().tip,
+                cash_received: getPaymentModalTotals().cash,
             }),
         });
         const data = await readJsonResponse(response, "No se pudo registrar el pago.");
@@ -559,6 +588,13 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const confirmPayment = async () => {
+        const totals = getPaymentModalTotals();
+        if (selectedPaymentMethod === "CASH" && totals.cash < totals.finalTotal) {
+            window.showToast("El efectivo recibido no cubre el total", "warning");
+            modalCashInput?.focus();
+            return;
+        }
+
         confirmPaymentButton.disabled = true;
         checkoutButton.disabled = true;
 
@@ -576,7 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (payment.auto_print_cashier) {
                 openPrintWindow(payment.receipt_print_url);
             }
-            window.showToast(`Orden #${payment.order_id} pagada por ${formatMoney(Number(payment.total))}.`, "success");
+            window.showToast("Pago registrado correctamente", "success");
         } catch (error) {
             window.showToast(error.message, "error");
             updateCheckoutState();
@@ -710,6 +746,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (confirmPaymentButton) {
         confirmPaymentButton.addEventListener("click", confirmPayment);
     }
+
+    modalTipInput?.addEventListener("input", updatePaymentModalTotals);
+    modalCashInput?.addEventListener("input", updatePaymentModalTotals);
 
     if (tableRequiredClose) {
         tableRequiredClose.addEventListener("click", closeTableRequiredModal);
