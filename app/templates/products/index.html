@@ -206,6 +206,59 @@
             font-weight: 850;
         }
 
+        .product-search-panel {
+            margin-bottom: 16px;
+            padding: 14px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+        .product-search-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .product-search-shell {
+            min-width: 0;
+            flex: 1;
+            position: relative;
+        }
+        .product-search-icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            display: grid;
+            place-items: center;
+            color: var(--cyan);
+            font-size: 17px;
+            pointer-events: none;
+            transform: translateY(-50%);
+        }
+        .product-search-input {
+            width: 100%;
+            min-height: 50px;
+            padding: 0 16px 0 45px;
+            color: var(--text);
+            background: rgba(7, 17, 31, .88);
+            border: 1px solid var(--line-strong);
+            border-radius: 10px;
+            outline: none;
+            transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+        }
+        .product-search-input::placeholder { color: var(--low); }
+        .product-search-input:focus {
+            background: #07111F;
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, .10), 0 10px 30px rgba(0, 229, 255, .08);
+        }
+        .product-search-count {
+            flex: 0 0 auto;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -217,6 +270,15 @@
             border: 1px solid var(--line);
             border-radius: 8px;
             overflow: hidden;
+            transition: opacity .14s ease, transform .14s ease, border-color .18s ease, box-shadow .18s ease;
+        }
+        .product-card:hover {
+            border-color: var(--line-strong);
+            box-shadow: 0 14px 34px rgba(0, 229, 255, .06);
+        }
+        .product-card.is-filtered-out {
+            opacity: 0;
+            transform: translateY(5px);
         }
         .product-media {
             height: 150px;
@@ -306,6 +368,7 @@
             color: var(--muted);
             font-weight: 850;
         }
+        [hidden] { display: none !important; }
 
         .modal {
             position: fixed;
@@ -395,6 +458,8 @@
         @media (max-width: 640px) {
             .content { padding: 14px; }
             .form-grid { grid-template-columns: 1fr; }
+            .product-search-row { align-items: stretch; flex-direction: column; gap: 9px; }
+            .product-search-count { padding-left: 2px; }
             .primary-button,
             .action-button { width: 100%; }
             .modal-actions { flex-direction: column; }
@@ -432,9 +497,24 @@
             {% endif %}
 
             {% if products %}
+                <section class="product-search-panel" aria-label="Buscar productos">
+                    <div class="product-search-row">
+                        <label class="product-search-shell" for="product-search">
+                            <span class="product-search-icon" aria-hidden="true">⌕</span>
+                            <input class="product-search-input" id="product-search" type="search" placeholder="Buscar producto..." autocomplete="off">
+                        </label>
+                        <div class="product-search-count" id="product-search-count" aria-live="polite">{{ products|length }} productos encontrados</div>
+                    </div>
+                </section>
+
                 <section class="product-grid" aria-label="Listado de productos">
                     {% for product in products %}
-                        <article class="product-card">
+                        <article
+                            class="product-card"
+                            data-name="{{ product.name|escape }}"
+                            data-category="{{ product.category.name|escape }}"
+                            data-description="{{ product.description|default:''|escape }}"
+                        >
                             <div class="product-media" {% if product.color %}style="color:{{ product.color }};"{% endif %}>
                                 {% if product.image %}
                                     <img src="{{ product.image.url }}" alt="{{ product.name }}">
@@ -475,6 +555,9 @@
                             </div>
                         </article>
                     {% endfor %}
+                </section>
+                <section class="panel" id="product-search-empty" hidden>
+                    <div class="empty">No se encontraron productos</div>
                 </section>
             {% else %}
                 <section class="panel">
@@ -529,5 +612,6 @@
             </div>
         {% endfor %}
     {% endif %}
+    <script src="{% static 'js/products.js' %}" defer></script>
 </body>
 </html>
