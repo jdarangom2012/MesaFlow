@@ -300,7 +300,7 @@ def pos(request):
         .order_by('sort_order', 'name')
     )
 
-    tables = list(RestaurantTable.objects.filter(restaurant=request.restaurant).order_by('name'))
+    tables = list(RestaurantTable.objects.filter(restaurant=request.restaurant, is_active=True).order_by('sort_order', 'name'))
     active_orders = (
         Order.objects
         .filter(restaurant=request.restaurant, status__in=['OPEN', 'PREPARING', 'READY'])

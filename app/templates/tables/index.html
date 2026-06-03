@@ -113,6 +113,43 @@
             border-radius: 8px;
         }
 
+        .hero-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .primary-button,
+        .secondary-button,
+        .danger-button {
+            width: auto;
+            min-width: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 14px;
+        }
+
+        .primary-button {
+            border: none;
+            background: linear-gradient(135deg, var(--cyan), var(--mint));
+            color: #07111F;
+            box-shadow: 0 16px 36px rgba(0, 212, 255, .16);
+        }
+
+        .secondary-button {
+            background: rgba(0, 212, 255, .08);
+            color: var(--cyan);
+        }
+
+        .danger-button {
+            border-color: rgba(255, 91, 110, .24);
+            background: rgba(255, 91, 110, .08);
+            color: var(--danger);
+        }
+
         .eyebrow {
             color: var(--cyan);
             font-size: 11px;
@@ -180,6 +217,7 @@
         .table-card.paid { border-color: rgba(143, 167, 192, .22); }
         .table-card.reserved { border-color: rgba(255, 193, 7, .30); }
         .table-card.payment_pending { border-color: rgba(255, 91, 110, .34); }
+        .table-card.inactive { opacity: .62; border-color: rgba(143, 167, 192, .18); }
 
         .table-head {
             display: flex;
@@ -200,6 +238,30 @@
             font-weight: 750;
         }
 
+        .table-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .type-pill,
+        .active-pill {
+            border-radius: 999px;
+            padding: 6px 9px;
+            font-size: 10px;
+            font-weight: 950;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .type-pill.salon { color: var(--cyan); background: rgba(0, 212, 255, .10); border: 1px solid rgba(0, 212, 255, .22); }
+        .type-pill.vip { color: #C084FC; background: rgba(192, 132, 252, .10); border: 1px solid rgba(192, 132, 252, .28); }
+        .type-pill.terrace { color: #00FFC6; background: rgba(0, 255, 198, .10); border: 1px solid rgba(0, 255, 198, .22); }
+        .type-pill.bar { color: #FFC107; background: rgba(255, 193, 7, .10); border: 1px solid rgba(255, 193, 7, .24); }
+        .active-pill { color: var(--mint); background: rgba(0, 255, 198, .08); border: 1px solid rgba(0, 255, 198, .18); }
+        .active-pill.inactive { color: var(--danger); background: rgba(255, 91, 110, .08); border-color: rgba(255, 91, 110, .20); }
+
         .status-pill {
             border-radius: 999px;
             padding: 7px 10px;
@@ -217,6 +279,7 @@
         .status-pill.paid { background: var(--low); color: white; }
         .status-pill.reserved { background: var(--amber); }
         .status-pill.payment_pending { background: var(--danger); color: white; }
+        .status-pill.inactive { background: var(--low); color: white; }
 
         .order-box {
             flex: 1;
@@ -255,6 +318,13 @@
             margin-top: 14px;
         }
 
+        .admin-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
         button {
             width: 100%;
             height: 42px;
@@ -268,10 +338,142 @@
             font-weight: 900;
         }
 
+        button:disabled {
+            opacity: .46;
+            cursor: not-allowed;
+        }
+
         .release-button {
             background: linear-gradient(135deg, var(--cyan), var(--mint));
             border: none;
             color: #07111F;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            min-height: 280px;
+            display: grid;
+            place-items: center;
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(145deg, rgba(0, 212, 255, .08), rgba(0, 255, 198, .03));
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .empty-icon { font-size: 42px; }
+        .empty-title { margin-top: 10px; font-size: 24px; font-weight: 950; }
+        .empty-copy { margin: 8px auto 18px; max-width: 420px; color: var(--muted); font-weight: 750; }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(7, 17, 31, .78);
+            backdrop-filter: blur(16px);
+        }
+
+        .modal-backdrop.is-open { display: flex; }
+
+        .modal-card {
+            width: min(100%, 520px);
+            max-height: min(760px, calc(100vh - 36px));
+            overflow: auto;
+            background: rgba(11, 23, 38, .98);
+            border: 1px solid rgba(0, 212, 255, .22);
+            border-radius: 14px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, .46), 0 0 30px rgba(0, 212, 255, .08);
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 20px 22px;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        .modal-title { font-size: 22px; font-weight: 950; }
+        .modal-subtitle { margin-top: 4px; color: var(--muted); font-size: 13px; font-weight: 750; }
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--card);
+            color: var(--muted);
+            border-color: rgba(255, 255, 255, .08);
+        }
+
+        .modal-form {
+            display: grid;
+            gap: 14px;
+            padding: 22px;
+        }
+
+        .form-field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .form-field label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .form-field input,
+        .form-field select {
+            width: 100%;
+            height: 46px;
+            border: 1px solid rgba(0, 212, 255, .18);
+            border-radius: 10px;
+            background: rgba(7, 17, 31, .72);
+            color: var(--text);
+            padding: 0 13px;
+            outline: none;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            border-color: rgba(0, 212, 255, .50);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, .10);
+        }
+
+        .checkbox-field {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 13px;
+            border: 1px solid rgba(0, 212, 255, .12);
+            border-radius: 10px;
+            background: rgba(7, 17, 31, .38);
+        }
+
+        .checkbox-field input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--cyan);
+        }
+
+        .form-errors {
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 6px;
         }
 
         @media (max-width: 980px) {
@@ -288,6 +490,10 @@
             }
 
             .summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .table-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
@@ -316,7 +522,24 @@
                 grid-template-columns: 1fr;
             }
 
+            .hero-actions {
+                justify-content: stretch;
+            }
+
+            .hero-actions .primary-button {
+                width: 100%;
+            }
+
             .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .table-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions,
+            .admin-actions {
                 grid-template-columns: 1fr;
             }
         }
@@ -333,8 +556,19 @@
                     <div class="eyebrow">Operación de mesas</div>
                     <div class="title">Mesas en sala</div>
                 </div>
-                <div class="restaurant-name">{{ restaurant_name }}</div>
+                <div class="hero-actions">
+                    {% if can_manage_tables %}
+                        <button class="primary-button" type="button" data-modal-target="table-create-modal">+ Nueva mesa</button>
+                    {% endif %}
+                    <div class="restaurant-name">{{ restaurant_name }}</div>
+                </div>
             </header>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div data-toast-message="{{ message|escape }}" data-toast-type="{{ message.tags|default:'info' }}" hidden>{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
             <section class="summary" aria-label="Resumen de estados">
                 <article class="summary-card">
@@ -362,6 +596,12 @@
                             <div>
                                 <div class="table-name">{{ card.table.name }}</div>
                                 <div class="capacity">{{ card.table.capacity }} personas</div>
+                                <div class="table-meta-row">
+                                    <span class="type-pill {{ card.table.type|lower }}">{{ card.table.get_type_display }}</span>
+                                    <span class="active-pill {% if not card.table.is_active %}inactive{% endif %}">
+                                        {% if card.table.is_active %}Activa{% else %}Inactiva{% endif %}
+                                    </span>
+                                </div>
                             </div>
                             <span class="status-pill {{ card.visual_status }}">
                                 {{ card.visual_label }}
@@ -382,22 +622,140 @@
                         <div class="actions">
                             <form method="post" action="{% url 'close_table' card.table.id %}">
                                 {% csrf_token %}
-                                <button type="submit">Cerrar mesa</button>
+                                <button type="submit" {% if not card.table.is_active %}disabled{% endif %}>Cerrar mesa</button>
                             </form>
                             <form method="post" action="{% url 'release_table' card.table.id %}">
                                 {% csrf_token %}
-                                <button class="release-button" type="submit">Liberar</button>
+                                <button class="release-button" type="submit" {% if not card.table.is_active %}disabled{% endif %}>Liberar</button>
                             </form>
                         </div>
+
+                        {% if can_manage_tables %}
+                            <div class="admin-actions" aria-label="Administrar {{ card.table.name }}">
+                                <button class="secondary-button" type="button" data-modal-target="table-edit-modal-{{ card.table.id }}">Editar</button>
+                                <form method="post" action="{% url 'table_delete' card.table.id %}" data-deactivate-form>
+                                    {% csrf_token %}
+                                    <button class="danger-button" type="submit" {% if not card.table.is_active %}disabled{% endif %}>Desactivar</button>
+                                </form>
+                            </div>
+                        {% endif %}
                     </article>
                 {% empty %}
-                    <article class="table-card">
-                        <div class="table-name">Sin mesas</div>
-                        <div class="capacity">Crea mesas para este restaurante desde el admin.</div>
+                    <article class="empty-state">
+                        <div>
+                            <div class="empty-icon" aria-hidden="true">🍽️</div>
+                            <div class="empty-title">No hay mesas configuradas</div>
+                            <div class="empty-copy">Crea mesas para comenzar la operación del restaurante.</div>
+                            {% if can_manage_tables %}
+                                <button class="primary-button" type="button" data-modal-target="table-create-modal">+ Crear primera mesa</button>
+                            {% endif %}
+                        </div>
                     </article>
                 {% endfor %}
             </section>
         </section>
     </main>
+
+    {% if can_manage_tables %}
+        <section class="modal-backdrop" id="table-create-modal" aria-hidden="true">
+            <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="table-create-title">
+                <div class="modal-head">
+                    <div>
+                        <div class="modal-title" id="table-create-title">Nueva mesa</div>
+                        <div class="modal-subtitle">Configura capacidad, tipo y disponibilidad operativa.</div>
+                    </div>
+                    <button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+                </div>
+                <form class="modal-form" method="post" action="{% url 'table_create' %}">
+                    {% csrf_token %}
+                    {% for field in create_form %}
+                        <div class="{% if field.field.widget.input_type == 'checkbox' %}checkbox-field{% else %}form-field{% endif %}">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="form-errors">{{ field.errors|join:", " }}</div>{% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="modal-actions">
+                        <button class="secondary-button" type="button" data-modal-close>Cancelar</button>
+                        <button class="primary-button" type="submit">Crear mesa</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        {% for card in table_cards %}
+            <section class="modal-backdrop" id="table-edit-modal-{{ card.table.id }}" aria-hidden="true">
+                <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="table-edit-title-{{ card.table.id }}">
+                    <div class="modal-head">
+                        <div>
+                            <div class="modal-title" id="table-edit-title-{{ card.table.id }}">Editar {{ card.table.name }}</div>
+                            <div class="modal-subtitle">Ajusta capacidad, tipo y estado activo de la mesa.</div>
+                        </div>
+                        <button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+                    </div>
+                    <form class="modal-form" method="post" action="{% url 'table_edit' card.table.id %}">
+                        {% csrf_token %}
+                        {% for field in card.table.edit_form %}
+                            <div class="{% if field.field.widget.input_type == 'checkbox' %}checkbox-field{% else %}form-field{% endif %}">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}<div class="form-errors">{{ field.errors|join:", " }}</div>{% endif %}
+                            </div>
+                        {% endfor %}
+                        <div class="modal-actions">
+                            <button class="secondary-button" type="button" data-modal-close>Cancelar</button>
+                            <button class="primary-button" type="submit">Guardar cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        {% endfor %}
+    {% endif %}
+
+    <script>
+        (() => {
+            const openModal = (modal) => {
+                if (!modal) return;
+                modal.classList.add("is-open");
+                modal.setAttribute("aria-hidden", "false");
+            };
+            const closeModal = (modal) => {
+                if (!modal) return;
+                modal.classList.remove("is-open");
+                modal.setAttribute("aria-hidden", "true");
+            };
+
+            document.querySelectorAll("[data-modal-target]").forEach((button) => {
+                button.addEventListener("click", () => openModal(document.getElementById(button.dataset.modalTarget)));
+            });
+
+            document.querySelectorAll("[data-modal-close]").forEach((button) => {
+                button.addEventListener("click", () => closeModal(button.closest(".modal-backdrop")));
+            });
+
+            document.querySelectorAll(".modal-backdrop").forEach((modal) => {
+                modal.addEventListener("click", (event) => {
+                    if (event.target === modal) closeModal(modal);
+                });
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    document.querySelectorAll(".modal-backdrop.is-open").forEach(closeModal);
+                }
+            });
+
+            document.querySelectorAll("[data-deactivate-form]").forEach((form) => {
+                form.addEventListener("submit", async (event) => {
+                    if (!window.showToastConfirm) return;
+                    event.preventDefault();
+                    const accepted = await window.showToastConfirm("¿Desactivar esta mesa?", {
+                        type: "warning",
+                    });
+                    if (accepted) form.submit();
+                });
+            });
+        })();
+    </script>
 </body>
 </html>
