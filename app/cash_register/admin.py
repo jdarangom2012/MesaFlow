@@ -5,7 +5,22 @@ from .models import CashMovement, CashRegisterSession
 
 @admin.register(CashRegisterSession)
 class CashRegisterSessionAdmin(admin.ModelAdmin):
-    list_display = ('restaurant', 'status', 'opening_amount', 'expected_total', 'actual_total', 'difference', 'total_sales', 'total_tax', 'opened_by', 'opened_at', 'closed_at')
+    list_display = (
+        'restaurant',
+        'status',
+        'opening_amount',
+        'expected_cash',
+        'counted_cash',
+        'difference',
+        'total_cash',
+        'total_card',
+        'total_qr',
+        'total_sales',
+        'total_tax',
+        'opened_by',
+        'opened_at',
+        'closed_at',
+    )
     list_filter = ('status', 'restaurant', 'opened_at')
     search_fields = ('restaurant__name', 'opened_by__username', 'closed_by__username')
     readonly_fields = ('opened_at', 'closed_at', 'difference')

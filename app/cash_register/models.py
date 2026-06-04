@@ -27,10 +27,17 @@ class CashRegisterSession(models.Model):
     opening_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     expected_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     actual_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    expected_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    counted_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     difference = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_card = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_qr = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_sales = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_tips = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_tax = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_expenses = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    notes = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_OPEN)
     opened_at = models.DateTimeField(auto_now_add=True)
     closed_at = models.DateTimeField(null=True, blank=True)
@@ -50,17 +57,39 @@ class CashRegisterSession(models.Model):
 
 
 class CashMovement(models.Model):
+    TYPE_OPENING = 'OPENING'
+    TYPE_SALE = 'SALE'
     TYPE_INCOME = 'INCOME'
     TYPE_EXPENSE = 'EXPENSE'
+    TYPE_TIP = 'TIP'
+    TYPE_ADJUSTMENT = 'ADJUSTMENT'
+    TYPE_CLOSING = 'CLOSING'
     TYPE_ORDER_PAYMENT = 'ORDER_PAYMENT'
 
     TYPE_CHOICES = [
+        (TYPE_OPENING, 'Apertura'),
+        (TYPE_SALE, 'Venta'),
         (TYPE_INCOME, 'Ingreso'),
-        (TYPE_EXPENSE, 'Gasto'),
+        (TYPE_EXPENSE, 'Egreso'),
+        (TYPE_TIP, 'Propina'),
+        (TYPE_ADJUSTMENT, 'Ajuste'),
+        (TYPE_CLOSING, 'Cierre'),
         (TYPE_ORDER_PAYMENT, 'Pago orden'),
     ]
 
-    PAYMENT_METHOD_CHOICES = Order.PAYMENT_METHOD_CHOICES
+    PAYMENT_CASH = 'CASH'
+    PAYMENT_CARD = 'CARD'
+    PAYMENT_QR = 'DIGITAL'
+    PAYMENT_MIXED = 'MIXED'
+    PAYMENT_OTHER = 'OTHER'
+
+    PAYMENT_METHOD_CHOICES = [
+        (PAYMENT_CASH, 'Efectivo'),
+        (PAYMENT_CARD, 'Tarjeta'),
+        (PAYMENT_QR, 'QR'),
+        (PAYMENT_MIXED, 'Mixto'),
+        (PAYMENT_OTHER, 'Otro'),
+    ]
 
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='cash_movements')
     session = models.ForeignKey(CashRegisterSession, on_delete=models.CASCADE, related_name='movements')

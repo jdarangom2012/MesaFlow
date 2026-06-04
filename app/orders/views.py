@@ -1,6 +1,7 @@
 import json
 from decimal import Decimal, InvalidOperation
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -11,7 +12,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
 from accounts.permissions import ADMIN, CAJERO, COCINA, MESERO, SUPERADMIN, role_required, tenant_filter, user_can_access_module
-from cash_register.services import record_order_payment
+from cash_register.services import get_open_session, record_order_payment
 from kitchen.realtime import broadcast_order_created, broadcast_order_paid, broadcast_order_removed, broadcast_order_updated
 from products.models import Product
 from tables.models import RestaurantTable
@@ -88,6 +89,10 @@ def order_action(request, order_id):
             transaction.on_commit(lambda: broadcast_order_updated(order))
 
         elif action == 'mark_paid' and order.status == 'READY':
+            if not get_open_session(order.restaurant):
+                messages.warning(request, 'Debes abrir caja antes de registrar pagos')
+                return redirect(f'{reverse("orders:list")}?status={selected_status}')
+
             order.status = 'PAID'
             order.payment_method = order.payment_method or 'CASH'
             order.paid_at = timezone.now()
@@ -310,6 +315,9 @@ def pay_order(request, order_id):
 
         if payment_method == 'CASH' and cash_received < order.total + tip:
             return JsonResponse({'success': False, 'error': 'El efectivo recibido no cubre el total'}, status=400)
+
+        if not get_open_session(order.restaurant):
+            return JsonResponse({'success': False, 'error': 'Debes abrir caja antes de registrar pagos'}, status=400)
 
         order.status = 'PAID'
         order.payment_method = payment_method

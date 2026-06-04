@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Case, IntegerField, Value, When
@@ -7,7 +8,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods
 
 from accounts.permissions import ADMIN, COCINA, SUPERADMIN, role_required, tenant_filter
-from cash_register.services import record_order_payment
+from cash_register.services import get_open_session, record_order_payment
 from kitchen.realtime import broadcast_order_paid, broadcast_order_updated
 from orders.models import Order
 
@@ -87,6 +88,7 @@ def kitchen_display(request):
         )
         next_status = request.POST.get('status')
         valid_transition = False
+        cash_register_required = False
 
         with transaction.atomic():
             if order.status == 'OPEN' and next_status == 'PREPARING':
@@ -102,20 +104,24 @@ def kitchen_display(request):
                 valid_transition = True
 
             elif order.status == 'READY' and next_status == 'PAID':
-                order.status = 'PAID'
-                order.payment_method = order.payment_method or 'CASH'
-                order.paid_at = timezone.now()
-                order.save(update_fields=['status', 'payment_method', 'paid_at'])
-                _sync_table_status(order.table)
-                record_order_payment(order, request.user)
-                transaction.on_commit(lambda: broadcast_order_paid(order))
-                valid_transition = True
+                if not get_open_session(order.restaurant):
+                    cash_register_required = True
+
+                else:
+                    order.status = 'PAID'
+                    order.payment_method = order.payment_method or 'CASH'
+                    order.paid_at = timezone.now()
+                    order.save(update_fields=['status', 'payment_method', 'paid_at'])
+                    _sync_table_status(order.table)
+                    record_order_payment(order, request.user)
+                    transaction.on_commit(lambda: broadcast_order_paid(order))
+                    valid_transition = True
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             if not valid_transition:
                 return JsonResponse({
                     'success': False,
-                    'error': 'Transición no permitida para esta orden.',
+                    'error': 'Debes abrir caja antes de registrar pagos' if cash_register_required else 'Transición no permitida para esta orden.',
                 }, status=400)
 
             return JsonResponse({
@@ -124,6 +130,9 @@ def kitchen_display(request):
                 'status': order.status,
                 'status_label': order.get_status_display(),
             })
+
+        if cash_register_required:
+            messages.warning(request, 'Debes abrir caja antes de registrar pagos')
 
         return redirect('kitchen')
 

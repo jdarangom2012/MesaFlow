@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from accounts.permissions import ADMIN, CAJERO, SUPERADMIN, role_required, tenant_filter
-from cash_register.services import record_order_payment
+from cash_register.services import get_open_session, record_order_payment
 from kitchen.realtime import broadcast_order_paid
 from orders.models import Order
 from orders.views import sync_table_status
@@ -104,6 +104,10 @@ def confirm_payment(request, order_id):
 
         if payment_method == 'CASH' and cash_received < order.total + tip:
             messages.warning(request, 'El efectivo recibido no cubre el total')
+            return redirect('payments:dashboard')
+
+        if not get_open_session(order.restaurant):
+            messages.warning(request, 'Debes abrir caja antes de registrar pagos')
             return redirect('payments:dashboard')
 
         order.status = 'PAID'
