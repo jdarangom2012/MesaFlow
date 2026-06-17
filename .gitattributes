@@ -1,0 +1,3 @@
+# Pega esto en un archivo llamado .gitattributes en la raíz del repo
+*.html linguist-language=Python
+templates/**/*.html linguist-vendored
